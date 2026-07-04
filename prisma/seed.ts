@@ -44,6 +44,8 @@ async function main() {
       banheiros: 2,
       vagas: 2,
       areaM2: 180,
+      precoVenda: "750000",
+      precoLocacao: null,
       fotos: [
         { url: "https://picsum.photos/seed/bz-casa-1/1280/960", capa: true },
         { url: "https://picsum.photos/seed/bz-casa-2/1280/960", capa: false },
@@ -65,6 +67,8 @@ async function main() {
       banheiros: 1,
       vagas: 1,
       areaM2: 40,
+      precoVenda: null,
+      precoLocacao: "2200",
       fotos: [
         { url: "https://picsum.photos/seed/bz-sala-1/1280/960", capa: true },
         { url: "https://picsum.photos/seed/bz-sala-2/1280/960", capa: false },
@@ -85,6 +89,8 @@ async function main() {
       banheiros: 2,
       vagas: 1,
       areaM2: 68,
+      precoVenda: "520000",
+      precoLocacao: "2800",
       fotos: [
         { url: "https://picsum.photos/seed/bz-apto-1/1280/960", capa: true },
         { url: "https://picsum.photos/seed/bz-apto-2/1280/960", capa: false },
@@ -96,7 +102,10 @@ async function main() {
   for (const { fotos, ...dados } of imoveis) {
     const property = await prisma.property.upsert({
       where: { codigo: dados.codigo },
-      update: {},
+      update: {
+        precoVenda: dados.precoVenda,
+        precoLocacao: dados.precoLocacao,
+      },
       create: dados,
     });
 

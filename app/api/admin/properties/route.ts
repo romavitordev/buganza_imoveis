@@ -65,6 +65,8 @@ export async function POST(request: Request) {
           banheiros: input.banheiros,
           vagas: input.vagas,
           areaM2: input.areaM2,
+          precoVenda: input.precoVenda,
+          precoLocacao: input.precoLocacao,
           precoInterno: input.precoInterno,
         },
         include: { fotos: true },

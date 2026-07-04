@@ -32,10 +32,13 @@ export default function Hero() {
             Especialistas em imóveis residenciais e comerciais
           </div>
 
-          <h1 className="bz-heading bz-anim bz-head-anim">
-            Seu Imóvel,
-            <br />
-            Sem Complicação.
+          <h1 className="bz-heading">
+            <span className="bz-line">
+              <span className="bz-line-inner">Seu Imóvel,</span>
+            </span>
+            <span className="bz-line">
+              <span className="bz-line-inner">Sem Complicação.</span>
+            </span>
           </h1>
 
           <div className="bz-btn-row bz-anim bz-btns-anim">
@@ -53,7 +56,9 @@ export default function Hero() {
             </Link>
           </div>
 
-          <div className="bz-trust bz-anim bz-btns-anim">CRECI 118400</div>
+          <div className="bz-trust bz-anim bz-btns-anim">
+            CRECI 118400 · Sorocaba/SP e região
+          </div>
         </div>
 
         <div className="bz-right-tags bz-anim bz-btns-anim">

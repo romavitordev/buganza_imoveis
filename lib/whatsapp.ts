@@ -25,3 +25,10 @@ export function linkWhatsAppGeral(): string {
 export function linkWhatsAppImovel(titulo: string, codigo: string): string {
   return whatsappLink(mensagemImovel(titulo, codigo));
 }
+
+export const MENSAGEM_ANUNCIAR =
+  "Olá! Tenho um imóvel e gostaria de anunciá-lo com a Imóveis Buganza. Podemos conversar?";
+
+export function linkWhatsAppAnunciar(): string {
+  return whatsappLink(MENSAGEM_ANUNCIAR);
+}

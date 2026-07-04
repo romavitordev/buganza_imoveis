@@ -31,6 +31,8 @@ export default async function AdminDashboardPage() {
     banheiros: p.banheiros,
     vagas: p.vagas,
     areaM2: p.areaM2,
+    precoVenda: p.precoVenda?.toString() ?? null,
+    precoLocacao: p.precoLocacao?.toString() ?? null,
     precoInterno: p.precoInterno?.toString() ?? null,
     atualizadoEm: p.atualizadoEm.toISOString(),
     fotos: p.fotos.map((f) => ({

@@ -67,6 +67,11 @@ model Property {
   vagas        Int?
   areaM2       Int?
 
+  // Preços PÚBLICOS — exibidos no site (cards e detalhe).
+  // Ausente = "Sob consulta".
+  precoVenda   Decimal?     @db.Decimal(12, 2)
+  precoLocacao Decimal?     @db.Decimal(12, 2)
+
   // Preço para organização interna do casal — NUNCA aparece no site público.
   // A allowlist de lib/dto.ts garante que este campo jamais é serializado
   // em respostas de rotas públicas.

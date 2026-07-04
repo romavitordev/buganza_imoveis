@@ -12,6 +12,7 @@ import type { PublicPropertyDTO } from "@/lib/dto";
 import { capaDoImovel } from "@/lib/dto";
 import { linkWhatsAppImovel } from "@/lib/whatsapp";
 import { TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
+import { precoPrincipal, precoSecundario } from "@/lib/format";
 
 interface PropertyCardProps {
   imovel: PublicPropertyDTO;
@@ -23,6 +24,8 @@ export default function PropertyCard({
   prioridade,
 }: PropertyCardProps) {
   const capa = capaDoImovel(imovel);
+  const preco = precoPrincipal(imovel);
+  const precoExtra = precoSecundario(imovel);
 
   const caracteristicas = [
     imovel.quartos !== null && {
@@ -44,7 +47,7 @@ export default function PropertyCard({
   ].filter((c): c is { icone: typeof BedDouble; texto: string } => Boolean(c));
 
   return (
-    <article className="group flex flex-col gap-4">
+    <article className="group flex h-full flex-col gap-4">
       <Link
         href={`/imoveis/${imovel.slug}`}
         className="relative block aspect-[4/3] overflow-hidden rounded-2xl bg-mist"
@@ -69,11 +72,22 @@ export default function PropertyCard({
         </span>
       </Link>
 
-      <div className="flex flex-col gap-2 px-1">
-        <h3 className="text-lg font-normal leading-snug tracking-tight">
+      <div className="flex flex-1 flex-col gap-2 px-1">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-lg font-semibold tracking-tight">
+            {preco ?? "Sob consulta"}
+          </p>
+          {precoExtra && (
+            <p className="text-[12px] font-medium text-black/50">
+              ou {precoExtra}
+            </p>
+          )}
+        </div>
+
+        <h3 className="text-base font-normal leading-snug tracking-tight">
           <Link
             href={`/imoveis/${imovel.slug}`}
-            className="hover:opacity-70 transition-opacity"
+            className="transition-opacity hover:opacity-70"
           >
             {imovel.titulo}
           </Link>
@@ -87,7 +101,7 @@ export default function PropertyCard({
             {caracteristicas.map(({ icone: Icone, texto }) => (
               <li
                 key={texto}
-                className="flex items-center gap-1.5 rounded-pill border border-black/10 px-3 py-1 text-[11px] font-medium text-black/70"
+                className="flex items-center gap-1.5 rounded-pill border border-black/10 px-3 py-1 text-[11px] font-medium text-black/70 transition-colors group-hover:border-black/25"
               >
                 <Icone size={12} strokeWidth={2} aria-hidden="true" />
                 {texto}
@@ -96,20 +110,23 @@ export default function PropertyCard({
           </ul>
         )}
 
-        <a
-          href={linkWhatsAppImovel(imovel.titulo, imovel.codigo)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-flex w-fit items-center gap-2 rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
-        >
-          <MessageCircle
-            size={14}
-            strokeWidth={2.5}
-            className="text-[#25D366]"
-            aria-hidden="true"
-          />
-          Consultar no WhatsApp
-        </a>
+        {/* mt-auto prende o CTA na base — cards sempre alinhados no grid */}
+        <div className="mt-auto pt-3">
+          <a
+            href={linkWhatsAppImovel(imovel.titulo, imovel.codigo)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-2 rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
+          >
+            <MessageCircle
+              size={14}
+              strokeWidth={2.5}
+              className="text-[#25D366]"
+              aria-hidden="true"
+            />
+            Falar sobre este imóvel
+          </a>
+        </div>
       </div>
     </article>
   );

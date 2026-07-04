@@ -29,6 +29,9 @@ export interface PublicPropertyDTO {
   banheiros: number | null;
   vagas: number | null;
   areaM2: number | null;
+  /** Preços públicos como string decimal ("750000.00") ou null = sob consulta. */
+  precoVenda: string | null;
+  precoLocacao: string | null;
   fotos: PublicPhotoDTO[];
 }
 
@@ -51,6 +54,8 @@ export function toPublicPropertyDTO(
     banheiros: property.banheiros,
     vagas: property.vagas,
     areaM2: property.areaM2,
+    precoVenda: property.precoVenda?.toString() ?? null,
+    precoLocacao: property.precoLocacao?.toString() ?? null,
     fotos: property.fotos
       .slice()
       .sort((a, b) => a.ordem - b.ordem)

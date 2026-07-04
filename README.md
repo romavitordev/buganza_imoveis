@@ -2,7 +2,7 @@
 
 Catálogo imobiliário completo da **Imóveis Buganza** (Sorocaba/SP · CRECI 118400), construído com Next.js 14 (App Router), TypeScript, Tailwind CSS e Prisma.
 
-**Regra de negócio central:** nenhum preço aparece em páginas públicas. O campo `precoInterno` existe apenas para organização dos corretores e é visível somente no admin — a rota pública usa um DTO com allowlist explícita ([lib/dto.ts](lib/dto.ts)) que jamais serializa esse campo. Toda conversão acontece via WhatsApp com mensagem pré-preenchida.
+**Preços:** os campos públicos `precoVenda` e `precoLocacao` aparecem nos cards e no detalhe (ausentes = "Sob consulta"). Já o `precoInterno` existe apenas para organização dos corretores e é visível somente no admin — a rota pública usa um DTO com allowlist explícita ([lib/dto.ts](lib/dto.ts)) que jamais serializa esse campo. Toda conversão acontece via WhatsApp com mensagem pré-preenchida.
 
 ## Stack
 
@@ -53,6 +53,10 @@ npm install
 npm run db:push   # cria as tabelas
 npm run db:seed   # cria o admin + 3 imóveis de exemplo
 ```
+
+> **Sem Postgres nenhum?** `npm run db:local` sobe um Postgres portátil
+> (binários em node_modules, dados em `.pgdata/`) na porta 5502 — o `.env`
+> de exemplo já aponta para ele. Deixe rodando em um terminal separado.
 
 (`npm run db:reset` zera o banco e roda o seed de novo.)
 

@@ -65,6 +65,10 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       ? String(property.areaM2)
       : ""
   );
+  const [precoVenda, setPrecoVenda] = useState(property?.precoVenda ?? "");
+  const [precoLocacao, setPrecoLocacao] = useState(
+    property?.precoLocacao ?? ""
+  );
   const [precoInterno, setPrecoInterno] = useState(
     property?.precoInterno ?? ""
   );
@@ -98,6 +102,8 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       banheiros: banheiros || null,
       vagas: vagas || null,
       areaM2: areaM2 || null,
+      precoVenda: precoVenda || null,
+      precoLocacao: precoLocacao || null,
       precoInterno: precoInterno || null,
       descricao,
     };
@@ -316,6 +322,32 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             value={areaM2}
             onChange={(e) => setAreaM2(e.target.value)}
             className={inputCls}
+          />
+        </label>
+
+        <label className={labelCls}>
+          <span className={legendaCls}>
+            Preço de venda (R$) — exibido no site
+          </span>
+          <input
+            inputMode="decimal"
+            value={precoVenda}
+            onChange={(e) => setPrecoVenda(e.target.value)}
+            className={inputCls}
+            placeholder="Ex.: 450000 (vazio = Sob consulta)"
+          />
+        </label>
+
+        <label className={labelCls}>
+          <span className={legendaCls}>
+            Preço de locação (R$/mês) — exibido no site
+          </span>
+          <input
+            inputMode="decimal"
+            value={precoLocacao}
+            onChange={(e) => setPrecoLocacao(e.target.value)}
+            className={inputCls}
+            placeholder="Ex.: 2500 (vazio = Sob consulta)"
           />
         </label>
 

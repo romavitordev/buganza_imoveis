@@ -141,77 +141,10 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 14px 16px;
   pointer-events: none;
 }
 .bz-nav > * { pointer-events: auto; }
-.bz-nav-left { display: flex; align-items: center; gap: 10px; }
-
-.bz-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
-.bz-brand-text {
-  display: none;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: #000;
-}
-
-.bz-menu-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #000;
-  border: none;
-  border-radius: 999px;
-  padding: 4px 14px 4px 4px;
-  cursor: pointer;
-  font-family: inherit;
-}
-.bz-menu-circle {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #000;
-  transition: transform 0.3s var(--bz-ease);
-}
-.bz-menu-btn[aria-expanded="true"] .bz-menu-circle { transform: rotate(45deg); }
-.bz-menu-label { font-size: 11px; color: #fff; font-weight: 500; }
-
-.bz-menu-panel {
-  position: fixed;
-  top: 64px;
-  left: 16px;
-  z-index: 60;
-  background: #000;
-  border-radius: 16px;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  min-width: 200px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
-}
-.bz-menu-panel a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 10px 14px;
-  border-radius: 10px;
-  transition: background 0.2s ease;
-}
-.bz-menu-panel a:hover { background: rgba(255,255,255,0.12); }
-
-.bz-tags-pill {
-  display: none;
-  background: #F4F4F6;
-  border-radius: 999px;
-  padding: 8px 16px;
-  gap: 14px;
-}
-.bz-tags-pill span { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 500; }
 
 .bz-contact-pill {
   display: flex;
@@ -245,7 +178,8 @@ h3 {
 .bz-footer {
   position: relative;
   z-index: 30;
-  padding: 24px 16px 28px;
+  /* padding extra embaixo no mobile por causa da bottom nav fixa */
+  padding: 24px 16px 92px;
   background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
   display: flex;
   flex-direction: column;
@@ -254,20 +188,55 @@ h3 {
 .bz-footer-left { display: flex; flex-direction: column; gap: 14px; }
 
 .bz-subtitle {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
-  color: rgba(0,0,0,0.55);
+  width: fit-content;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,0.6);
+  background: rgba(255,255,255,0.75);
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 999px;
+  padding: 8px 14px;
+  backdrop-filter: blur(4px);
 }
 .bz-dot { width: 8px; height: 8px; border-radius: 50%; background: #000; flex: none; }
 
+/* Heading do hero — maior, com contraste de peso entre as linhas
+   e reveal por linha com máscara */
 .bz-heading {
   font-weight: 300;
-  font-size: clamp(2rem, 8vw, 4.5rem);
-  letter-spacing: -0.03em;
-  line-height: 1;
+  font-size: clamp(2rem, 9vw, 3.2rem);
+  letter-spacing: -0.04em;
+  line-height: 1.04;
   color: #000;
+}
+.bz-heading .bz-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em; /* respiro para descendentes (ç, p) */
+}
+.bz-heading .bz-line-inner {
+  display: block;
+  transform: translateY(112%);
+  animation: bzLineUp 0.9s var(--bz-ease) forwards;
+}
+.bz-heading .bz-line:nth-child(2) .bz-line-inner {
+  animation-delay: 0.16s;
+  font-weight: 500;
+}
+@keyframes bzLineUp {
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bz-heading .bz-line-inner {
+    animation: none;
+    transform: none;
+  }
 }
 
 .bz-trust { font-size: 11px; color: rgba(0,0,0,0.45); }
@@ -306,12 +275,9 @@ h3 {
 
 /* ---------- desktop (768px+) ---------- */
 @media (min-width: 768px) {
-  .bz-nav { padding: 24px 32px; }
-  .bz-brand-text { display: block; }
-  .bz-tags-pill { display: flex; }
+  .bz-nav { padding: 20px 32px; }
   .bz-contact-label { display: block; }
-  .bz-menu-circle, .bz-contact-circle { width: 32px; height: 32px; }
-  .bz-menu-panel { top: 76px; left: 32px; }
+  .bz-contact-circle { width: 32px; height: 32px; }
   .bz-media-wrap { align-items: flex-end; padding: 0; }
   .bz-scene { aspect-ratio: auto; height: min(86%, 100%); max-height: none; }
   .bz-footer {
@@ -320,5 +286,5 @@ h3 {
     justify-content: space-between;
     padding: 32px 32px 36px;
   }
-  .bz-heading { font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
+  .bz-heading { font-size: clamp(3.2rem, 6.2vw, 6rem); }
 }

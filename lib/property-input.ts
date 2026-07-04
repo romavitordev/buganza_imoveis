@@ -19,6 +19,8 @@ export interface PropertyInput {
   banheiros: number | null;
   vagas: number | null;
   areaM2: number | null;
+  precoVenda: Prisma.Decimal | null;
+  precoLocacao: Prisma.Decimal | null;
   precoInterno: Prisma.Decimal | null;
 }
 
@@ -43,12 +45,15 @@ function inteiroOpcional(value: unknown, campo: string): number | null {
   return n;
 }
 
-function decimalOpcional(value: unknown): Prisma.Decimal | null {
+function decimalOpcional(value: unknown, campo: string): Prisma.Decimal | null {
   if (value === null || value === undefined || value === "") return null;
-  const texto = String(value).replace(/\./g, "").replace(",", ".");
+  const texto = String(value)
+    .replace(/[R$\s]/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
   const numero = Number(typeof value === "number" ? value : texto);
   if (!Number.isFinite(numero) || numero < 0) {
-    throw new Error("Preço interno inválido.");
+    throw new Error(`Campo "${campo}" inválido.`);
   }
   return new Prisma.Decimal(numero.toFixed(2));
 }
@@ -113,7 +118,9 @@ export function parsePropertyInput(
       banheiros: inteiroOpcional(payload.banheiros, "banheiros"),
       vagas: inteiroOpcional(payload.vagas, "vagas"),
       areaM2: inteiroOpcional(payload.areaM2, "área (m²)"),
-      precoInterno: decimalOpcional(payload.precoInterno),
+      precoVenda: decimalOpcional(payload.precoVenda, "preço de venda"),
+      precoLocacao: decimalOpcional(payload.precoLocacao, "preço de locação"),
+      precoInterno: decimalOpcional(payload.precoInterno, "preço interno"),
     };
   } catch (e) {
     return { erro: e instanceof Error ? e.message : "Dados inválidos." };

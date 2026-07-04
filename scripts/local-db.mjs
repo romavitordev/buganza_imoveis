@@ -32,7 +32,18 @@ if (!jaInicializado) {
   await pg.initialise();
 }
 
-await pg.start();
+try {
+  await pg.start();
+} catch (erro) {
+  const mensagem = String(erro?.message ?? erro ?? "");
+  if (mensagem.includes("postmaster.pid") || mensagem.includes("already")) {
+    console.log(
+      "✔ O Postgres local já está rodando (postmaster ativo em .pgdata/). Nada a fazer."
+    );
+    process.exit(0);
+  }
+  throw erro;
+}
 
 if (!jaInicializado) {
   await pg.createDatabase("buganza");

@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Hero from "@/components/Hero";
 import PropertyCard from "@/components/PropertyCard";
+import ComoFunciona from "@/components/ComoFunciona";
 import QuemSomos from "@/components/QuemSomos";
+import Faq from "@/components/Faq";
+import AnuncieBanner from "@/components/AnuncieBanner";
 import SiteFooter from "@/components/SiteFooter";
 import { prisma } from "@/lib/prisma";
 import { toPublicPropertyDTOList } from "@/lib/dto";
@@ -57,7 +60,13 @@ export default async function HomePage() {
         </section>
       )}
 
+      <ComoFunciona />
+
       <QuemSomos />
+
+      <Faq />
+
+      <AnuncieBanner />
 
       <SiteFooter />
     </main>

@@ -6,7 +6,8 @@ import { linkWhatsAppGeral } from "@/lib/whatsapp";
 export default function SiteFooter() {
   return (
     <footer className="border-t border-black/10 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 md:flex-row md:items-center md:justify-between md:px-8">
+      {/* pb extra no mobile por causa da bottom nav fixa */}
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 pb-28 pt-10 md:flex-row md:items-center md:justify-between md:px-8 md:pb-10">
         <div className="flex items-center gap-2.5">
           <BrandMark />
           <div>

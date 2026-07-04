@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { MessageCircle, Plus } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Building2, Home, MessageCircle, Users } from "lucide-react";
 
 interface SiteNavProps {
   whatsappHref: string;
@@ -25,71 +25,58 @@ export function BrandMark() {
   );
 }
 
+const LINKS = [
+  { href: "/", rotulo: "Início", icone: Home },
+  { href: "/imoveis", rotulo: "Imóveis", icone: Building2 },
+  { href: "/#quem-somos", rotulo: "Quem Somos", icone: Users },
+];
+
+function linkAtivo(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  if (href.startsWith("/#")) return false;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
-  const [menuAberto, setMenuAberto] = useState(false);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
-
-  // Fecha ao clicar fora ou apertar Esc
-  useEffect(() => {
-    if (!menuAberto) return;
-
-    function onClick(e: MouseEvent) {
-      const alvo = e.target as Node;
-      if (
-        panelRef.current &&
-        !panelRef.current.contains(alvo) &&
-        btnRef.current &&
-        !btnRef.current.contains(alvo)
-      ) {
-        setMenuAberto(false);
-      }
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setMenuAberto(false);
-        btnRef.current?.focus();
-      }
-    }
-
-    document.addEventListener("click", onClick);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("click", onClick);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [menuAberto]);
+  const pathname = usePathname();
 
   return (
     <>
+      {/* ---------- barra superior ---------- */}
       <nav
         className={`bz-nav ${animated ? "bz-anim bz-nav-anim" : ""}`}
         aria-label="Principal"
       >
-        <div className="bz-nav-left">
-          <Link className="bz-brand" href="/" aria-label="Imóveis Buganza">
-            <BrandMark />
-            <span className="bz-brand-text">Imóveis Buganza</span>
-          </Link>
+        <Link
+          className="flex items-center gap-2"
+          href="/"
+          aria-label="Imóveis Buganza — início"
+        >
+          <BrandMark />
+          <span className="text-sm font-semibold tracking-tight text-black">
+            Imóveis Buganza
+          </span>
+        </Link>
 
-          <button
-            ref={btnRef}
-            className="bz-menu-btn"
-            type="button"
-            aria-label={menuAberto ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={menuAberto}
-            onClick={() => setMenuAberto((v) => !v)}
-          >
-            <span className="bz-menu-circle">
-              <Plus size={12} strokeWidth={3} aria-hidden="true" />
-            </span>
-            <span className="bz-menu-label">Menu</span>
-          </button>
-
-          <div className="bz-tags-pill">
-            <span>Residencial</span>
-            <span>Comercial</span>
-          </div>
+        {/* Links inline — só desktop; no mobile a navegação fica na barra inferior */}
+        <div className="hidden items-center gap-1 rounded-pill bg-white/85 p-1 shadow-[0_2px_16px_rgba(0,0,0,0.06)] backdrop-blur md:flex">
+          {LINKS.map(({ href, rotulo }) => {
+            const ativo = linkAtivo(pathname, href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={ativo ? "page" : undefined}
+                className={`rounded-pill px-4 py-2 text-[12px] font-medium transition-colors ${
+                  ativo
+                    ? "bg-black text-white"
+                    : "text-black/65 hover:bg-black/5 hover:text-black"
+                }`}
+              >
+                {rotulo}
+              </Link>
+            );
+          })}
         </div>
 
         <a
@@ -105,27 +92,48 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         </a>
       </nav>
 
-      {menuAberto && (
-        <div className="bz-menu-panel" ref={panelRef}>
-          <Link href="/imoveis" onClick={() => setMenuAberto(false)}>
-            Ver Imóveis
-          </Link>
-          <Link href="/#quem-somos" onClick={() => setMenuAberto(false)}>
-            Quem Somos
-          </Link>
-          <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-            Falar no WhatsApp
-          </a>
+      {/* ---------- bottom nav (só mobile) ---------- */}
+      <nav
+        aria-label="Navegação inferior"
+        className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+      >
+        <div className="grid h-16 grid-cols-4">
+          {LINKS.map(({ href, rotulo, icone: Icone }) => {
+            const ativo = linkAtivo(pathname, href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={ativo ? "page" : undefined}
+                className={`flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors ${
+                  ativo ? "text-black" : "text-black/45"
+                }`}
+              >
+                <span
+                  className={`flex h-7 w-12 items-center justify-center rounded-pill transition-colors ${
+                    ativo ? "bg-black text-white" : ""
+                  }`}
+                >
+                  <Icone size={17} strokeWidth={ativo ? 2.25 : 1.75} aria-hidden="true" />
+                </span>
+                {rotulo}
+              </Link>
+            );
+          })}
+
           <a
-            href="https://instagram.com/imoveis_buganza"
+            href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
+            className="flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/45"
           >
-            Instagram
+            <span className="flex h-7 w-12 items-center justify-center rounded-pill bg-black text-[#25D366]">
+              <MessageCircle size={17} strokeWidth={2.25} aria-hidden="true" />
+            </span>
+            WhatsApp
           </a>
-          <a href="mailto:imoveisbuganza@gmail.com">E-mail</a>
         </div>
-      )}
+      </nav>
     </>
   );
 }

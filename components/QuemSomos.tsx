@@ -76,17 +76,41 @@ export default function QuemSomos() {
             </a>
             <span className="text-[11px] text-black/45">CRECI 118400</span>
           </div>
+
+          {/* Números — informações fictícias por enquanto */}
+          <dl className="mt-4 grid grid-cols-3 gap-4 border-t border-black/10 pt-6">
+            {[
+              { numero: "+120", rotulo: "imóveis negociados" },
+              { numero: "+5", rotulo: "anos de mercado" },
+              { numero: "100%", rotulo: "acompanhamento pessoal" },
+            ].map(({ numero, rotulo }) => (
+              <div key={rotulo}>
+                <dt className="sr-only">{rotulo}</dt>
+                <dd className="text-2xl font-semibold tracking-tight md:text-3xl">
+                  {numero}
+                </dd>
+                <dd className="mt-0.5 text-[11px] leading-snug text-black/50">
+                  {rotulo}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
         <div className="grid grid-cols-1 content-center gap-4 sm:grid-cols-1">
           {PILARES.map(({ icone: Icone, titulo, texto }, i) => (
             <div
               key={titulo}
-              className="bz-fade-up flex gap-4 rounded-2xl border border-black/8 bg-white p-6"
+              className="bz-fade-up group flex gap-4 rounded-2xl border border-black/8 bg-white p-6 transition-all duration-300 ease-premium hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_18px_44px_rgba(0,0,0,0.09)]"
               style={{ animationDelay: `${0.1 + i * 0.12}s` }}
             >
-              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-black text-white">
-                <Icone size={18} strokeWidth={1.75} aria-hidden="true" />
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-transparent bg-black text-white transition-all duration-300 ease-premium group-hover:scale-105 group-hover:border-black group-hover:bg-white group-hover:text-black">
+                <Icone
+                  size={18}
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                  className="transition-transform duration-300 ease-premium group-hover:-rotate-6"
+                />
               </span>
               <div>
                 <h3 className="mb-1 text-base font-medium tracking-tight">

@@ -19,6 +19,10 @@ import { prisma } from "@/lib/prisma";
 import { toPublicPropertyDTO, capaDoImovel } from "@/lib/dto";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
 import { TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
+import {
+  formatarPreco,
+  precoLocacaoFormatado,
+} from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +69,12 @@ export default async function ImovelPage({ params }: PageProps) {
   if (!imovel) notFound();
 
   const whatsappHref = linkWhatsAppImovel(imovel.titulo, imovel.codigo);
+  const temPreco =
+    Boolean(formatarPreco(imovel.precoVenda)) ||
+    Boolean(precoLocacaoFormatado(imovel));
+  const rotuloCta = temPreco
+    ? "Tenho interesse — chamar no WhatsApp"
+    : "Consultar valor no WhatsApp";
 
   const caracteristicas = [
     { icone: Building2, rotulo: "Tipo", valor: TIPO_LABEL[imovel.tipo] },
@@ -101,7 +111,7 @@ export default async function ImovelPage({ params }: PageProps) {
     <>
       <SiteNav whatsappHref={linkWhatsAppGeral()} />
 
-      <main className="mx-auto max-w-6xl px-4 pb-32 pt-28 md:px-8 md:pb-20 md:pt-36">
+      <main className="mx-auto max-w-6xl px-4 pb-44 pt-24 md:px-8 md:pb-20 md:pt-36">
         <Link
           href="/imoveis"
           className="mb-8 inline-flex items-center gap-2 text-[13px] font-medium text-black/55 transition-colors hover:text-black"
@@ -128,6 +138,41 @@ export default async function ImovelPage({ params }: PageProps) {
                 {imovel.bairro} · {imovel.cidade}
               </p>
             </header>
+
+            {/* Preços */}
+            <div className="flex flex-wrap items-end gap-x-6 gap-y-2 rounded-2xl bg-mist px-5 py-4">
+              {formatarPreco(imovel.precoVenda) && (
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+                    Venda
+                  </p>
+                  <p className="text-2xl font-semibold tracking-tight">
+                    {formatarPreco(imovel.precoVenda)}
+                  </p>
+                </div>
+              )}
+              {precoLocacaoFormatado(imovel) && (
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+                    Locação
+                  </p>
+                  <p className="text-2xl font-semibold tracking-tight">
+                    {precoLocacaoFormatado(imovel)}
+                  </p>
+                </div>
+              )}
+              {!formatarPreco(imovel.precoVenda) &&
+                !precoLocacaoFormatado(imovel) && (
+                  <div>
+                    <p className="text-2xl font-semibold tracking-tight">
+                      Sob consulta
+                    </p>
+                    <p className="text-[12px] text-black/50">
+                      Chame no WhatsApp — respondemos rápido
+                    </p>
+                  </div>
+                )}
+            </div>
 
             <ul className="flex flex-col divide-y divide-black/8 rounded-2xl border border-black/10">
               {caracteristicas.map(({ icone: Icone, rotulo, valor }) => (
@@ -158,7 +203,7 @@ export default async function ImovelPage({ params }: PageProps) {
                   className="text-[#25D366]"
                   aria-hidden="true"
                 />
-                Consultar valor no WhatsApp
+                {rotuloCta}
               </a>
               <p className="text-center text-[11px] text-black/40">
                 Resposta rápida · atendimento direto com os corretores
@@ -182,8 +227,8 @@ export default async function ImovelPage({ params }: PageProps) {
         </div>
       </main>
 
-      {/* CTA sticky no mobile */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white/95 p-3 backdrop-blur md:hidden">
+      {/* CTA sticky no mobile — acima da bottom nav */}
+      <div className="fixed inset-x-0 bottom-16 z-40 border-t border-black/10 bg-white/95 p-3 backdrop-blur md:hidden">
         <a
           href={whatsappHref}
           target="_blank"
@@ -196,7 +241,7 @@ export default async function ImovelPage({ params }: PageProps) {
             className="text-[#25D366]"
             aria-hidden="true"
           />
-          Consultar valor no WhatsApp
+          {rotuloCta}
         </a>
       </div>
 

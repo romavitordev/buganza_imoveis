@@ -80,6 +80,8 @@ export async function PATCH(request: Request, { params }: Params) {
         banheiros: input.banheiros,
         vagas: input.vagas,
         areaM2: input.areaM2,
+        precoVenda: input.precoVenda,
+        precoLocacao: input.precoLocacao,
         precoInterno: input.precoInterno,
       },
       include: { fotos: { orderBy: { ordem: "asc" } } },

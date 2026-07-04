@@ -33,6 +33,9 @@ export interface AdminProperty {
   banheiros: number | null;
   vagas: number | null;
   areaM2: number | null;
+  /** Preços públicos como string ("750000.00") — exibidos no site. */
+  precoVenda: string | null;
+  precoLocacao: string | null;
   /** Preço interno como string ("1234.56") — visível SÓ no admin. */
   precoInterno: string | null;
   atualizadoEm: string;
