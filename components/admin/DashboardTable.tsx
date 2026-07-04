@@ -5,8 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  Eye,
   ImageOff,
   LogOut,
+  MessageCircle,
   Pencil,
   Plus,
   Search,
@@ -23,16 +25,30 @@ const STATUS_ESTILO: Record<AdminProperty["status"], string> = {
   ALUGADO: "border border-black/20 text-black/60",
 };
 
+interface Resumo7d {
+  visualizacoes: number;
+  cliquesWhatsApp: number;
+}
+
 export default function DashboardTable({
   propertiesIniciais,
+  resumo7d,
 }: {
   propertiesIniciais: AdminProperty[];
+  resumo7d: Resumo7d;
 }) {
   const router = useRouter();
   const [properties, setProperties] = useState(propertiesIniciais);
   const [busca, setBusca] = useState("");
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+
+  const maisVisto = useMemo(() => {
+    const ordenadas = properties
+      .slice()
+      .sort((a, b) => b.visualizacoes - a.visualizacoes);
+    return ordenadas[0]?.visualizacoes ? ordenadas[0] : null;
+  }, [properties]);
 
   const filtradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -140,6 +156,41 @@ export default function DashboardTable({
         </div>
       </header>
 
+      {/* Métricas do site público — últimos 7 dias */}
+      <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-black/10 p-5">
+          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
+            <Eye size={13} aria-hidden="true" />
+            Visualizações (7 dias)
+          </p>
+          <p className="mt-1 text-3xl font-semibold tracking-tight">
+            {resumo7d.visualizacoes}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-black/10 p-5">
+          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
+            <MessageCircle size={13} aria-hidden="true" />
+            Cliques no WhatsApp (7 dias)
+          </p>
+          <p className="mt-1 text-3xl font-semibold tracking-tight">
+            {resumo7d.cliquesWhatsApp}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-black/10 p-5">
+          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
+            <Star size={13} aria-hidden="true" />
+            Mais visto (total)
+          </p>
+          <p className="mt-1 truncate text-sm font-medium">
+            {maisVisto
+              ? `${maisVisto.codigo} · ${maisVisto.visualizacoes} visualizaç${
+                  maisVisto.visualizacoes === 1 ? "ão" : "ões"
+                }`
+              : "Sem dados ainda"}
+          </p>
+        </div>
+      </div>
+
       <div className="relative mb-6 max-w-sm">
         <Search
           size={15}
@@ -185,6 +236,10 @@ export default function DashboardTable({
                 <th className="px-4 py-3 font-medium">Transação</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 text-center font-medium">Destaque</th>
+                <th className="px-4 py-3 text-right font-medium">Views</th>
+                <th className="px-4 py-3 text-right font-medium">
+                  Cliques WA
+                </th>
                 <th className="px-4 py-3 font-medium">Atualizado</th>
                 <th className="px-4 py-3 text-right font-medium">Ações</th>
               </tr>
@@ -256,6 +311,12 @@ export default function DashboardTable({
                           }
                         />
                       </button>
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {p.visualizacoes}
+                    </td>
+                    <td className="px-4 py-3 text-right tabular-nums">
+                      {p.cliquesWhatsApp}
                     </td>
                     <td className="px-4 py-3 text-black/55">
                       {dataCurta(p.atualizadoEm)}

@@ -38,6 +38,10 @@ export interface AdminProperty {
   precoLocacao: string | null;
   /** Preço interno como string ("1234.56") — visível SÓ no admin. */
   precoInterno: string | null;
+  videoUrl: string | null;
   atualizadoEm: string;
   fotos: AdminPhoto[];
+  /** Métricas do site público (total acumulado). */
+  visualizacoes: number;
+  cliquesWhatsApp: number;
 }

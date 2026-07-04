@@ -40,6 +40,11 @@ enum StatusImovel {
   ALUGADO
 }
 
+enum TipoEvento {
+  VISUALIZACAO
+  CLIQUE_WHATSAPP
+}
+
 model AdminUser {
   id           String   @id @default(cuid())
   nome         String
@@ -77,12 +82,30 @@ model Property {
   // em respostas de rotas públicas.
   precoInterno Decimal?     @db.Decimal(12, 2)
 
+  // Vídeo do imóvel — aparece SÓ na página de detalhe, abaixo da galeria.
+  // Nunca é usado como capa do card nem nos destaques.
+  videoUrl        String?
+  videoStorageKey String?
+
   fotos        PropertyPhoto[]
+  eventos      PropertyEvent[]
   criadoEm     DateTime     @default(now())
   atualizadoEm DateTime     @updatedAt
 
   @@index([status, destaque])
   @@index([tipo, transacao, cidade])
+}
+
+// Eventos de analytics do site público: visualizações da página do imóvel
+// e cliques nos botões de WhatsApp. Alimentam as métricas do dashboard.
+model PropertyEvent {
+  id         String     @id @default(cuid())
+  property   Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  tipo       TipoEvento
+  criadoEm   DateTime   @default(now())
+
+  @@index([propertyId, tipo, criadoEm])
 }
 
 model PropertyPhoto {

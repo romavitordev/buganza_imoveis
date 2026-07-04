@@ -32,6 +32,8 @@ export interface PublicPropertyDTO {
   /** Preços públicos como string decimal ("750000.00") ou null = sob consulta. */
   precoVenda: string | null;
   precoLocacao: string | null;
+  /** Vídeo do imóvel — exibido só no detalhe, nunca como capa. */
+  videoUrl: string | null;
   fotos: PublicPhotoDTO[];
 }
 
@@ -56,6 +58,7 @@ export function toPublicPropertyDTO(
     areaM2: property.areaM2,
     precoVenda: property.precoVenda?.toString() ?? null,
     precoLocacao: property.precoLocacao?.toString() ?? null,
+    videoUrl: property.videoUrl,
     fotos: property.fotos
       .slice()
       .sort((a, b) => a.ordem - b.ordem)

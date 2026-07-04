@@ -3,7 +3,7 @@ import path from "path";
 import { mkdir, writeFile, unlink } from "fs/promises";
 
 /**
- * Storage de fotos.
+ * Storage de fotos e vídeos dos imóveis.
  *
  * Produção: Supabase Storage, bucket público "imoveis", upload server-side
  * com a SERVICE_ROLE_KEY (nunca exposta ao cliente).
@@ -46,7 +46,31 @@ export async function uploadPropertyPhoto(
   file: File
 ): Promise<UploadResult> {
   const ext = extensaoSegura(file);
-  const key = `properties/${propertyId}/${randomUUID()}.${ext}`;
+  return uploadArquivo(
+    `properties/${propertyId}/${randomUUID()}.${ext}`,
+    file,
+    propertyId
+  );
+}
+
+/** Faz upload do vídeo do imóvel (exibido só no detalhe, nunca como capa). */
+export async function uploadPropertyVideo(
+  propertyId: string,
+  file: File
+): Promise<UploadResult> {
+  const ext = extensaoVideoSegura(file);
+  return uploadArquivo(
+    `properties/${propertyId}/video-${randomUUID()}.${ext}`,
+    file,
+    propertyId
+  );
+}
+
+async function uploadArquivo(
+  key: string,
+  file: File,
+  propertyId: string
+): Promise<UploadResult> {
   const buffer = Buffer.from(await file.arrayBuffer());
 
   const config = supabaseConfig();
@@ -73,6 +97,15 @@ export async function uploadPropertyPhoto(
       storageKey: `${LOCAL_PREFIX}${key}`,
     };
   }
+  return uploadSupabase(config, key, file, buffer);
+}
+
+async function uploadSupabase(
+  config: { url: string; serviceKey: string },
+  key: string,
+  file: File,
+  buffer: Buffer
+): Promise<UploadResult> {
 
   const response = await fetch(
     `${config.url}/storage/v1/object/${BUCKET}/${key}`,
@@ -83,7 +116,7 @@ export async function uploadPropertyPhoto(
         "Content-Type": file.type || "application/octet-stream",
         "x-upsert": "false",
       },
-      body: buffer,
+      body: new Uint8Array(buffer),
     }
   );
 
@@ -145,6 +178,9 @@ export async function deletePropertyPhotos(
   await Promise.allSettled(storageKeys.map(deletePropertyPhoto));
 }
 
+/** Remove o vídeo do imóvel do storage (mesma mecânica das fotos). */
+export const deletePropertyVideo = deletePropertyPhoto;
+
 const EXTENSOES_VALIDAS = new Set(["jpg", "jpeg", "png", "webp", "avif", "gif"]);
 
 function extensaoSegura(file: File): string {
@@ -153,4 +189,15 @@ function extensaoSegura(file: File): string {
   const doNome = file.name.split(".").pop()?.toLowerCase() ?? "";
   if (EXTENSOES_VALIDAS.has(doNome)) return doNome === "jpeg" ? "jpg" : doNome;
   return "jpg";
+}
+
+const EXTENSOES_VIDEO = new Set(["mp4", "webm", "mov", "m4v"]);
+
+function extensaoVideoSegura(file: File): string {
+  const daMime = file.type.split("/")[1]?.toLowerCase() ?? "";
+  if (daMime === "quicktime") return "mov";
+  if (EXTENSOES_VIDEO.has(daMime)) return daMime;
+  const doNome = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (EXTENSOES_VIDEO.has(doNome)) return doNome;
+  return "mp4";
 }

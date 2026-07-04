@@ -15,6 +15,9 @@ import {
 import Gallery from "@/components/Gallery";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
+import ShareButton from "@/components/ShareButton";
+import TrackView from "@/components/TrackView";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import { prisma } from "@/lib/prisma";
 import { toPublicPropertyDTO, capaDoImovel } from "@/lib/dto";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
@@ -107,22 +110,75 @@ export default async function ImovelPage({ params }: PageProps) {
       c !== null
   );
 
+  // Dados estruturados (Google) — melhora a exibição nos resultados de busca
+  const capa = capaDoImovel(imovel);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: imovel.titulo,
+    description: imovel.descricao.replace(/\s+/g, " ").slice(0, 300),
+    ...(capa ? { image: capa.url } : {}),
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: imovel.cidade,
+      addressRegion: "SP",
+      addressCountry: "BR",
+    },
+    ...(imovel.precoVenda
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: Number(imovel.precoVenda),
+            priceCurrency: "BRL",
+          },
+        }
+      : {}),
+  };
+
   return (
     <>
       <SiteNav whatsappHref={linkWhatsAppGeral()} />
+      <TrackView slug={imovel.slug} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       <main className="mx-auto max-w-6xl px-4 pb-44 pt-24 md:px-8 md:pb-20 md:pt-36">
-        <Link
-          href="/imoveis"
-          className="mb-8 inline-flex items-center gap-2 text-[13px] font-medium text-black/55 transition-colors hover:text-black"
-        >
-          <ArrowLeft size={15} aria-hidden="true" />
-          Voltar para o catálogo
-        </Link>
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <Link
+            href="/imoveis"
+            className="inline-flex items-center gap-2 text-[13px] font-medium text-black/55 transition-colors hover:text-black"
+          >
+            <ArrowLeft size={15} aria-hidden="true" />
+            Voltar para o catálogo
+          </Link>
+          <ShareButton titulo={imovel.titulo} />
+        </div>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr]">
-          {/* Galeria */}
-          <Gallery fotos={imovel.fotos} titulo={imovel.titulo} />
+          {/* Galeria + vídeo (o vídeo nunca é a capa) */}
+          <div className="flex flex-col gap-8">
+            <Gallery fotos={imovel.fotos} titulo={imovel.titulo} />
+
+            {imovel.videoUrl && (
+              <section aria-labelledby="video-imovel-titulo">
+                <h2
+                  id="video-imovel-titulo"
+                  className="mb-3 text-lg font-normal tracking-tight"
+                >
+                  Vídeo do imóvel
+                </h2>
+                <video
+                  src={imovel.videoUrl}
+                  controls
+                  preload="metadata"
+                  playsInline
+                  className="aspect-video w-full rounded-2xl bg-black"
+                />
+              </section>
+            )}
+          </div>
 
           {/* Ficha */}
           <div className="flex flex-col gap-6">
@@ -191,10 +247,9 @@ export default async function ImovelPage({ params }: PageProps) {
 
             {/* CTA desktop */}
             <div className="hidden flex-col gap-3 md:flex">
-              <a
+              <WhatsAppLink
                 href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
+                trackSlug={imovel.slug}
                 className="inline-flex items-center justify-center gap-2 rounded-pill bg-black px-7 py-4 text-sm font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
               >
                 <MessageCircle
@@ -204,7 +259,7 @@ export default async function ImovelPage({ params }: PageProps) {
                   aria-hidden="true"
                 />
                 {rotuloCta}
-              </a>
+              </WhatsAppLink>
               <p className="text-center text-[11px] text-black/40">
                 Resposta rápida · atendimento direto com os corretores
               </p>
@@ -229,10 +284,9 @@ export default async function ImovelPage({ params }: PageProps) {
 
       {/* CTA sticky no mobile — acima da bottom nav */}
       <div className="fixed inset-x-0 bottom-16 z-40 border-t border-black/10 bg-white/95 p-3 backdrop-blur md:hidden">
-        <a
+        <WhatsAppLink
           href={whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
+          trackSlug={imovel.slug}
           className="flex items-center justify-center gap-2 rounded-pill bg-black px-6 py-4 text-sm font-medium text-white"
         >
           <MessageCircle
@@ -242,7 +296,7 @@ export default async function ImovelPage({ params }: PageProps) {
             aria-hidden="true"
           />
           {rotuloCta}
-        </a>
+        </WhatsAppLink>
       </div>
 
       <SiteFooter />

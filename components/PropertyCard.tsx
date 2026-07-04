@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { PublicPropertyDTO } from "@/lib/dto";
 import { capaDoImovel } from "@/lib/dto";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import { linkWhatsAppImovel } from "@/lib/whatsapp";
 import { TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 import { precoPrincipal, precoSecundario } from "@/lib/format";
@@ -112,10 +113,9 @@ export default function PropertyCard({
 
         {/* mt-auto prende o CTA na base — cards sempre alinhados no grid */}
         <div className="mt-auto pt-3">
-          <a
+          <WhatsAppLink
             href={linkWhatsAppImovel(imovel.titulo, imovel.codigo)}
-            target="_blank"
-            rel="noopener noreferrer"
+            trackSlug={imovel.slug}
             className="inline-flex w-fit items-center gap-2 rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
           >
             <MessageCircle
@@ -125,7 +125,7 @@ export default function PropertyCard({
               aria-hidden="true"
             />
             Falar sobre este imóvel
-          </a>
+          </WhatsAppLink>
         </div>
       </div>
     </article>

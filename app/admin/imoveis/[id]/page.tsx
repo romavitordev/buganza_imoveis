@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { AdminProperty } from "@/lib/admin-types";
 import PropertyForm from "@/components/admin/PropertyForm";
 import PhotoManager from "@/components/admin/PhotoManager";
+import VideoManager from "@/components/admin/VideoManager";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +43,7 @@ export default async function EditarImovelPage({
     precoVenda: p.precoVenda?.toString() ?? null,
     precoLocacao: p.precoLocacao?.toString() ?? null,
     precoInterno: p.precoInterno?.toString() ?? null,
+    videoUrl: p.videoUrl,
     atualizadoEm: p.atualizadoEm.toISOString(),
     fotos: p.fotos.map((f) => ({
       id: f.id,
@@ -50,6 +52,8 @@ export default async function EditarImovelPage({
       ordem: f.ordem,
       capa: f.capa,
     })),
+    visualizacoes: 0,
+    cliquesWhatsApp: 0,
   };
 
   return (
@@ -57,6 +61,11 @@ export default async function EditarImovelPage({
       <PropertyForm property={property} />
       <hr className="border-black/10" />
       <PhotoManager propertyId={property.id} fotosIniciais={property.fotos} />
+      <hr className="border-black/10" />
+      <VideoManager
+        propertyId={property.id}
+        videoUrlInicial={property.videoUrl}
+      />
     </main>
   );
 }
