@@ -1,0 +1,93 @@
+// Schema do banco — Buganza Imóveis
+//
+// Para desenvolvimento local SEM Postgres, dá para trocar para SQLite,
+// mas atenção — o Prisma NÃO suporta enums em SQLite, então a troca exige:
+//   1. Em `datasource db`, mude `provider = "postgresql"` para `provider = "sqlite"`
+//   2. No .env, use: DATABASE_URL="file:./dev.db"
+//   3. Remova as anotações exclusivas de Postgres: `@db.Text` (em Property.descricao)
+//      e `@db.Decimal(12, 2)` (em Property.precoInterno)
+//   4. Substitua os campos que usam enums (tipo, transacao, status) por `String`
+//      e remova os blocos `enum` — os valores continuam os mesmos em runtime
+//   5. Rode `npm run db:push` e `npm run db:seed` normalmente
+// Recomendação: prefira um Postgres gratuito no Neon (https://neon.tech) —
+// leva 2 minutos e evita essas alterações.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TipoImovel {
+  RESIDENCIAL
+  COMERCIAL
+  TERRENO
+}
+
+enum Transacao {
+  VENDA
+  LOCACAO
+  VENDA_LOCACAO
+}
+
+enum StatusImovel {
+  ATIVO
+  PAUSADO
+  VENDIDO
+  ALUGADO
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  nome         String
+  email        String   @unique
+  passwordHash String
+  criadoEm     DateTime @default(now())
+}
+
+model Property {
+  id           String       @id @default(cuid())
+  codigo       String       @unique
+  slug         String       @unique
+  titulo       String
+  descricao    String       @db.Text
+  tipo         TipoImovel
+  transacao    Transacao
+  status       StatusImovel @default(ATIVO)
+  destaque     Boolean      @default(false)
+
+  cidade       String
+  bairro       String
+
+  quartos      Int?
+  banheiros    Int?
+  vagas        Int?
+  areaM2       Int?
+
+  // Preço para organização interna do casal — NUNCA aparece no site público.
+  // A allowlist de lib/dto.ts garante que este campo jamais é serializado
+  // em respostas de rotas públicas.
+  precoInterno Decimal?     @db.Decimal(12, 2)
+
+  fotos        PropertyPhoto[]
+  criadoEm     DateTime     @default(now())
+  atualizadoEm DateTime     @updatedAt
+
+  @@index([status, destaque])
+  @@index([tipo, transacao, cidade])
+}
+
+model PropertyPhoto {
+  id         String   @id @default(cuid())
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId String
+  url        String
+  storageKey String
+  ordem      Int      @default(0)
+  capa       Boolean  @default(false)
+
+  @@index([propertyId, ordem])
+}

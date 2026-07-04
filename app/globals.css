@@ -1,0 +1,324 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   Buganza Imóveis
+   Paleta: preto (#000/#111) e branco (#fff)
+   Fonte: Inter (300, 400, 500, 600)
+   Easing: cubic-bezier(0.16, 1, 0.3, 1)
+   ============================================ */
+
+:root {
+  --bz-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: #ffffff;
+  color: #000;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
+
+*:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- animações do hero ---------- */
+@keyframes bzDown  { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bzUp16  { from { opacity: 0; transform: translateY(16px);  } to { opacity: 1; transform: translateY(0); } }
+@keyframes bzUp20  { from { opacity: 0; transform: translateY(20px);  } to { opacity: 1; transform: translateY(0); } }
+@keyframes bzMedia { from { opacity: 0; transform: scale(1.05);       } to { opacity: 1; transform: scale(1); } }
+/* Brilho das janelas — mais rápido e com contraste maior */
+@keyframes bzGlow  { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
+
+.bz-anim {
+  opacity: 0;
+  animation-fill-mode: forwards;
+  animation-timing-function: var(--bz-ease);
+}
+.bz-nav-anim    { animation-name: bzDown;  animation-duration: 0.8s; }
+.bz-media-anim  { animation-name: bzMedia; animation-duration: 1.8s; }
+.bz-footer-anim { animation-name: bzUp20;  animation-duration: 1s;   animation-delay: 0.5s; }
+.bz-sub-anim    { animation-name: bzUp16;  animation-duration: 0.8s; animation-delay: 0.6s; }
+.bz-head-anim   { animation-name: bzUp20;  animation-duration: 0.8s; animation-delay: 0.8s; }
+.bz-btns-anim   { animation-name: bzUp16;  animation-duration: 0.8s; animation-delay: 1.0s; }
+
+.bz-lit { animation: bzGlow 2.6s ease-in-out infinite; }
+
+/* animação de entrada para seções abaixo do hero */
+@keyframes bzFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.bz-fade-up {
+  animation: bzFadeUp 0.9s var(--bz-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bz-anim,
+  .bz-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .bz-lit { animation: none; }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ---------- hero ---------- */
+.bz-page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.bz-media-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Mobile: cena centralizada na área livre entre a navbar e o conteúdo,
+     para que prédios e sol fiquem 100% visíveis sem disputar com o texto */
+  padding: 72px 12px min(300px, 40svh);
+  /* Mesmo degradê do céu do SVG — sem faixas quando a cena é "meet" */
+  background: linear-gradient(to bottom, #ffffff 0%, #f2f2f4 70%, #ececee 100%);
+}
+.bz-scene {
+  /* Cena inteira (prédios + sol) sempre visível em qualquer tela */
+  width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1200 / 700;
+  display: block;
+}
+
+/* ---------- efeito de scroll do hero (var --bz-p: 0 no topo → 1 fora) ---------- */
+.bz-layer-bg {
+  transform: translateY(calc(var(--bz-p, 0) * 90px));
+  opacity: calc(1 - var(--bz-p, 0) * 1.1);
+  will-change: transform, opacity;
+}
+.bz-layer-main {
+  transform: translateY(calc(var(--bz-p, 0) * 200px));
+  opacity: calc(1 - var(--bz-p, 0) * 1.25);
+  will-change: transform, opacity;
+}
+.bz-layer-sun {
+  opacity: calc(1 - var(--bz-p, 0) * 0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bz-layer-bg,
+  .bz-layer-main,
+  .bz-layer-sun {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---------- navbar ---------- */
+.bz-nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  pointer-events: none;
+}
+.bz-nav > * { pointer-events: auto; }
+.bz-nav-left { display: flex; align-items: center; gap: 10px; }
+
+.bz-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+.bz-brand-text {
+  display: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #000;
+}
+
+.bz-menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #000;
+  border: none;
+  border-radius: 999px;
+  padding: 4px 14px 4px 4px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.bz-menu-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  transition: transform 0.3s var(--bz-ease);
+}
+.bz-menu-btn[aria-expanded="true"] .bz-menu-circle { transform: rotate(45deg); }
+.bz-menu-label { font-size: 11px; color: #fff; font-weight: 500; }
+
+.bz-menu-panel {
+  position: fixed;
+  top: 64px;
+  left: 16px;
+  z-index: 60;
+  background: #000;
+  border-radius: 16px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+}
+.bz-menu-panel a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+.bz-menu-panel a:hover { background: rgba(255,255,255,0.12); }
+
+.bz-tags-pill {
+  display: none;
+  background: #F4F4F6;
+  border-radius: 999px;
+  padding: 8px 16px;
+  gap: 14px;
+}
+.bz-tags-pill span { font-size: 11px; color: rgba(0,0,0,0.7); font-weight: 500; }
+
+.bz-contact-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #F4F4F6;
+  border-radius: 999px;
+  padding: 4px;
+  text-decoration: none;
+  transition: background 0.25s ease;
+}
+.bz-contact-pill:hover { background: #e9e9ec; }
+.bz-contact-circle {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #25D366; /* verde só no glifo do ícone */
+}
+.bz-contact-label {
+  display: none;
+  font-size: 11px;
+  color: #000;
+  font-weight: 500;
+  padding-right: 12px;
+}
+
+/* ---------- conteúdo inferior do hero ---------- */
+.bz-footer {
+  position: relative;
+  z-index: 30;
+  padding: 24px 16px 28px;
+  background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.bz-footer-left { display: flex; flex-direction: column; gap: 14px; }
+
+.bz-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(0,0,0,0.55);
+}
+.bz-dot { width: 8px; height: 8px; border-radius: 50%; background: #000; flex: none; }
+
+.bz-heading {
+  font-weight: 300;
+  font-size: clamp(2rem, 8vw, 4.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #000;
+}
+
+.bz-trust { font-size: 11px; color: rgba(0,0,0,0.45); }
+
+.bz-btn-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.bz-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 12px 22px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s var(--bz-ease), background 0.25s ease, border-color 0.25s ease;
+}
+.bz-btn-primary { background: #000; color: #fff; border: 1px solid #000; }
+.bz-btn-primary:hover { transform: translateY(-2px); }
+.bz-btn-primary svg { color: #25D366; }
+.bz-btn-secondary { background: transparent; color: #000; border: 1px solid rgba(0,0,0,0.35); }
+.bz-btn-secondary:hover { border-color: #000; transform: translateY(-2px); }
+
+.bz-right-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.bz-right-tags span {
+  font-size: 11px;
+  color: rgba(0,0,0,0.75);
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-weight: 500;
+}
+
+/* ---------- desktop (768px+) ---------- */
+@media (min-width: 768px) {
+  .bz-nav { padding: 24px 32px; }
+  .bz-brand-text { display: block; }
+  .bz-tags-pill { display: flex; }
+  .bz-contact-label { display: block; }
+  .bz-menu-circle, .bz-contact-circle { width: 32px; height: 32px; }
+  .bz-menu-panel { top: 76px; left: 32px; }
+  .bz-media-wrap { align-items: flex-end; padding: 0; }
+  .bz-scene { aspect-ratio: auto; height: min(86%, 100%); max-height: none; }
+  .bz-footer {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 32px 32px 36px;
+  }
+  .bz-heading { font-size: clamp(2.5rem, 5.5vw, 4.5rem); }
+}
