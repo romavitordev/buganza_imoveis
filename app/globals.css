@@ -262,7 +262,13 @@ h3 {
 .bz-btn-secondary { background: transparent; color: #000; border: 1px solid rgba(0,0,0,0.35); }
 .bz-btn-secondary:hover { border-color: #000; transform: translateY(-2px); }
 
-.bz-right-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.bz-right-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  /* mobile: centralizadas; desktop volta ao alinhamento à direita */
+  justify-content: center;
+}
 .bz-right-tags span {
   font-size: 11px;
   color: rgba(0,0,0,0.75);
