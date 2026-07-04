@@ -28,6 +28,10 @@ const STATUS_ESTILO: Record<AdminProperty["status"], string> = {
 interface Resumo7d {
   visualizacoes: number;
   cliquesWhatsApp: number;
+  /** % dos acessos vindos de celular (null = sem dados). */
+  percentualMobile: number | null;
+  /** Principais origens de tráfego (utm_source/referrer). */
+  origens: { origem: string; total: number }[];
 }
 
 export default function DashboardTable({
@@ -156,8 +160,9 @@ export default function DashboardTable({
         </div>
       </header>
 
-      {/* Métricas do site público — últimos 7 dias */}
-      <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {/* Métricas do site público — últimos 7 dias.
+          Contagem única por dispositivo/dia; nenhum dado pessoal armazenado. */}
+      <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-black/10 p-5">
           <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
             <Eye size={13} aria-hidden="true" />
@@ -166,6 +171,11 @@ export default function DashboardTable({
           <p className="mt-1 text-3xl font-semibold tracking-tight">
             {resumo7d.visualizacoes}
           </p>
+          {resumo7d.percentualMobile !== null && (
+            <p className="mt-0.5 text-[11px] text-black/45">
+              {resumo7d.percentualMobile}% pelo celular
+            </p>
+          )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
           <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
@@ -175,6 +185,14 @@ export default function DashboardTable({
           <p className="mt-1 text-3xl font-semibold tracking-tight">
             {resumo7d.cliquesWhatsApp}
           </p>
+          {resumo7d.visualizacoes > 0 && (
+            <p className="mt-0.5 text-[11px] text-black/45">
+              {Math.round(
+                (resumo7d.cliquesWhatsApp / resumo7d.visualizacoes) * 100
+              )}
+              % de conversão
+            </p>
+          )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
           <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
@@ -188,6 +206,28 @@ export default function DashboardTable({
                 }`
               : "Sem dados ainda"}
           </p>
+        </div>
+        <div className="rounded-2xl border border-black/10 p-5">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+            Origens do tráfego (7 dias)
+          </p>
+          {resumo7d.origens.length > 0 ? (
+            <ul className="mt-1.5 flex flex-col gap-0.5">
+              {resumo7d.origens.map(({ origem, total }) => (
+                <li
+                  key={origem}
+                  className="flex items-center justify-between gap-2 text-[12px]"
+                >
+                  <span className="truncate font-medium">{origem}</span>
+                  <span className="tabular-nums text-black/50">{total}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-1 text-sm font-medium text-black/50">
+              Acessos diretos por enquanto
+            </p>
+          )}
         </div>
       </div>
 

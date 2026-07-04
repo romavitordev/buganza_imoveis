@@ -12,21 +12,37 @@ export const metadata = {
 export default async function AdminDashboardPage() {
   const seteDiasAtras = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [properties, eventosTotais, eventos7d] = await Promise.all([
-    prisma.property.findMany({
-      orderBy: { atualizadoEm: "desc" },
-      include: { fotos: { orderBy: { ordem: "asc" } } },
-    }),
-    prisma.propertyEvent.groupBy({
-      by: ["propertyId", "tipo"],
-      _count: { _all: true },
-    }),
-    prisma.propertyEvent.groupBy({
-      by: ["tipo"],
-      where: { criadoEm: { gte: seteDiasAtras } },
-      _count: { _all: true },
-    }),
-  ]);
+  const [properties, eventosTotais, eventos7d, dispositivos7d, origens7d] =
+    await Promise.all([
+      prisma.property.findMany({
+        orderBy: { atualizadoEm: "desc" },
+        include: { fotos: { orderBy: { ordem: "asc" } } },
+      }),
+      prisma.propertyEvent.groupBy({
+        by: ["propertyId", "tipo"],
+        _count: { _all: true },
+      }),
+      prisma.propertyEvent.groupBy({
+        by: ["tipo"],
+        where: { criadoEm: { gte: seteDiasAtras } },
+        _count: { _all: true },
+      }),
+      prisma.propertyEvent.groupBy({
+        by: ["dispositivo"],
+        where: {
+          criadoEm: { gte: seteDiasAtras },
+          dispositivo: { not: null },
+        },
+        _count: { _all: true },
+      }),
+      prisma.propertyEvent.groupBy({
+        by: ["origem"],
+        where: { criadoEm: { gte: seteDiasAtras }, origem: { not: null } },
+        _count: { _all: true },
+        orderBy: { _count: { origem: "desc" } },
+        take: 3,
+      }),
+    ]);
 
   const contagem = new Map<string, { views: number; cliques: number }>();
   for (const evento of eventosTotais) {
@@ -68,11 +84,26 @@ export default async function AdminDashboardPage() {
     cliquesWhatsApp: contagem.get(p.id)?.cliques ?? 0,
   }));
 
+  const totalDispositivos = dispositivos7d.reduce(
+    (soma, d) => soma + d._count._all,
+    0
+  );
+  const mobile7d =
+    dispositivos7d.find((d) => d.dispositivo === "MOBILE")?._count._all ?? 0;
+
   const resumo7d = {
     visualizacoes:
       eventos7d.find((e) => e.tipo === "VISUALIZACAO")?._count._all ?? 0,
     cliquesWhatsApp:
       eventos7d.find((e) => e.tipo === "CLIQUE_WHATSAPP")?._count._all ?? 0,
+    percentualMobile:
+      totalDispositivos > 0
+        ? Math.round((mobile7d / totalDispositivos) * 100)
+        : null,
+    origens: origens7d.map((o) => ({
+      origem: o.origem ?? "direto",
+      total: o._count._all,
+    })),
   };
 
   return (

@@ -4,17 +4,19 @@ import { useEffect } from "react";
 import { enviarEvento } from "@/lib/track";
 
 /**
- * Registra 1 visualização por imóvel por sessão do navegador
- * (dedupe via sessionStorage). Renderiza nada.
+ * Registra 1 visualização por imóvel POR DISPOSITIVO (localStorage —
+ * persiste entre visitas). O servidor ainda aplica uma trava diária por
+ * hash de IP+navegador, para não inflar mesmo em aba anônima.
+ * Renderiza nada.
  */
 export default function TrackView({ slug }: { slug: string }) {
   useEffect(() => {
     try {
       const chave = `bz-view-${slug}`;
-      if (sessionStorage.getItem(chave)) return;
-      sessionStorage.setItem(chave, "1");
+      if (localStorage.getItem(chave)) return;
+      localStorage.setItem(chave, String(Date.now()));
     } catch {
-      // sessionStorage indisponível (modo privado etc.) — registra mesmo assim
+      // localStorage indisponível (modo privado etc.) — o servidor deduplica
     }
     enviarEvento(slug, "visualizacao");
   }, [slug]);

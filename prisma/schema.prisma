@@ -98,14 +98,23 @@ model Property {
 
 // Eventos de analytics do site público: visualizações da página do imóvel
 // e cliques nos botões de WhatsApp. Alimentam as métricas do dashboard.
+//
+// LGPD: nenhum dado pessoal cru é armazenado. `dedupeHash` é um SHA-256 de
+// IP+navegador usado apenas para não contar o mesmo dispositivo duas vezes
+// no mesmo dia — o IP em si nunca é gravado.
 model PropertyEvent {
-  id         String     @id @default(cuid())
-  property   Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  propertyId String
-  tipo       TipoEvento
-  criadoEm   DateTime   @default(now())
+  id          String     @id @default(cuid())
+  property    Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  propertyId  String
+  tipo        TipoEvento
+  // Contexto anônimo do acesso
+  dispositivo String? // MOBILE | DESKTOP | TABLET
+  origem      String? // utm_source ou domínio do referrer (ex.: instagram.com)
+  dedupeHash  String? // pseudônimo do dispositivo (nunca o IP cru)
+  criadoEm    DateTime   @default(now())
 
   @@index([propertyId, tipo, criadoEm])
+  @@index([dedupeHash, tipo, criadoEm])
 }
 
 model PropertyPhoto {
