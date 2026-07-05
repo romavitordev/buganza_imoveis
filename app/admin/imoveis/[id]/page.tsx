@@ -36,6 +36,7 @@ export default async function EditarImovelPage({
     destaque: p.destaque,
     cidade: p.cidade,
     bairro: p.bairro,
+    enderecoMapa: p.enderecoMapa,
     quartos: p.quartos,
     banheiros: p.banheiros,
     vagas: p.vagas,

@@ -45,6 +45,9 @@ export default function PropertyForm({ property }: PropertyFormProps) {
   const [destaque, setDestaque] = useState(property?.destaque ?? false);
   const [cidade, setCidade] = useState(property?.cidade ?? "Sorocaba");
   const [bairro, setBairro] = useState(property?.bairro ?? "");
+  const [enderecoMapa, setEnderecoMapa] = useState(
+    property?.enderecoMapa ?? ""
+  );
   const [quartos, setQuartos] = useState(
     property?.quartos !== null && property?.quartos !== undefined
       ? String(property.quartos)
@@ -98,6 +101,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       destaque,
       cidade,
       bairro,
+      enderecoMapa: enderecoMapa || null,
       quartos: quartos || null,
       banheiros: banheiros || null,
       vagas: vagas || null,
@@ -278,6 +282,20 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             value={bairro}
             onChange={(e) => setBairro(e.target.value)}
             className={inputCls}
+          />
+        </label>
+
+        <label className={`${labelCls} md:col-span-2`}>
+          <span className={legendaCls}>
+            Endereço para o mapa (opcional — deixe vazio para mostrar só o
+            bairro)
+          </span>
+          <input
+            value={enderecoMapa}
+            onChange={(e) => setEnderecoMapa(e.target.value)}
+            maxLength={160}
+            className={inputCls}
+            placeholder="Ex.: Rua das Palmeiras, 123 — usado só para posicionar o pino no site"
           />
         </label>
 

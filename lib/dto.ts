@@ -25,6 +25,8 @@ export interface PublicPropertyDTO {
   transacao: Property["transacao"];
   cidade: string;
   bairro: string;
+  /** Endereço opcional para o pino do mapa (o casal decide por imóvel). */
+  enderecoMapa: string | null;
   quartos: number | null;
   banheiros: number | null;
   vagas: number | null;
@@ -52,6 +54,7 @@ export function toPublicPropertyDTO(
     transacao: property.transacao,
     cidade: property.cidade,
     bairro: property.bairro,
+    enderecoMapa: property.enderecoMapa,
     quartos: property.quartos,
     banheiros: property.banheiros,
     vagas: property.vagas,

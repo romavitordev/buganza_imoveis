@@ -66,6 +66,9 @@ model Property {
 
   cidade       String
   bairro       String
+  // Endereço opcional usado SÓ para posicionar o pino do mapa no site.
+  // Vazio = mapa mostra a região do bairro (localização aproximada).
+  enderecoMapa String?
 
   quartos      Int?
   banheiros    Int?

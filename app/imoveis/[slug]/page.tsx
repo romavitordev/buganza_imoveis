@@ -179,7 +179,8 @@ export default async function ImovelPage({ params }: PageProps) {
               </section>
             )}
 
-            {/* Localização aproximada (bairro) — endereço exato só após contato */}
+            {/* Mapa: pino exato se o admin preencheu o endereço;
+                senão, região do bairro (localização aproximada) */}
             <section aria-labelledby="mapa-imovel-titulo">
               <h2
                 id="mapa-imovel-titulo"
@@ -189,8 +190,10 @@ export default async function ImovelPage({ params }: PageProps) {
               </h2>
               <iframe
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                  `${imovel.bairro}, ${imovel.cidade}, SP`
-                )}&z=14&output=embed`}
+                  imovel.enderecoMapa
+                    ? `${imovel.enderecoMapa}, ${imovel.cidade}, SP`
+                    : `${imovel.bairro}, ${imovel.cidade}, SP`
+                )}&z=${imovel.enderecoMapa ? 16 : 14}&output=embed`}
                 title={`Mapa de ${imovel.bairro}, ${imovel.cidade}`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -198,8 +201,9 @@ export default async function ImovelPage({ params }: PageProps) {
                 className="aspect-video w-full rounded-2xl border border-black/10 grayscale transition-[filter] duration-500 ease-premium hover:grayscale-0"
               />
               <p className="mt-2 text-[12px] text-black/45">
-                Localização aproximada ({imovel.bairro}) — passamos o endereço
-                completo no atendimento pelo WhatsApp.
+                {imovel.enderecoMapa
+                  ? `${imovel.enderecoMapa} · ${imovel.bairro}, ${imovel.cidade}`
+                  : `Localização aproximada (${imovel.bairro}) — passamos o endereço completo no atendimento pelo WhatsApp.`}
               </p>
             </section>
           </div>

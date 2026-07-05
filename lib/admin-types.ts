@@ -29,6 +29,8 @@ export interface AdminProperty {
   destaque: boolean;
   cidade: string;
   bairro: string;
+  /** Endereço opcional usado só para o pino do mapa no site. */
+  enderecoMapa: string | null;
   quartos: number | null;
   banheiros: number | null;
   vagas: number | null;

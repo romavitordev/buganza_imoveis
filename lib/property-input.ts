@@ -15,6 +15,7 @@ export interface PropertyInput {
   destaque: boolean;
   cidade: string;
   bairro: string;
+  enderecoMapa: string | null;
   quartos: number | null;
   banheiros: number | null;
   vagas: number | null;
@@ -90,6 +91,8 @@ export function parsePropertyInput(
     const bairro = texto(payload.bairro);
     if (!bairro) return { erro: "Informe o bairro." };
 
+    const enderecoMapa = texto(payload.enderecoMapa).slice(0, 160) || null;
+
     const slugInformado = texto(payload.slug);
 
     return {
@@ -114,6 +117,7 @@ export function parsePropertyInput(
       destaque: payload.destaque === true,
       cidade,
       bairro,
+      enderecoMapa,
       quartos: inteiroOpcional(payload.quartos, "quartos"),
       banheiros: inteiroOpcional(payload.banheiros, "banheiros"),
       vagas: inteiroOpcional(payload.vagas, "vagas"),

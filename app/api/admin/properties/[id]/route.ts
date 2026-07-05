@@ -76,6 +76,7 @@ export async function PATCH(request: Request, { params }: Params) {
         destaque: input.destaque,
         cidade: input.cidade,
         bairro: input.bairro,
+        enderecoMapa: input.enderecoMapa,
         quartos: input.quartos,
         banheiros: input.banheiros,
         vagas: input.vagas,
