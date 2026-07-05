@@ -11,11 +11,42 @@
  */
 
 import EmbeddedPostgres from "embedded-postgres";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
+import net from "node:net";
 import path from "node:path";
 
 const DATA_DIR = path.resolve(".pgdata");
 const PORT = 5502;
+
+/** true se algo está realmente escutando na porta do Postgres. */
+function portaAtiva() {
+  return new Promise((resolve) => {
+    const socket = net.connect({ port: PORT, host: "127.0.0.1" });
+    socket.once("connect", () => {
+      socket.end();
+      resolve(true);
+    });
+    socket.once("error", () => resolve(false));
+    socket.setTimeout(1500, () => {
+      socket.destroy();
+      resolve(false);
+    });
+  });
+}
+
+// Lock obsoleto: postmaster.pid existe mas nenhum servidor responde
+// (acontece quando o processo é morto sem shutdown limpo).
+const pidFile = path.join(DATA_DIR, "postmaster.pid");
+if (existsSync(pidFile)) {
+  if (await portaAtiva()) {
+    console.log(
+      `✔ O Postgres local já está rodando na porta ${PORT}. Nada a fazer.`
+    );
+    process.exit(0);
+  }
+  console.log("Removendo lock obsoleto (postmaster.pid sem servidor ativo)…");
+  rmSync(pidFile, { force: true });
+}
 
 const pg = new EmbeddedPostgres({
   databaseDir: DATA_DIR,

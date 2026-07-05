@@ -15,7 +15,13 @@ export default function SiteFooter() {
               Imóveis Buganza
             </p>
             <p className="text-[11px] text-black/45">
-              CRECI 118400 · Sorocaba/SP
+              CRECI 118400 · Sorocaba/SP ·{" "}
+              <Link
+                href="/privacidade"
+                className="underline decoration-black/20 underline-offset-2 transition-colors hover:text-black"
+              >
+                Privacidade
+              </Link>
             </p>
           </div>
         </div>

@@ -178,6 +178,30 @@ export default async function ImovelPage({ params }: PageProps) {
                 />
               </section>
             )}
+
+            {/* Localização aproximada (bairro) — endereço exato só após contato */}
+            <section aria-labelledby="mapa-imovel-titulo">
+              <h2
+                id="mapa-imovel-titulo"
+                className="mb-3 text-lg font-normal tracking-tight"
+              >
+                Localização
+              </h2>
+              <iframe
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                  `${imovel.bairro}, ${imovel.cidade}, SP`
+                )}&z=14&output=embed`}
+                title={`Mapa de ${imovel.bairro}, ${imovel.cidade}`}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                className="aspect-video w-full rounded-2xl border border-black/10 grayscale transition-[filter] duration-500 ease-premium hover:grayscale-0"
+              />
+              <p className="mt-2 text-[12px] text-black/45">
+                Localização aproximada ({imovel.bairro}) — passamos o endereço
+                completo no atendimento pelo WhatsApp.
+              </p>
+            </section>
           </div>
 
           {/* Ficha */}

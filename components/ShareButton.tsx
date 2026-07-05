@@ -7,22 +7,67 @@ interface ShareButtonProps {
   titulo: string;
 }
 
-/** Compartilhar o imóvel: share nativo no mobile, copiar link no desktop. */
+/**
+ * Compartilhar o imóvel com cadeia de fallbacks:
+ *  1. share nativo (mobile, contexto seguro)
+ *  2. clipboard API
+ *  3. execCommand("copy") — funciona em http:// e navegadores antigos
+ */
 export default function ShareButton({ titulo }: ShareButtonProps) {
   const [copiado, setCopiado] = useState(false);
 
+  function marcarCopiado() {
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  }
+
+  function copiarLegado(url: string): boolean {
+    try {
+      const area = document.createElement("textarea");
+      area.value = url;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.opacity = "0";
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(area);
+      return ok;
+    } catch {
+      return false;
+    }
+  }
+
   async function compartilhar() {
     const url = window.location.href;
-    try {
-      if (navigator.share) {
+
+    // 1) share nativo (abre a folha de compartilhamento do celular)
+    if (typeof navigator.share === "function") {
+      try {
         await navigator.share({ title: titulo, url });
         return;
+      } catch (e) {
+        // usuário fechou a folha — não é erro
+        if (e instanceof Error && e.name === "AbortError") return;
+        // NotAllowedError/outros → tenta copiar
       }
+    }
+
+    // 2) clipboard API (exige contexto seguro)
+    try {
       await navigator.clipboard.writeText(url);
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2000);
+      marcarCopiado();
+      return;
     } catch {
-      // usuário cancelou o share nativo — nada a fazer
+      // indisponível (http:// ou permissão negada) → fallback legado
+    }
+
+    // 3) fallback legado
+    if (copiarLegado(url)) {
+      marcarCopiado();
+    } else {
+      // último recurso: mostra o link para copiar manualmente
+      window.prompt("Copie o link do imóvel:", url);
     }
   }
 

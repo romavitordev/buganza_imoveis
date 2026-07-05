@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const fixas: MetadataRoute.Sitemap = [
     { url: base, changeFrequency: "weekly", priority: 1 },
     { url: `${base}/imoveis`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${base}/privacidade`, changeFrequency: "yearly", priority: 0.3 },
   ];
 
   const imoveis = await prisma.property
