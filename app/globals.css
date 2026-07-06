@@ -300,3 +300,73 @@ h3 {
   }
   .bz-heading { font-size: clamp(3.2rem, 6.2vw, 6rem); }
 }
+
+/* ---------- navbar: âncoras + indicador deslizante ---------- */
+
+/* Seções não ficam escondidas sob a navbar fixa ao dar scroll suave */
+section[id] {
+  scroll-margin-top: 92px;
+}
+
+/* Pílula preta que desliza atrás do link ativo (desktop) */
+.bz-nav-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  border-radius: 999px;
+  background: #000;
+  transition:
+    transform 0.45s var(--bz-ease),
+    width 0.45s var(--bz-ease),
+    opacity 0.3s ease;
+  will-change: transform, width;
+}
+
+/* Pílula do menu inferior (mobile) que acompanha a seção ativa */
+.bz-bottomnav-indicator {
+  position: absolute;
+  top: 10px;
+  height: 28px;
+  width: 48px;
+  border-radius: 999px;
+  background: #000;
+  transition:
+    transform 0.4s var(--bz-ease),
+    opacity 0.3s ease;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bz-nav-indicator,
+  .bz-bottomnav-indicator {
+    transition: opacity 0.2s ease;
+  }
+}
+
+/* ---------- lightbox da galeria ---------- */
+@keyframes bzBackdropIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bzBackdropOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes bzZoomIn  { from { opacity: 0; transform: scale(0.9);  } to { opacity: 1; transform: scale(1); } }
+@keyframes bzZoomOut { from { opacity: 1; transform: scale(1);    } to { opacity: 0; transform: scale(0.95); } }
+@keyframes bzImgFade { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: scale(1); } }
+@keyframes bzControlsIn { from { opacity: 0; } to { opacity: 1; } }
+
+.bz-lightbox {
+  animation: bzBackdropIn 0.28s var(--bz-ease) both;
+}
+.bz-lightbox.bz-closing {
+  animation: bzBackdropOut 0.24s var(--bz-ease) forwards;
+}
+.bz-lightbox-figure {
+  animation: bzZoomIn 0.36s var(--bz-ease) both;
+}
+.bz-lightbox.bz-closing .bz-lightbox-figure {
+  animation: bzZoomOut 0.24s var(--bz-ease) forwards;
+}
+.bz-lightbox-img {
+  animation: bzImgFade 0.34s var(--bz-ease) both;
+}
+.bz-lightbox-controls {
+  animation: bzControlsIn 0.4s 0.14s both;
+}

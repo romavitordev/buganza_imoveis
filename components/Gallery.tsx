@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { PublicPhotoDTO } from "@/lib/dto";
@@ -10,9 +10,19 @@ interface GalleryProps {
   titulo: string;
 }
 
+const DURACAO_FECHAR = 240; // deve casar com a animação bzZoomOut/bzBackdropOut
+
+function prefereMenosMovimento(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 /**
- * Galeria da página de detalhe: capa grande + thumbnails clicáveis
- * e lightbox simples com navegação por teclado.
+ * Galeria da página de detalhe: capa grande + thumbnails clicáveis e
+ * lightbox com animação fluida de abrir/fechar, transição ao trocar de
+ * foto e navegação por teclado.
  */
 export default function Gallery({ fotos, titulo }: GalleryProps) {
   const ordenadas = fotos
@@ -20,7 +30,10 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
     .sort((a, b) => Number(b.capa) - Number(a.capa) || a.ordem - b.ordem);
 
   const [indiceAtivo, setIndiceAtivo] = useState(0);
-  const [lightboxAberto, setLightboxAberto] = useState(false);
+  // montado = presente no DOM; fechando = tocando animação de saída
+  const [montado, setMontado] = useState(false);
+  const [fechando, setFechando] = useState(false);
+  const timerRef = useRef<number | null>(null);
 
   const total = ordenadas.length;
 
@@ -31,11 +44,26 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
     [total]
   );
 
+  const abrir = useCallback(() => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    setFechando(false);
+    setMontado(true);
+  }, []);
+
+  const fechar = useCallback(() => {
+    setFechando(true);
+    const ms = prefereMenosMovimento() ? 0 : DURACAO_FECHAR;
+    timerRef.current = window.setTimeout(() => {
+      setMontado(false);
+      setFechando(false);
+    }, ms);
+  }, []);
+
   useEffect(() => {
-    if (!lightboxAberto) return;
+    if (!montado) return;
 
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setLightboxAberto(false);
+      if (e.key === "Escape") fechar();
       if (e.key === "ArrowLeft") navegar(-1);
       if (e.key === "ArrowRight") navegar(1);
     }
@@ -46,7 +74,13 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [lightboxAberto, navegar]);
+  }, [montado, fechar, navegar]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+    };
+  }, []);
 
   if (total === 0) {
     return (
@@ -63,8 +97,8 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
       {/* Foto principal */}
       <button
         type="button"
-        onClick={() => setLightboxAberto(true)}
-        className="relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-2xl bg-mist"
+        onClick={abrir}
+        className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-2xl bg-mist"
         aria-label={`Ampliar foto ${indiceAtivo + 1} de ${total}`}
       >
         <Image
@@ -73,7 +107,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 60vw"
-          className="object-cover"
+          className="object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.03]"
         />
         {total > 1 && (
           <span className="absolute bottom-3 right-3 rounded-pill bg-black/70 px-3 py-1 text-[11px] font-medium text-white backdrop-blur">
@@ -96,7 +130,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
               onClick={() => setIndiceAtivo(i)}
               aria-label={`Ver foto ${i + 1}`}
               aria-current={i === indiceAtivo ? "true" : undefined}
-              className={`relative aspect-square overflow-hidden rounded-lg bg-mist transition-opacity ${
+              className={`relative aspect-square overflow-hidden rounded-lg bg-mist transition-all duration-300 ease-premium ${
                 i === indiceAtivo
                   ? "ring-2 ring-black ring-offset-2"
                   : "opacity-70 hover:opacity-100"
@@ -115,19 +149,21 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
       )}
 
       {/* Lightbox */}
-      {lightboxAberto && (
+      {montado && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4"
+          className={`bz-lightbox fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 ${
+            fechando ? "bz-closing" : ""
+          }`}
           role="dialog"
           aria-modal="true"
           aria-label={`Galeria de fotos de ${titulo}`}
-          onClick={() => setLightboxAberto(false)}
+          onClick={fechar}
         >
           <button
             type="button"
-            onClick={() => setLightboxAberto(false)}
+            onClick={fechar}
             aria-label="Fechar galeria"
-            className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25"
+            className="bz-lightbox-controls absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95"
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -141,7 +177,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
                   navegar(-1);
                 }}
                 aria-label="Foto anterior"
-                className="absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 md:left-6"
+                className="bz-lightbox-controls absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95 md:left-6"
               >
                 <ChevronLeft size={22} aria-hidden="true" />
               </button>
@@ -152,7 +188,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
                   navegar(1);
                 }}
                 aria-label="Próxima foto"
-                className="absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 md:right-6"
+                className="bz-lightbox-controls absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95 md:right-6"
               >
                 <ChevronRight size={22} aria-hidden="true" />
               </button>
@@ -160,20 +196,23 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
           )}
 
           <div
-            className="relative h-[80vh] w-full max-w-5xl"
+            className="bz-lightbox-figure relative h-[80vh] w-full max-w-5xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
-              src={ativa.url}
-              alt={`${titulo} — foto ${indiceAtivo + 1} de ${total}`}
-              fill
-              sizes="100vw"
-              className="object-contain"
-            />
+            {/* key por índice → replay do fade a cada troca de foto */}
+            <div key={indiceAtivo} className="bz-lightbox-img absolute inset-0">
+              <Image
+                src={ativa.url}
+                alt={`${titulo} — foto ${indiceAtivo + 1} de ${total}`}
+                fill
+                sizes="100vw"
+                className="object-contain"
+              />
+            </div>
           </div>
 
           {total > 1 && (
-            <span className="absolute bottom-6 rounded-pill bg-white/10 px-4 py-1.5 text-[12px] font-medium text-white">
+            <span className="bz-lightbox-controls absolute bottom-6 rounded-pill bg-white/10 px-4 py-1.5 text-[12px] font-medium text-white">
               {indiceAtivo + 1} / {total}
             </span>
           )}

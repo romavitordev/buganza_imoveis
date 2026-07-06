@@ -2,6 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+} from "react";
 import { Building2, Home, MessageCircle, Users } from "lucide-react";
 
 interface SiteNavProps {
@@ -25,20 +33,121 @@ export function BrandMark() {
   );
 }
 
-const LINKS = [
-  { href: "/", rotulo: "Início", icone: Home },
-  { href: "/imoveis", rotulo: "Imóveis", icone: Building2 },
-  { href: "/#quem-somos", rotulo: "Quem Somos", icone: Users },
+type Secao = "topo" | "quem-somos" | null;
+
+const LINKS: {
+  href: string;
+  rotulo: string;
+  icone: typeof Home;
+  secao: Secao;
+}[] = [
+  { href: "/", rotulo: "Início", icone: Home, secao: "topo" },
+  { href: "/imoveis", rotulo: "Imóveis", icone: Building2, secao: null },
+  { href: "/#quem-somos", rotulo: "Quem Somos", icone: Users, secao: "quem-somos" },
 ];
 
-function linkAtivo(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
-  if (href.startsWith("/#")) return false;
-  return pathname === href || pathname.startsWith(`${href}/`);
+function prefereMenosMovimento(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 }
 
 export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
   const pathname = usePathname();
+  const naHome = pathname === "/";
+
+  // Seção visível na home, detectada por scroll (IntersectionObserver)
+  const [secaoAtiva, setSecaoAtiva] = useState<Secao>("topo");
+
+  useEffect(() => {
+    if (!naHome) return;
+    const alvo = document.getElementById("quem-somos");
+    if (!alvo) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => setSecaoAtiva(entry.isIntersecting ? "quem-somos" : "topo"),
+      // troca por volta do meio da tela
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    obs.observe(alvo);
+    return () => obs.disconnect();
+  }, [naHome]);
+
+  // Índice do link ativo dentro de LINKS (-1 = nenhum)
+  const indiceAtivo = naHome
+    ? LINKS.findIndex((l) => l.secao === secaoAtiva)
+    : LINKS.findIndex(
+        (l) =>
+          l.href !== "/" &&
+          (pathname === l.href || pathname.startsWith(`${l.href}/`))
+      );
+
+  // Scroll suave para seções da home (com offset da navbar via scroll-margin)
+  const rolarPara = useCallback(
+    (e: MouseEvent, secao: Secao) => {
+      if (!naHome || secao === null) return; // deixa o Next navegar normalmente
+      e.preventDefault();
+      const comportamento: ScrollBehavior = prefereMenosMovimento()
+        ? "auto"
+        : "smooth";
+      if (secao === "topo") {
+        window.scrollTo({ top: 0, behavior: comportamento });
+      } else {
+        document
+          .getElementById(secao)
+          ?.scrollIntoView({ behavior: comportamento, block: "start" });
+      }
+    },
+    [naHome]
+  );
+
+  // ---- indicador deslizante (desktop) ----
+  const desktopRef = useRef<HTMLDivElement>(null);
+  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [indDesktop, setIndDesktop] = useState({
+    left: 0,
+    width: 0,
+    pronto: false,
+  });
+
+  useLayoutEffect(() => {
+    function medir() {
+      const container = desktopRef.current;
+      const el = linkRefs.current[indiceAtivo];
+      if (!container || !el || indiceAtivo < 0) {
+        setIndDesktop((s) => ({ ...s, pronto: false }));
+        return;
+      }
+      const cr = container.getBoundingClientRect();
+      const er = el.getBoundingClientRect();
+      setIndDesktop({ left: er.left - cr.left, width: er.width, pronto: true });
+    }
+    medir();
+    // remede após o carregamento da fonte (larguras mudam)
+    const t = window.setTimeout(medir, 140);
+    window.addEventListener("resize", medir);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("resize", medir);
+    };
+  }, [indiceAtivo, pathname]);
+
+  // ---- indicador deslizante (mobile, 4 colunas iguais) ----
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const [larguraBottom, setLarguraBottom] = useState(0);
+
+  useLayoutEffect(() => {
+    function medir() {
+      if (bottomRef.current) setLarguraBottom(bottomRef.current.clientWidth);
+    }
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
+  }, []);
+
+  const colunaMobile = larguraBottom / 4;
+  const bottomLeft =
+    indiceAtivo >= 0 ? (indiceAtivo + 0.5) * colunaMobile - 24 : 0;
 
   return (
     <>
@@ -59,18 +168,32 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         </Link>
 
         {/* Links inline — só desktop; no mobile a navegação fica na barra inferior */}
-        <div className="hidden items-center gap-1 rounded-pill bg-white/85 p-1 shadow-[0_2px_16px_rgba(0,0,0,0.06)] backdrop-blur md:flex">
-          {LINKS.map(({ href, rotulo }) => {
-            const ativo = linkAtivo(pathname, href);
+        <div
+          ref={desktopRef}
+          className="relative hidden items-center gap-1 rounded-pill bg-white/85 p-1 shadow-[0_2px_16px_rgba(0,0,0,0.06)] backdrop-blur md:flex"
+        >
+          <span
+            aria-hidden="true"
+            className="bz-nav-indicator"
+            style={{
+              transform: `translateX(${indDesktop.left}px)`,
+              width: indDesktop.width,
+              opacity: indDesktop.pronto ? 1 : 0,
+            }}
+          />
+          {LINKS.map(({ href, rotulo, secao }, i) => {
+            const ativo = i === indiceAtivo;
             return (
               <Link
                 key={href}
                 href={href}
+                ref={(el) => {
+                  linkRefs.current[i] = el;
+                }}
+                onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
-                className={`rounded-pill px-4 py-2 text-[12px] font-medium transition-colors ${
-                  ativo
-                    ? "bg-black text-white"
-                    : "text-black/65 hover:bg-black/5 hover:text-black"
+                className={`relative z-10 rounded-pill px-4 py-2 text-[12px] font-medium transition-colors duration-300 ${
+                  ativo ? "text-white" : "text-black/65 hover:text-black"
                 }`}
               >
                 {rotulo}
@@ -97,24 +220,34 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         aria-label="Navegação inferior"
         className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
-        <div className="grid h-16 grid-cols-4">
-          {LINKS.map(({ href, rotulo, icone: Icone }) => {
-            const ativo = linkAtivo(pathname, href);
+        <div ref={bottomRef} className="relative grid h-16 grid-cols-4">
+          <span
+            aria-hidden="true"
+            className="bz-bottomnav-indicator"
+            style={{
+              transform: `translateX(${bottomLeft}px)`,
+              opacity: indiceAtivo >= 0 && larguraBottom > 0 ? 1 : 0,
+            }}
+          />
+          {LINKS.map(({ href, rotulo, icone: Icone, secao }, i) => {
+            const ativo = i === indiceAtivo;
             return (
               <Link
                 key={href}
                 href={href}
+                onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
-                className={`flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors ${
+                className={`relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors duration-300 ${
                   ativo ? "text-black" : "text-black/45"
                 }`}
               >
-                <span
-                  className={`flex h-7 w-12 items-center justify-center rounded-pill transition-colors ${
-                    ativo ? "bg-black text-white" : ""
-                  }`}
-                >
-                  <Icone size={17} strokeWidth={ativo ? 2.25 : 1.75} aria-hidden="true" />
+                <span className="flex h-7 w-12 items-center justify-center">
+                  <Icone
+                    size={17}
+                    strokeWidth={ativo ? 2.25 : 1.75}
+                    aria-hidden="true"
+                    className={ativo ? "text-white" : ""}
+                  />
                 </span>
                 {rotulo}
               </Link>
@@ -125,7 +258,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/45"
+            className="relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/45"
           >
             <span className="flex h-7 w-12 items-center justify-center rounded-pill bg-black text-[#25D366]">
               <MessageCircle size={17} strokeWidth={2.25} aria-hidden="true" />
