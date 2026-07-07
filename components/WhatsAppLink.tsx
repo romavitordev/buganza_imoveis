@@ -1,20 +1,19 @@
-"use client";
-
 import type { ReactNode } from "react";
-import { enviarEvento } from "@/lib/track";
 
 interface WhatsAppLinkProps {
+  /** Caminho interno /api/contato — o servidor monta o número e redireciona. */
   href: string;
-  /** Slug do imóvel — quando presente, o clique é contabilizado no admin. */
-  trackSlug?: string;
   className?: string;
   children: ReactNode;
 }
 
-/** Link de WhatsApp que registra o clique como evento de analytics. */
+/**
+ * Link de contato do WhatsApp. Aponta para a rota interna /api/contato,
+ * que redireciona ao WhatsApp no servidor (o número nunca vai ao cliente).
+ * O clique é contabilizado no servidor — sem beacon, sem contagem dupla.
+ */
 export default function WhatsAppLink({
   href,
-  trackSlug,
   className,
   children,
 }: WhatsAppLinkProps) {
@@ -24,9 +23,6 @@ export default function WhatsAppLink({
       target="_blank"
       rel="noopener noreferrer"
       className={className}
-      onClick={() => {
-        if (trackSlug) enviarEvento(trackSlug, "clique_whatsapp");
-      }}
     >
       {children}
     </a>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { enviarEvento } from "@/lib/track";
+import { registrarVisualizacao } from "@/lib/track";
 
 /**
  * Registra 1 visualização por imóvel POR DISPOSITIVO (localStorage —
@@ -18,7 +18,7 @@ export default function TrackView({ slug }: { slug: string }) {
     } catch {
       // localStorage indisponível (modo privado etc.) — o servidor deduplica
     }
-    enviarEvento(slug, "visualizacao");
+    registrarVisualizacao(slug);
   }, [slug]);
 
   return null;

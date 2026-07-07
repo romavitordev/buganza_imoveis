@@ -71,7 +71,7 @@ export default async function ImovelPage({ params }: PageProps) {
   const imovel = await buscarImovelAtivo(params.slug);
   if (!imovel) notFound();
 
-  const whatsappHref = linkWhatsAppImovel(imovel.titulo, imovel.codigo);
+  const whatsappHref = linkWhatsAppImovel(imovel.slug);
   const temPreco =
     Boolean(formatarPreco(imovel.precoVenda)) ||
     Boolean(precoLocacaoFormatado(imovel));
@@ -277,7 +277,6 @@ export default async function ImovelPage({ params }: PageProps) {
             <div className="hidden flex-col gap-3 md:flex">
               <WhatsAppLink
                 href={whatsappHref}
-                trackSlug={imovel.slug}
                 className="inline-flex items-center justify-center gap-2 rounded-pill bg-black px-7 py-4 text-sm font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
               >
                 <MessageCircle
@@ -314,7 +313,6 @@ export default async function ImovelPage({ params }: PageProps) {
       <div className="fixed inset-x-0 bottom-16 z-40 border-t border-black/10 bg-white/95 p-3 backdrop-blur md:hidden">
         <WhatsAppLink
           href={whatsappHref}
-          trackSlug={imovel.slug}
           className="flex items-center justify-center gap-2 rounded-pill bg-black px-6 py-4 text-sm font-medium text-white"
         >
           <MessageCircle

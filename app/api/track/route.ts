@@ -1,28 +1,18 @@
-import { createHash } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ipDaRequisicao } from "@/lib/ratelimit";
+import { registrarEventoUnico, normalizarOrigem } from "@/lib/analytics";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Rota PÚBLICA de analytics: registra visualizações da página do imóvel
- * e cliques nos botões de WhatsApp. Recebe beacons do client.
- * Nunca retorna erro "barulhento" — analytics não pode quebrar o site.
+ * Rota PÚBLICA de analytics: registra VISUALIZAÇÕES da página do imóvel
+ * (beacon do cliente ao abrir o detalhe). Os cliques de WhatsApp são
+ * contabilizados no servidor pela rota /api/contato.
  *
- * Privacidade (LGPD):
- *  - o IP NUNCA é gravado; vira um hash SHA-256 (IP+navegador) usado só
- *    para deduplicar o mesmo dispositivo no mesmo dia;
- *  - o contexto capturado é anônimo: tipo de dispositivo e origem do acesso.
+ * Nunca retorna erro "barulhento" — analytics não pode quebrar o site.
  */
-
-const TIPOS_VALIDOS = {
-  visualizacao: "VISUALIZACAO",
-  clique_whatsapp: "CLIQUE_WHATSAPP",
-} as const;
-
-type TipoParam = keyof typeof TIPOS_VALIDOS;
 
 // Limite leve por IP (60 eventos/min) contra flood acidental ou malicioso
 const JANELA_MS = 60 * 1000;
@@ -45,23 +35,6 @@ function dentroDoLimite(ip: string): boolean {
   return registro.total <= MAX_EVENTOS;
 }
 
-function detectarDispositivo(userAgent: string): string {
-  const ua = userAgent.toLowerCase();
-  if (/ipad|tablet|(android(?!.*mobile))/.test(ua)) return "TABLET";
-  if (/mobile|iphone|android/.test(ua)) return "MOBILE";
-  return "DESKTOP";
-}
-
-/** Normaliza a origem: aceita utm_source ou hostname do referrer. */
-function normalizarOrigem(valor: unknown): string | null {
-  if (typeof valor !== "string") return null;
-  const texto = valor.trim().toLowerCase().slice(0, 60);
-  if (!texto) return null;
-  // remove protocolo/caminho caso venha uma URL inteira
-  const semProtocolo = texto.replace(/^https?:\/\//, "").split("/")[0];
-  return semProtocolo.replace(/^www\./, "") || null;
-}
-
 export async function POST(request: Request) {
   try {
     const ip = ipDaRequisicao(request);
@@ -76,12 +49,8 @@ export async function POST(request: Request) {
     } | null;
 
     const slug = typeof body?.slug === "string" ? body.slug : null;
-    const tipoParam =
-      typeof body?.tipo === "string" && body.tipo in TIPOS_VALIDOS
-        ? (body.tipo as TipoParam)
-        : null;
-
-    if (!slug || !tipoParam) {
+    // Esta rota só registra visualizações; cliques vêm por /api/contato.
+    if (!slug || body?.tipo !== "visualizacao") {
       return NextResponse.json({ ok: true });
     }
 
@@ -94,38 +63,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
-    const tipo = TIPOS_VALIDOS[tipoParam];
-    const userAgent = request.headers.get("user-agent") ?? "";
-
-    // Pseudônimo do dispositivo: hash de IP+UA+imóvel — o IP cru nunca é salvo
-    const dedupeHash = createHash("sha256")
-      .update(`${ip}|${userAgent}|${property.id}`)
-      .digest("hex");
-
-    // 1 evento por dispositivo, por imóvel, por tipo, por dia
-    const inicioDoDia = new Date();
-    inicioDoDia.setHours(0, 0, 0, 0);
-
-    const jaRegistrado = await prisma.propertyEvent.findFirst({
-      where: {
-        dedupeHash,
-        tipo,
-        criadoEm: { gte: inicioDoDia },
-      },
-      select: { id: true },
-    });
-
-    if (!jaRegistrado) {
-      await prisma.propertyEvent.create({
-        data: {
-          propertyId: property.id,
-          tipo,
-          dispositivo: detectarDispositivo(userAgent),
-          origem: normalizarOrigem(body?.origem),
-          dedupeHash,
-        },
-      });
-    }
+    await registrarEventoUnico(
+      request,
+      property.id,
+      "VISUALIZACAO",
+      normalizarOrigem(body?.origem)
+    );
   } catch (e) {
     console.error("[track]", e);
   }

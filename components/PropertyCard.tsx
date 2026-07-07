@@ -114,8 +114,7 @@ export default function PropertyCard({
         {/* mt-auto prende o CTA na base — cards sempre alinhados no grid */}
         <div className="mt-auto pt-3">
           <WhatsAppLink
-            href={linkWhatsAppImovel(imovel.titulo, imovel.codigo)}
-            trackSlug={imovel.slug}
+            href={linkWhatsAppImovel(imovel.slug)}
             className="inline-flex w-fit items-center gap-2 rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
           >
             <MessageCircle

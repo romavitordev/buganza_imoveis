@@ -1,34 +1,29 @@
 /**
- * Links de conversão via WhatsApp — única forma de contato do site.
- * Nenhum preço é exibido publicamente; o valor é sempre "consultado".
+ * Contato via WhatsApp — lado CLIENTE (seguro para o navegador).
+ *
+ * Aqui NÃO existe o número nem as mensagens: tudo isso fica no servidor
+ * (lib/whatsapp-server.ts). Estas funções só montam o caminho interno
+ * /api/contato, que o backend usa para redirecionar ao WhatsApp. Assim o
+ * número não aparece no "inspecionar" e não é colhido por bots.
  */
 
-export function whatsappNumber(): string {
-  return process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "";
-}
+export type ContatoCtx = "geral" | "anunciar" | "imovel";
 
-export function whatsappLink(mensagem: string): string {
-  return `https://wa.me/${whatsappNumber()}?text=${encodeURIComponent(mensagem)}`;
-}
-
-export const MENSAGEM_GERAL =
-  "Olá! Vim pelo site e gostaria de saber mais sobre os imóveis disponíveis.";
-
-export function mensagemImovel(titulo: string, codigo: string): string {
-  return `Olá! Tenho interesse no imóvel "${titulo}" (cód. ${codigo}). Poderia me passar mais informações e valores?`;
+export function linkContato(ctx: ContatoCtx, slug?: string): string {
+  const params = new URLSearchParams({ ctx });
+  if (slug) params.set("slug", slug);
+  return `/api/contato?${params.toString()}`;
 }
 
 export function linkWhatsAppGeral(): string {
-  return whatsappLink(MENSAGEM_GERAL);
+  return linkContato("geral");
 }
-
-export function linkWhatsAppImovel(titulo: string, codigo: string): string {
-  return whatsappLink(mensagemImovel(titulo, codigo));
-}
-
-export const MENSAGEM_ANUNCIAR =
-  "Olá! Tenho um imóvel e gostaria de anunciá-lo com a Imóveis Buganza. Podemos conversar?";
 
 export function linkWhatsAppAnunciar(): string {
-  return whatsappLink(MENSAGEM_ANUNCIAR);
+  return linkContato("anunciar");
+}
+
+/** Link de contato de um imóvel específico (a mensagem é montada no servidor). */
+export function linkWhatsAppImovel(slug: string): string {
+  return linkContato("imovel", slug);
 }
