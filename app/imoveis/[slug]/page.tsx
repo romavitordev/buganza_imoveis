@@ -46,8 +46,10 @@ async function buscarImovelAtivo(slug: string) {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const imovel = await buscarImovelAtivo(params.slug).catch(() => null);
-  if (!imovel) return { title: "Imóvel não encontrado" };
+  // notFound() AQUI (antes do streaming do loading.tsx) garante status 404
+  // de verdade para slugs inexistentes — sem soft-404 para o Google.
+  const imovel = await buscarImovelAtivo(params.slug);
+  if (!imovel) notFound();
 
   const capa = capaDoImovel(imovel);
   const descricao = `${TIPO_LABEL[imovel.tipo]} para ${TRANSACAO_LABEL[
