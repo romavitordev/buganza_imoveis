@@ -149,8 +149,22 @@ h3 {
   justify-content: space-between;
   padding: 14px 16px;
   pointer-events: none;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    backdrop-filter 0.35s ease;
 }
 .bz-nav > * { pointer-events: auto; }
+
+/* Ao rolar, a barra ganha fundo translúcido com blur e borda sutil —
+   o logo e o CTA deixam de flutuar soltos sobre o conteúdo */
+.bz-nav-scrolled {
+  background: rgba(255, 255, 255, 0.82);
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 
 .bz-contact-pill {
   display: flex;
@@ -299,6 +313,40 @@ h3 {
     padding: 32px 32px 36px;
   }
   .bz-heading { font-size: clamp(3.2rem, 6.2vw, 6rem); }
+}
+
+/* ---------- scroll hint do hero ---------- */
+@keyframes bzHintBounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, 7px); }
+}
+.bz-scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  transition: color 0.25s ease, border-color 0.25s ease;
+  animation: bzHintBounce 2.2s ease-in-out infinite;
+}
+.bz-scroll-hint:hover { color: #000; border-color: #000; }
+
+@media (min-width: 768px) {
+  .bz-scroll-hint { display: flex; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bz-scroll-hint { animation: none; }
 }
 
 /* ---------- navbar: âncoras + indicador deslizante ---------- */

@@ -14,6 +14,7 @@ import WhatsAppLink from "@/components/WhatsAppLink";
 import { linkWhatsAppImovel } from "@/lib/whatsapp";
 import { TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 import { precoPrincipal, precoSecundario } from "@/lib/format";
+import { BLUR_DATA_URL } from "@/lib/blur";
 
 interface PropertyCardProps {
   imovel: PublicPropertyDTO;
@@ -61,6 +62,8 @@ export default function PropertyCard({
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             priority={prioridade}
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
             className="object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.04]"
           />
         ) : (

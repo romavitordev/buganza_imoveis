@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { PublicPhotoDTO } from "@/lib/dto";
+import { BLUR_DATA_URL } from "@/lib/blur";
 
 interface GalleryProps {
   fotos: PublicPhotoDTO[];
@@ -94,27 +95,50 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Foto principal */}
-      <button
-        type="button"
-        onClick={abrir}
-        className="group relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden rounded-2xl bg-mist"
-        aria-label={`Ampliar foto ${indiceAtivo + 1} de ${total}`}
-      >
-        <Image
-          src={ativa.url}
-          alt={`${titulo} — foto ${indiceAtivo + 1} de ${total}`}
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 60vw"
-          className="object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.03]"
-        />
+      {/* Foto principal — setas prev/next direto na capa, sem abrir o lightbox */}
+      <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-mist">
+        <button
+          type="button"
+          onClick={abrir}
+          className="absolute inset-0 block h-full w-full cursor-zoom-in"
+          aria-label={`Ampliar foto ${indiceAtivo + 1} de ${total}`}
+        >
+          <Image
+            src={ativa.url}
+            alt={`${titulo} — foto ${indiceAtivo + 1} de ${total}`}
+            fill
+            priority
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            sizes="(max-width: 1024px) 100vw, 60vw"
+            className="object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.03]"
+          />
+        </button>
+
         {total > 1 && (
-          <span className="absolute bottom-3 right-3 rounded-pill bg-black/70 px-3 py-1 text-[11px] font-medium text-white backdrop-blur">
-            {indiceAtivo + 1} / {total}
-          </span>
+          <>
+            <button
+              type="button"
+              onClick={() => navegar(-1)}
+              aria-label="Foto anterior"
+              className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black shadow-[0_2px_12px_rgba(0,0,0,0.14)] backdrop-blur transition-all duration-200 ease-premium hover:scale-110 active:scale-95 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+            >
+              <ChevronLeft size={18} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              onClick={() => navegar(1)}
+              aria-label="Próxima foto"
+              className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black shadow-[0_2px_12px_rgba(0,0,0,0.14)] backdrop-blur transition-all duration-200 ease-premium hover:scale-110 active:scale-95 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
+            >
+              <ChevronRight size={18} aria-hidden="true" />
+            </button>
+            <span className="pointer-events-none absolute bottom-3 right-3 rounded-pill bg-black/70 px-3 py-1 text-[11px] font-medium text-white backdrop-blur">
+              {indiceAtivo + 1} / {total}
+            </span>
+          </>
         )}
-      </button>
+      </div>
 
       {/* Thumbnails */}
       {total > 1 && (
@@ -140,6 +164,8 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
                 src={foto.url}
                 alt=""
                 fill
+                placeholder="blur"
+                blurDataURL={BLUR_DATA_URL}
                 sizes="120px"
                 className="object-cover"
               />

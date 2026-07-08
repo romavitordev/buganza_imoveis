@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MessageCircle } from "lucide-react";
+import { ChevronDown, MessageCircle } from "lucide-react";
 import CityScene from "@/components/CityScene";
 import SiteNav from "@/components/SiteNav";
 import { linkWhatsAppGeral } from "@/lib/whatsapp";
@@ -67,6 +67,15 @@ export default function Hero() {
           <span>Locação</span>
         </div>
       </div>
+
+      {/* Convite sutil ao scroll (só desktop — no mobile o conteúdo já guia) */}
+      <a
+        href="#destaques"
+        className="bz-scroll-hint bz-anim bz-btns-anim"
+        aria-label="Ver imóveis em destaque"
+      >
+        <ChevronDown size={16} strokeWidth={2} aria-hidden="true" />
+      </a>
     </div>
   );
 }

@@ -57,6 +57,27 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
   const pathname = usePathname();
   const naHome = pathname === "/";
 
+  // Estado "scrolled": a barra ganha fundo/borda ao rolar, para o logo e o
+  // CTA não flutuarem soltos sobre o conteúdo
+  const [rolou, setRolou] = useState(false);
+
+  useEffect(() => {
+    let raf = 0;
+    function aplicar() {
+      raf = 0;
+      setRolou(window.scrollY > 24);
+    }
+    function onScroll() {
+      if (!raf) raf = requestAnimationFrame(aplicar);
+    }
+    aplicar();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // Seção visível na home, detectada por scroll (IntersectionObserver)
   const [secaoAtiva, setSecaoAtiva] = useState<Secao>("topo");
 
@@ -153,7 +174,9 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
     <>
       {/* ---------- barra superior ---------- */}
       <nav
-        className={`bz-nav ${animated ? "bz-anim bz-nav-anim" : ""}`}
+        className={`bz-nav ${rolou ? "bz-nav-scrolled" : ""} ${
+          animated ? "bz-anim bz-nav-anim" : ""
+        }`}
         aria-label="Principal"
       >
         <Link
