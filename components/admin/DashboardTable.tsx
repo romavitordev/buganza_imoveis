@@ -60,6 +60,47 @@ function compararPor(
   }
 }
 
+// Componente de MÓDULO (não aninhado no DashboardTable): declarar dentro
+// recriaria o tipo a cada render e o React remontaria o <th>, derrubando
+// o foco do teclado a cada clique de ordenação
+function ThOrdenavel({
+  campo,
+  ordenacao,
+  onOrdenar,
+  alinhar,
+  children,
+}: {
+  campo: CampoOrdenavel;
+  ordenacao: Ordenacao;
+  onOrdenar: (campo: CampoOrdenavel) => void;
+  alinhar?: "right";
+  children: React.ReactNode;
+}) {
+  const ativo = ordenacao.campo === campo;
+  const Icone = ativo
+    ? ordenacao.asc
+      ? ChevronUp
+      : ChevronDown
+    : ChevronsUpDown;
+  return (
+    <th
+      className={`px-4 py-3 font-medium ${alinhar === "right" ? "text-right" : ""}`}
+      aria-sort={ativo ? (ordenacao.asc ? "ascending" : "descending") : undefined}
+    >
+      <button
+        type="button"
+        onClick={() => onOrdenar(campo)}
+        className={`inline-flex items-center gap-1 uppercase tracking-wide transition-colors hover:text-black ${
+          ativo ? "text-black" : ""
+        }`}
+      >
+        {children}
+        <Icone size={12} aria-hidden="true" className={ativo ? "" : "opacity-50"} />
+      </button>
+    </th>
+  );
+}
+
 interface Resumo7d {
   visualizacoes: number;
   cliquesWhatsApp: number;
@@ -192,40 +233,6 @@ export default function DashboardTable({
       month: "2-digit",
       year: "2-digit",
     });
-  }
-
-  function ThOrdenavel({
-    campo,
-    alinhar,
-    children,
-  }: {
-    campo: CampoOrdenavel;
-    alinhar?: "right";
-    children: React.ReactNode;
-  }) {
-    const ativo = ordenacao.campo === campo;
-    const Icone = ativo
-      ? ordenacao.asc
-        ? ChevronUp
-        : ChevronDown
-      : ChevronsUpDown;
-    return (
-      <th
-        className={`px-4 py-3 font-medium ${alinhar === "right" ? "text-right" : ""}`}
-        aria-sort={ativo ? (ordenacao.asc ? "ascending" : "descending") : undefined}
-      >
-        <button
-          type="button"
-          onClick={() => ordenarPor(campo)}
-          className={`inline-flex items-center gap-1 uppercase tracking-wide transition-colors hover:text-black ${
-            ativo ? "text-black" : ""
-          }`}
-        >
-          {children}
-          <Icone size={12} aria-hidden="true" className={ativo ? "" : "opacity-50"} />
-        </button>
-      </th>
-    );
   }
 
   return (
@@ -370,19 +377,35 @@ export default function DashboardTable({
             <thead>
               <tr className="border-b border-black/10 bg-mist/60 text-[11px] uppercase tracking-wide text-black/45">
                 <th className="px-4 py-3 font-medium">Foto</th>
-                <ThOrdenavel campo="codigo">Código</ThOrdenavel>
-                <ThOrdenavel campo="titulo">Título</ThOrdenavel>
+                <ThOrdenavel campo="codigo" ordenacao={ordenacao} onOrdenar={ordenarPor}>
+                  Código
+                </ThOrdenavel>
+                <ThOrdenavel campo="titulo" ordenacao={ordenacao} onOrdenar={ordenarPor}>
+                  Título
+                </ThOrdenavel>
                 <th className="px-4 py-3 font-medium">Tipo</th>
                 <th className="px-4 py-3 font-medium">Transação</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 text-center font-medium">Destaque</th>
-                <ThOrdenavel campo="visualizacoes" alinhar="right">
+                <ThOrdenavel
+                  campo="visualizacoes"
+                  ordenacao={ordenacao}
+                  onOrdenar={ordenarPor}
+                  alinhar="right"
+                >
                   Views
                 </ThOrdenavel>
-                <ThOrdenavel campo="cliquesWhatsApp" alinhar="right">
+                <ThOrdenavel
+                  campo="cliquesWhatsApp"
+                  ordenacao={ordenacao}
+                  onOrdenar={ordenarPor}
+                  alinhar="right"
+                >
                   Cliques WA
                 </ThOrdenavel>
-                <ThOrdenavel campo="atualizadoEm">Atualizado</ThOrdenavel>
+                <ThOrdenavel campo="atualizadoEm" ordenacao={ordenacao} onOrdenar={ordenarPor}>
+                  Atualizado
+                </ThOrdenavel>
                 <th className="px-4 py-3 text-right font-medium">Ações</th>
               </tr>
             </thead>

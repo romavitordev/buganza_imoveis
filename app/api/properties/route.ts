@@ -26,6 +26,12 @@ export async function GET(request: Request) {
     .filter(Boolean)
     .slice(0, 60);
 
+  // ?ids= presente porém vazio = "meus favoritos: nenhum" → lista vazia,
+  // não o catálogo inteiro
+  if (ids && ids.length === 0) {
+    return NextResponse.json({ properties: [] });
+  }
+
   const tipo =
     tipoParam && (Object.values(TipoImovel) as string[]).includes(tipoParam)
       ? (tipoParam as TipoImovel)
@@ -52,7 +58,7 @@ export async function GET(request: Request) {
             }
           : {}),
         ...(cidadeParam ? { cidade: cidadeParam } : {}),
-        ...(ids && ids.length > 0 ? { id: { in: ids } } : {}),
+        ...(ids ? { id: { in: ids } } : {}),
         ...(q
           ? {
               OR: [

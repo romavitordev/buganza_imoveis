@@ -1,8 +1,9 @@
 "use client";
 
 import { FormEvent, Suspense, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Lock } from "lucide-react";
+import { ArrowLeft, Loader2, Lock } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 
 function LoginForm() {
@@ -111,6 +112,14 @@ function LoginForm() {
             {enviando ? "Entrando…" : "Entrar"}
           </button>
         </form>
+
+        <Link
+          href="/"
+          className="mt-6 flex items-center justify-center gap-1.5 text-[13px] font-medium text-black/50 transition-colors hover:text-black"
+        >
+          <ArrowLeft size={14} aria-hidden="true" />
+          Voltar para o site
+        </Link>
       </div>
     </main>
   );
