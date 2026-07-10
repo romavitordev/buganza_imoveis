@@ -69,6 +69,30 @@ npm run dev
 - Site: http://localhost:3000
 - Admin: http://localhost:3000/admin (login com `ADMIN_EMAIL`/`ADMIN_PASSWORD`)
 
+## Qualidade
+
+```bash
+npm test       # testes unitários (Vitest) — inclui o teste que garante
+               # que precoInterno NUNCA vaza no DTO público
+npm run lint   # ESLint (next/core-web-vitals)
+```
+
+## Como o conteúdo chega ao visitante (cache)
+
+As páginas públicas usam **ISR**: home e detalhe são servidas do cache e
+regeneradas no máximo a cada 5 minutos — mas **toda mutação no admin**
+(criar/editar/excluir imóvel, fotos, vídeo) invalida o cache na hora via
+`revalidatePath` ([lib/revalidate.ts](lib/revalidate.ts)). O catálogo
+`/imoveis` é dinâmico (filtros, busca `?q=` e ordenação via URL).
+
+## Upload de fotos e vídeo
+
+Em produção o upload vai **direto do navegador para o Supabase** com URL
+assinada (rota `/api/admin/properties/[id]/uploads`) — o arquivo não passa
+pela Vercel, então o limite de 4,5 MB de body não se aplica (essencial para
+vídeos de até 50 MB). Sem Supabase configurado (dev), cai automaticamente
+no upload via servidor para `public/uploads`.
+
 ## Deploy na Vercel
 
 1. Suba o repositório para o GitHub e importe na [Vercel](https://vercel.com)

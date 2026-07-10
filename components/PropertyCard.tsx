@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import type { PublicPropertyDTO } from "@/lib/dto";
 import { capaDoImovel } from "@/lib/dto";
+import FavoriteButton from "@/components/FavoriteButton";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { linkWhatsAppImovel } from "@/lib/whatsapp";
 import { TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
@@ -49,7 +50,10 @@ export default function PropertyCard({
   ].filter((c): c is { icone: typeof BedDouble; texto: string } => Boolean(c));
 
   return (
-    <article className="group flex h-full flex-col gap-4">
+    // relative: âncora do coração de favoritar, que fica FORA do <Link>
+    // (botão dentro de link é armadilha de acessibilidade)
+    <article className="group relative flex h-full flex-col gap-4">
+      <FavoriteButton id={imovel.id} titulo={imovel.titulo} />
       <Link
         href={`/imoveis/${imovel.slug}`}
         className="relative block aspect-[4/3] overflow-hidden rounded-2xl bg-mist"

@@ -9,7 +9,8 @@ import SiteFooter from "@/components/SiteFooter";
 import { prisma } from "@/lib/prisma";
 import { toPublicPropertyDTOList } from "@/lib/dto";
 
-export const dynamic = "force-dynamic";
+// ISR: home servida do cache; admin invalida na hora via revalidatePath
+export const revalidate = 300;
 
 export default async function HomePage() {
   const destaques = await prisma.property

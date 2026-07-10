@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
     "db:local": "node scripts/local-db.mjs",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
@@ -33,10 +34,13 @@
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
     "embedded-postgres": "^18.4.0-beta.17",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.35",
     "postcss": "^8.4.49",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
   }
 }

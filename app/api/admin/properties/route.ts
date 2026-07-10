@@ -6,6 +6,7 @@ import {
   parsePropertyInput,
   isValidationError,
 } from "@/lib/property-input";
+import { revalidarPaginasPublicas } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -74,6 +75,7 @@ export async function POST(request: Request) {
       });
     });
 
+    revalidarPaginasPublicas(property.slug);
     return NextResponse.json({ property }, { status: 201 });
   } catch (e) {
     console.error("[admin/properties POST]", e);

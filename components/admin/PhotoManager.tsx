@@ -33,6 +33,78 @@ export default function PhotoManager({
 
   const ordenadas = fotos.slice().sort((a, b) => a.ordem - b.ordem);
 
+  /**
+   * Envia uma foto. Produção: upload DIRETO navegador → Supabase via URL
+   * assinada (o arquivo não passa pela Vercel). Dev sem Supabase: a rota
+   * de assinatura responde { fallback: true } e caímos no multipart local.
+   */
+  async function enviarFoto(arquivo: File): Promise<AdminPhoto[]> {
+    const contentType = arquivo.type || "application/octet-stream";
+
+    const sign = await fetch(`/api/admin/properties/${propertyId}/uploads`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        kind: "foto",
+        fileName: arquivo.name,
+        contentType,
+        tamanho: arquivo.size,
+      }),
+    });
+    const signBody = (await sign.json().catch(() => null)) as {
+      erro?: string;
+      fallback?: boolean;
+      uploadUrl?: string;
+      storageKey?: string;
+    } | null;
+    if (!sign.ok) {
+      throw new Error(signBody?.erro ?? "Erro ao preparar o envio.");
+    }
+
+    if (!signBody?.fallback && signBody?.uploadUrl && signBody.storageKey) {
+      const upload = await fetch(signBody.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": contentType },
+        body: arquivo,
+      });
+      if (!upload.ok) throw new Error("Falha no envio direto da foto.");
+
+      const confirmar = await fetch(
+        `/api/admin/properties/${propertyId}/uploads`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind: "foto",
+            storageKeys: [signBody.storageKey],
+          }),
+        }
+      );
+      const confirmado = (await confirmar.json().catch(() => null)) as {
+        erro?: string;
+        fotos?: AdminPhoto[];
+      } | null;
+      if (!confirmar.ok) {
+        throw new Error(confirmado?.erro ?? "Erro ao registrar a foto.");
+      }
+      return confirmado?.fotos ?? [];
+    }
+
+    // Fallback de desenvolvimento: multipart via servidor
+    const formData = new FormData();
+    formData.append("fotos", arquivo);
+    const res = await fetch(`/api/admin/properties/${propertyId}/photos`, {
+      method: "POST",
+      body: formData,
+    });
+    const body = (await res.json().catch(() => null)) as {
+      erro?: string;
+      fotos?: AdminPhoto[];
+    } | null;
+    if (!res.ok) throw new Error(body?.erro ?? "Erro ao enviar a foto.");
+    return body?.fotos ?? [];
+  }
+
   async function onSelecionar(e: ChangeEvent<HTMLInputElement>) {
     const arquivos = Array.from(e.target.files ?? []);
     e.target.value = ""; // permite reenviar o mesmo arquivo depois
@@ -55,24 +127,10 @@ export default function PhotoManager({
     // Envia um a um para mostrar o progresso real
     for (let i = 0; i < arquivos.length; i++) {
       setProgresso(`Enviando foto ${i + 1} de ${arquivos.length}…`);
-      const formData = new FormData();
-      formData.append("fotos", arquivos[i]);
-
       try {
-        const res = await fetch(
-          `/api/admin/properties/${propertyId}/photos`,
-          { method: "POST", body: formData }
-        );
-        const body = (await res.json().catch(() => null)) as {
-          erro?: string;
-          fotos?: AdminPhoto[];
-        } | null;
-
-        if (!res.ok) {
-          throw new Error(body?.erro ?? "Erro ao enviar a foto.");
-        }
-        if (body?.fotos) {
-          setFotos((atual) => [...atual, ...body.fotos!]);
+        const novas = await enviarFoto(arquivos[i]);
+        if (novas.length > 0) {
+          setFotos((atual) => [...atual, ...novas]);
         }
       } catch (err) {
         setErro(

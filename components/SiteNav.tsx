@@ -10,7 +10,7 @@ import {
   useState,
   type MouseEvent,
 } from "react";
-import { Building2, Home, MessageCircle, Users } from "lucide-react";
+import { Building2, Heart, Home, MessageCircle, Users } from "lucide-react";
 
 interface SiteNavProps {
   whatsappHref: string;
@@ -43,6 +43,7 @@ const LINKS: {
 }[] = [
   { href: "/", rotulo: "Início", icone: Home, secao: "topo" },
   { href: "/imoveis", rotulo: "Imóveis", icone: Building2, secao: null },
+  { href: "/favoritos", rotulo: "Favoritos", icone: Heart, secao: null },
   { href: "/#quem-somos", rotulo: "Quem Somos", icone: Users, secao: "quem-somos" },
 ];
 
@@ -166,7 +167,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
     return () => window.removeEventListener("resize", medir);
   }, []);
 
-  const colunaMobile = larguraBottom / 4;
+  const colunaMobile = larguraBottom / 5;
   const bottomLeft =
     indiceAtivo >= 0 ? (indiceAtivo + 0.5) * colunaMobile - 24 : 0;
 
@@ -243,7 +244,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         aria-label="Navegação inferior"
         className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
-        <div ref={bottomRef} className="relative grid h-16 grid-cols-4">
+        <div ref={bottomRef} className="relative grid h-16 grid-cols-5">
           <span
             aria-hidden="true"
             className="bz-bottomnav-indicator"

@@ -42,18 +42,72 @@ export default function VideoManager({
 
     setEnviando(true);
     try {
-      const formData = new FormData();
-      formData.append("video", arquivo);
-      const res = await fetch(`/api/admin/properties/${propertyId}/video`, {
+      const contentType = arquivo.type || "application/octet-stream";
+
+      // 1) Upload direto navegador → Supabase (produção): o vídeo de até
+      //    50 MB nunca passaria pelo limite de 4,5 MB de body da Vercel
+      const sign = await fetch(`/api/admin/properties/${propertyId}/uploads`, {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "video",
+          fileName: arquivo.name,
+          contentType,
+          tamanho: arquivo.size,
+        }),
       });
-      const body = (await res.json().catch(() => null)) as {
+      const signBody = (await sign.json().catch(() => null)) as {
         erro?: string;
-        videoUrl?: string;
+        fallback?: boolean;
+        uploadUrl?: string;
+        storageKey?: string;
       } | null;
-      if (!res.ok) throw new Error(body?.erro ?? "Erro ao enviar o vídeo.");
-      setVideoUrl(body?.videoUrl ?? null);
+      if (!sign.ok) {
+        throw new Error(signBody?.erro ?? "Erro ao preparar o envio.");
+      }
+
+      if (!signBody?.fallback && signBody?.uploadUrl && signBody.storageKey) {
+        const upload = await fetch(signBody.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": contentType },
+          body: arquivo,
+        });
+        if (!upload.ok) throw new Error("Falha no envio direto do vídeo.");
+
+        const confirmar = await fetch(
+          `/api/admin/properties/${propertyId}/uploads`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              kind: "video",
+              storageKeys: [signBody.storageKey],
+            }),
+          }
+        );
+        const confirmado = (await confirmar.json().catch(() => null)) as {
+          erro?: string;
+          videoUrl?: string;
+        } | null;
+        if (!confirmar.ok) {
+          throw new Error(confirmado?.erro ?? "Erro ao registrar o vídeo.");
+        }
+        setVideoUrl(confirmado?.videoUrl ?? null);
+      } else {
+        // 2) Dev sem Supabase: multipart via servidor (public/uploads)
+        const formData = new FormData();
+        formData.append("video", arquivo);
+        const res = await fetch(`/api/admin/properties/${propertyId}/video`, {
+          method: "POST",
+          body: formData,
+        });
+        const body = (await res.json().catch(() => null)) as {
+          erro?: string;
+          videoUrl?: string;
+        } | null;
+        if (!res.ok) throw new Error(body?.erro ?? "Erro ao enviar o vídeo.");
+        setVideoUrl(body?.videoUrl ?? null);
+      }
       router.refresh();
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Erro ao enviar o vídeo.");

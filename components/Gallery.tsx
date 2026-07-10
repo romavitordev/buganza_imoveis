@@ -35,6 +35,10 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
   const [montado, setMontado] = useState(false);
   const [fechando, setFechando] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const fecharBtnRef = useRef<HTMLButtonElement>(null);
+  // Elemento focado antes de abrir o lightbox — o foco volta para ele ao fechar
+  const focoAnteriorRef = useRef<HTMLElement | null>(null);
 
   const total = ordenadas.length;
 
@@ -47,6 +51,10 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
 
   const abrir = useCallback(() => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
+    focoAnteriorRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     setFechando(false);
     setMontado(true);
   }, []);
@@ -57,16 +65,62 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
     timerRef.current = window.setTimeout(() => {
       setMontado(false);
       setFechando(false);
+      focoAnteriorRef.current?.focus();
     }, ms);
   }, []);
 
+  // Swipe horizontal (mobile): troca de foto na capa e no lightbox
+  const toqueRef = useRef<{ x: number; y: number } | null>(null);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0];
+    toqueRef.current = { x: t.clientX, y: t.clientY };
+  }, []);
+
+  const onTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const inicio = toqueRef.current;
+      toqueRef.current = null;
+      if (!inicio || total < 2) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - inicio.x;
+      const dy = t.clientY - inicio.y;
+      // Gesto dominantemente horizontal e longo o bastante para ser intencional
+      if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        navegar(dx < 0 ? 1 : -1);
+      }
+    },
+    [navegar, total]
+  );
+
   useEffect(() => {
     if (!montado) return;
+
+    // Foco inicial no botão de fechar — leitores de tela anunciam o dialog
+    fecharBtnRef.current?.focus();
 
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") fechar();
       if (e.key === "ArrowLeft") navegar(-1);
       if (e.key === "ArrowRight") navegar(1);
+
+      // Trap de foco: Tab circula apenas pelos controles do lightbox
+      if (e.key === "Tab") {
+        const focaveis = dialogRef.current?.querySelectorAll<HTMLElement>(
+          "button, [href], [tabindex]:not([tabindex='-1'])"
+        );
+        if (!focaveis || focaveis.length === 0) return;
+        const primeiro = focaveis[0];
+        const ultimo = focaveis[focaveis.length - 1];
+        const atual = document.activeElement;
+        if (e.shiftKey && (atual === primeiro || atual === document.body)) {
+          e.preventDefault();
+          ultimo.focus();
+        } else if (!e.shiftKey && atual === ultimo) {
+          e.preventDefault();
+          primeiro.focus();
+        }
+      }
     }
 
     document.addEventListener("keydown", onKey);
@@ -95,8 +149,13 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Foto principal — setas prev/next direto na capa, sem abrir o lightbox */}
-      <div className="group relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-mist">
+      {/* Foto principal — setas prev/next direto na capa, sem abrir o lightbox.
+          touch-pan-y: o navegador cuida do scroll vertical; swipe horizontal é nosso */}
+      <div
+        className="group relative aspect-[4/3] w-full touch-pan-y overflow-hidden rounded-2xl bg-mist"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <button
           type="button"
           onClick={abrir}
@@ -177,6 +236,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
       {/* Lightbox */}
       {montado && (
         <div
+          ref={dialogRef}
           className={`bz-lightbox fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 ${
             fechando ? "bz-closing" : ""
           }`}
@@ -186,6 +246,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
           onClick={fechar}
         >
           <button
+            ref={fecharBtnRef}
             type="button"
             onClick={fechar}
             aria-label="Fechar galeria"
@@ -222,8 +283,10 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
           )}
 
           <div
-            className="bz-lightbox-figure relative h-[80vh] w-full max-w-5xl"
+            className="bz-lightbox-figure relative h-[80vh] w-full max-w-5xl touch-pan-y"
             onClick={(e) => e.stopPropagation()}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
           >
             {/* key por índice → replay do fade a cada troca de foto */}
             <div key={indiceAtivo} className="bz-lightbox-img absolute inset-0">
@@ -238,7 +301,10 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
           </div>
 
           {total > 1 && (
-            <span className="bz-lightbox-controls absolute bottom-6 rounded-pill bg-white/10 px-4 py-1.5 text-[12px] font-medium text-white">
+            <span
+              aria-live="polite"
+              className="bz-lightbox-controls absolute bottom-6 rounded-pill bg-white/10 px-4 py-1.5 text-[12px] font-medium text-white"
+            >
               {indiceAtivo + 1} / {total}
             </span>
           )}

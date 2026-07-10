@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { PropertyPhoto } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { uploadPropertyPhoto } from "@/lib/storage";
+import { revalidarPaginasPublicas } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -89,6 +90,7 @@ export async function POST(request: Request, { params }: Params) {
       criadas.push(foto);
     }
 
+    revalidarPaginasPublicas(property.slug);
     return NextResponse.json({ fotos: criadas }, { status: 201 });
   } catch (e) {
     console.error("[admin/photos POST]", e);

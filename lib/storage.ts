@@ -40,17 +40,96 @@ export interface UploadResult {
   storageKey: string;
 }
 
+/** Nome + MIME — o suficiente para escolher a extensão sem ter o arquivo. */
+interface ArquivoInfo {
+  name: string;
+  type: string;
+}
+
+/** Chave de storage para uma nova foto do imóvel. */
+export function chaveNovaFoto(
+  propertyId: string,
+  arquivo: ArquivoInfo
+): string {
+  return `properties/${propertyId}/${randomUUID()}.${extensaoSegura(arquivo)}`;
+}
+
+/** Chave de storage para o vídeo do imóvel. */
+export function chaveNovoVideo(
+  propertyId: string,
+  arquivo: ArquivoInfo
+): string {
+  return `properties/${propertyId}/video-${randomUUID()}.${extensaoVideoSegura(
+    arquivo
+  )}`;
+}
+
+/** URL pública de uma chave no bucket (exige Supabase configurado). */
+export function urlPublicaDaChave(storageKey: string): string {
+  const config = supabaseConfig();
+  if (!config) {
+    throw new Error(
+      "Storage não configurado: defina SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY."
+    );
+  }
+  return `${config.url}/storage/v1/object/public/${BUCKET}/${storageKey}`;
+}
+
+export interface SignedUpload {
+  /** URL para o navegador fazer PUT do arquivo diretamente. */
+  uploadUrl: string;
+  storageKey: string;
+  publicUrl: string;
+}
+
+/**
+ * Cria uma URL assinada de upload direto (navegador → Supabase), evitando
+ * o limite de 4,5 MB de body das funções da Vercel. Retorna null quando o
+ * Supabase não está configurado (dev usa o fallback multipart local).
+ */
+export async function criarUploadAssinado(
+  storageKey: string
+): Promise<SignedUpload | null> {
+  const config = supabaseConfig();
+  if (!config) return null;
+
+  const response = await fetch(
+    `${config.url}/storage/v1/object/upload/sign/${BUCKET}/${storageKey}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${config.serviceKey}`,
+        "Content-Type": "application/json",
+      },
+      body: "{}",
+    }
+  );
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(
+      `Falha ao assinar o upload (${response.status}): ${body}`
+    );
+  }
+
+  const data = (await response.json()) as { url?: string };
+  if (!data.url) {
+    throw new Error("Resposta inesperada do Supabase ao assinar o upload.");
+  }
+
+  return {
+    uploadUrl: `${config.url}/storage/v1${data.url}`,
+    storageKey,
+    publicUrl: `${config.url}/storage/v1/object/public/${BUCKET}/${storageKey}`,
+  };
+}
+
 /** Faz upload de uma foto e retorna URL pública + chave de storage. */
 export async function uploadPropertyPhoto(
   propertyId: string,
   file: File
 ): Promise<UploadResult> {
-  const ext = extensaoSegura(file);
-  return uploadArquivo(
-    `properties/${propertyId}/${randomUUID()}.${ext}`,
-    file,
-    propertyId
-  );
+  return uploadArquivo(chaveNovaFoto(propertyId, file), file, propertyId);
 }
 
 /** Faz upload do vídeo do imóvel (exibido só no detalhe, nunca como capa). */
@@ -58,12 +137,7 @@ export async function uploadPropertyVideo(
   propertyId: string,
   file: File
 ): Promise<UploadResult> {
-  const ext = extensaoVideoSegura(file);
-  return uploadArquivo(
-    `properties/${propertyId}/video-${randomUUID()}.${ext}`,
-    file,
-    propertyId
-  );
+  return uploadArquivo(chaveNovoVideo(propertyId, file), file, propertyId);
 }
 
 async function uploadArquivo(
@@ -183,7 +257,7 @@ export const deletePropertyVideo = deletePropertyPhoto;
 
 const EXTENSOES_VALIDAS = new Set(["jpg", "jpeg", "png", "webp", "avif", "gif"]);
 
-function extensaoSegura(file: File): string {
+function extensaoSegura(file: ArquivoInfo): string {
   const daMime = file.type.split("/")[1]?.toLowerCase() ?? "";
   if (EXTENSOES_VALIDAS.has(daMime)) return daMime === "jpeg" ? "jpg" : daMime;
   const doNome = file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -193,7 +267,7 @@ function extensaoSegura(file: File): string {
 
 const EXTENSOES_VIDEO = new Set(["mp4", "webm", "mov", "m4v"]);
 
-function extensaoVideoSegura(file: File): string {
+function extensaoVideoSegura(file: ArquivoInfo): string {
   const daMime = file.type.split("/")[1]?.toLowerCase() ?? "";
   if (daMime === "quicktime") return "mov";
   if (EXTENSOES_VIDEO.has(daMime)) return daMime;

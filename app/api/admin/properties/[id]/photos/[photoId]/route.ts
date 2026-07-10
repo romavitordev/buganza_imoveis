@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deletePropertyPhoto } from "@/lib/storage";
+import { revalidarPaginasPublicas } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ interface Params {
 export async function PATCH(request: Request, { params }: Params) {
   const foto = await prisma.propertyPhoto.findFirst({
     where: { id: params.photoId, propertyId: params.id },
+    include: { property: { select: { slug: true } } },
   });
 
   if (!foto) {
@@ -88,6 +90,7 @@ export async function PATCH(request: Request, { params }: Params) {
       where: { propertyId: params.id },
       orderBy: { ordem: "asc" },
     });
+    revalidarPaginasPublicas(foto.property.slug);
     return NextResponse.json({ fotos });
   } catch (e) {
     console.error("[admin/photos PATCH]", e);
@@ -102,6 +105,7 @@ export async function PATCH(request: Request, { params }: Params) {
 export async function DELETE(_request: Request, { params }: Params) {
   const foto = await prisma.propertyPhoto.findFirst({
     where: { id: params.photoId, propertyId: params.id },
+    include: { property: { select: { slug: true } } },
   });
 
   if (!foto) {
@@ -133,6 +137,7 @@ export async function DELETE(_request: Request, { params }: Params) {
       where: { propertyId: params.id },
       orderBy: { ordem: "asc" },
     });
+    revalidarPaginasPublicas(foto.property.slug);
     return NextResponse.json({ ok: true, fotos });
   } catch (e) {
     console.error("[admin/photos DELETE]", e);

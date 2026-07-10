@@ -6,6 +6,7 @@ import {
   parsePropertyInput,
   isValidationError,
 } from "@/lib/property-input";
+import { revalidarPaginasPublicas } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,7 +29,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
   const existente = await prisma.property.findUnique({
     where: { id: params.id },
-    select: { id: true, titulo: true },
+    select: { id: true, titulo: true, slug: true },
   });
   if (!existente) {
     return NextResponse.json(
@@ -50,6 +51,7 @@ export async function PATCH(request: Request, { params }: Params) {
       data: { destaque },
       include: { fotos: { orderBy: { ordem: "asc" } } },
     });
+    revalidarPaginasPublicas(property.slug);
     return NextResponse.json({ property });
   }
 
@@ -88,6 +90,8 @@ export async function PATCH(request: Request, { params }: Params) {
       include: { fotos: { orderBy: { ordem: "asc" } } },
     });
 
+    // slug pode mudar na edição — invalida a página antiga e a nova
+    revalidarPaginasPublicas(existente.slug, property.slug);
     return NextResponse.json({ property });
   } catch (e) {
     console.error("[admin/properties PATCH]", e);
@@ -116,6 +120,7 @@ export async function DELETE(_request: Request, { params }: Params) {
     // Primeiro o banco (cascade remove PropertyPhoto), depois o storage
     await prisma.property.delete({ where: { id: params.id } });
     await deletePropertyPhotos(property.fotos.map((f) => f.storageKey));
+    revalidarPaginasPublicas(property.slug);
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[admin/properties DELETE]", e);

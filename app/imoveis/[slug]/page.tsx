@@ -19,6 +19,7 @@ import ShareButton from "@/components/ShareButton";
 import TrackView from "@/components/TrackView";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { prisma } from "@/lib/prisma";
+import { siteUrl } from "@/lib/site-url";
 import { toPublicPropertyDTO, capaDoImovel } from "@/lib/dto";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
 import { TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
@@ -27,7 +28,9 @@ import {
   precoLocacaoFormatado,
 } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
+// ISR por slug: gerada sob demanda e servida do cache; mutações no admin
+// invalidam via revalidatePath (lib/revalidate.ts)
+export const revalidate = 300;
 
 interface PageProps {
   params: { slug: string };
@@ -137,6 +140,29 @@ export default async function ImovelPage({ params }: PageProps) {
       : {}),
   };
 
+  // Breadcrumbs estruturados — o Google mostra "Início › Imóveis › {título}"
+  // no lugar da URL crua nos resultados de busca
+  const base = siteUrl();
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Início", item: base },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Imóveis",
+        item: `${base}/imoveis`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: imovel.titulo,
+        item: `${base}/imoveis/${imovel.slug}`,
+      },
+    ],
+  };
+
   return (
     <>
       <SiteNav whatsappHref={linkWhatsAppGeral()} />
@@ -144,6 +170,10 @@ export default async function ImovelPage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       <main className="mx-auto max-w-6xl px-4 pb-44 pt-24 md:px-8 md:pb-20 md:pt-36">

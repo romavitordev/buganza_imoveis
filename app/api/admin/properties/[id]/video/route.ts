@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { uploadPropertyVideo, deletePropertyVideo } from "@/lib/storage";
+import { revalidarPaginasPublicas } from "@/lib/revalidate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,7 +20,7 @@ interface Params {
 export async function POST(request: Request, { params }: Params) {
   const property = await prisma.property.findUnique({
     where: { id: params.id },
-    select: { id: true, videoStorageKey: true },
+    select: { id: true, videoStorageKey: true, slug: true },
   });
 
   if (!property) {
@@ -76,6 +77,7 @@ export async function POST(request: Request, { params }: Params) {
       select: { videoUrl: true },
     });
 
+    revalidarPaginasPublicas(property.slug);
     return NextResponse.json({ videoUrl: atualizado.videoUrl }, { status: 201 });
   } catch (e) {
     console.error("[admin/video POST]", e);
@@ -90,7 +92,7 @@ export async function POST(request: Request, { params }: Params) {
 export async function DELETE(_request: Request, { params }: Params) {
   const property = await prisma.property.findUnique({
     where: { id: params.id },
-    select: { id: true, videoStorageKey: true },
+    select: { id: true, videoStorageKey: true, slug: true },
   });
 
   if (!property) {
@@ -108,6 +110,7 @@ export async function DELETE(_request: Request, { params }: Params) {
     if (property.videoStorageKey) {
       await deletePropertyVideo(property.videoStorageKey);
     }
+    revalidarPaginasPublicas(property.slug);
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[admin/video DELETE]", e);

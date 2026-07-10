@@ -5,6 +5,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsUpDown,
+  ChevronUp,
   Eye,
   ImageOff,
   LogOut,
@@ -24,6 +29,36 @@ const STATUS_ESTILO: Record<AdminProperty["status"], string> = {
   VENDIDO: "border border-black/20 text-black/60",
   ALUGADO: "border border-black/20 text-black/60",
 };
+
+const POR_PAGINA = 10;
+
+type CampoOrdenavel =
+  | "codigo"
+  | "titulo"
+  | "visualizacoes"
+  | "cliquesWhatsApp"
+  | "atualizadoEm";
+
+interface Ordenacao {
+  campo: CampoOrdenavel;
+  asc: boolean;
+}
+
+function compararPor(
+  a: AdminProperty,
+  b: AdminProperty,
+  campo: CampoOrdenavel
+): number {
+  switch (campo) {
+    case "codigo":
+    case "titulo":
+    case "atualizadoEm": // ISO string — ordem lexicográfica = cronológica
+      return a[campo].localeCompare(b[campo], "pt-BR");
+    case "visualizacoes":
+    case "cliquesWhatsApp":
+      return a[campo] - b[campo];
+  }
+}
 
 interface Resumo7d {
   visualizacoes: number;
@@ -46,6 +81,21 @@ export default function DashboardTable({
   const [busca, setBusca] = useState("");
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [ordenacao, setOrdenacao] = useState<Ordenacao>({
+    campo: "atualizadoEm",
+    asc: false,
+  });
+  const [pagina, setPagina] = useState(1);
+
+  function ordenarPor(campo: CampoOrdenavel) {
+    setOrdenacao((atual) =>
+      atual.campo === campo
+        ? { campo, asc: !atual.asc }
+        : // Métricas abrem do maior para o menor; texto, em ordem alfabética
+          { campo, asc: campo === "codigo" || campo === "titulo" }
+    );
+    setPagina(1);
+  }
 
   const maisVisto = useMemo(() => {
     const ordenadas = properties
@@ -56,13 +106,26 @@ export default function DashboardTable({
 
   const filtradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    if (!termo) return properties;
-    return properties.filter(
-      (p) =>
-        p.titulo.toLowerCase().includes(termo) ||
-        p.codigo.toLowerCase().includes(termo)
-    );
-  }, [properties, busca]);
+    const base = termo
+      ? properties.filter(
+          (p) =>
+            p.titulo.toLowerCase().includes(termo) ||
+            p.codigo.toLowerCase().includes(termo)
+        )
+      : properties;
+    const sinal = ordenacao.asc ? 1 : -1;
+    return base
+      .slice()
+      .sort((a, b) => sinal * compararPor(a, b, ordenacao.campo));
+  }, [properties, busca, ordenacao]);
+
+  const totalPaginas = Math.max(1, Math.ceil(filtradas.length / POR_PAGINA));
+  // Exclusões/busca podem deixar a página atual além do fim — recua no render
+  const paginaAtual = Math.min(pagina, totalPaginas);
+  const visiveis = filtradas.slice(
+    (paginaAtual - 1) * POR_PAGINA,
+    paginaAtual * POR_PAGINA
+  );
 
   async function toggleDestaque(property: AdminProperty) {
     setOcupadoId(property.id);
@@ -129,6 +192,40 @@ export default function DashboardTable({
       month: "2-digit",
       year: "2-digit",
     });
+  }
+
+  function ThOrdenavel({
+    campo,
+    alinhar,
+    children,
+  }: {
+    campo: CampoOrdenavel;
+    alinhar?: "right";
+    children: React.ReactNode;
+  }) {
+    const ativo = ordenacao.campo === campo;
+    const Icone = ativo
+      ? ordenacao.asc
+        ? ChevronUp
+        : ChevronDown
+      : ChevronsUpDown;
+    return (
+      <th
+        className={`px-4 py-3 font-medium ${alinhar === "right" ? "text-right" : ""}`}
+        aria-sort={ativo ? (ordenacao.asc ? "ascending" : "descending") : undefined}
+      >
+        <button
+          type="button"
+          onClick={() => ordenarPor(campo)}
+          className={`inline-flex items-center gap-1 uppercase tracking-wide transition-colors hover:text-black ${
+            ativo ? "text-black" : ""
+          }`}
+        >
+          {children}
+          <Icone size={12} aria-hidden="true" className={ativo ? "" : "opacity-50"} />
+        </button>
+      </th>
+    );
   }
 
   return (
@@ -240,7 +337,10 @@ export default function DashboardTable({
         <input
           type="search"
           value={busca}
-          onChange={(e) => setBusca(e.target.value)}
+          onChange={(e) => {
+            setBusca(e.target.value);
+            setPagina(1);
+          }}
           placeholder="Buscar por título ou código…"
           aria-label="Buscar imóveis"
           className="w-full rounded-pill border border-black/15 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-black"
@@ -270,22 +370,24 @@ export default function DashboardTable({
             <thead>
               <tr className="border-b border-black/10 bg-mist/60 text-[11px] uppercase tracking-wide text-black/45">
                 <th className="px-4 py-3 font-medium">Foto</th>
-                <th className="px-4 py-3 font-medium">Código</th>
-                <th className="px-4 py-3 font-medium">Título</th>
+                <ThOrdenavel campo="codigo">Código</ThOrdenavel>
+                <ThOrdenavel campo="titulo">Título</ThOrdenavel>
                 <th className="px-4 py-3 font-medium">Tipo</th>
                 <th className="px-4 py-3 font-medium">Transação</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 text-center font-medium">Destaque</th>
-                <th className="px-4 py-3 text-right font-medium">Views</th>
-                <th className="px-4 py-3 text-right font-medium">
+                <ThOrdenavel campo="visualizacoes" alinhar="right">
+                  Views
+                </ThOrdenavel>
+                <ThOrdenavel campo="cliquesWhatsApp" alinhar="right">
                   Cliques WA
-                </th>
-                <th className="px-4 py-3 font-medium">Atualizado</th>
+                </ThOrdenavel>
+                <ThOrdenavel campo="atualizadoEm">Atualizado</ThOrdenavel>
                 <th className="px-4 py-3 text-right font-medium">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/8">
-              {filtradas.map((p) => {
+              {visiveis.map((p) => {
                 const capa = p.fotos.find((f) => f.capa) ?? p.fotos[0];
                 const ocupado = ocupadoId === p.id;
                 return (
@@ -386,6 +488,38 @@ export default function DashboardTable({
               })}
             </tbody>
           </table>
+
+          {totalPaginas > 1 && (
+            <nav
+              aria-label="Paginação da tabela"
+              className="flex items-center justify-between border-t border-black/10 px-4 py-3"
+            >
+              <p className="text-[12px] text-black/50">
+                Página {paginaAtual} de {totalPaginas} · {filtradas.length}{" "}
+                imóve{filtradas.length === 1 ? "l" : "is"}
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  disabled={paginaAtual === 1}
+                  onClick={() => setPagina(paginaAtual - 1)}
+                  aria-label="Página anterior"
+                  className="rounded-full p-2 transition-colors hover:bg-mist disabled:opacity-30"
+                >
+                  <ChevronLeft size={16} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  disabled={paginaAtual === totalPaginas}
+                  onClick={() => setPagina(paginaAtual + 1)}
+                  aria-label="Próxima página"
+                  className="rounded-full p-2 transition-colors hover:bg-mist disabled:opacity-30"
+                >
+                  <ChevronRight size={16} aria-hidden="true" />
+                </button>
+              </div>
+            </nav>
+          )}
         </div>
       )}
     </main>

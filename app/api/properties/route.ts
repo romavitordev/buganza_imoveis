@@ -9,7 +9,8 @@ export const dynamic = "force-dynamic";
 /**
  * ROTA PÚBLICA — somente imóveis ATIVOS, sempre via DTO com allowlist.
  * `precoInterno` jamais é serializado aqui (garantido por lib/dto.ts).
- * Filtros: ?tipo=RESIDENCIAL&transacao=VENDA&cidade=Sorocaba
+ * Filtros: ?tipo=RESIDENCIAL&transacao=VENDA&cidade=Sorocaba&q=campolim
+ * Favoritos: ?ids=id1,id2 (máx. 60) — usado pela página /favoritos
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -17,6 +18,13 @@ export async function GET(request: Request) {
   const tipoParam = searchParams.get("tipo");
   const transacaoParam = searchParams.get("transacao");
   const cidadeParam = searchParams.get("cidade");
+  const q = searchParams.get("q")?.trim().slice(0, 80) || undefined;
+  const ids = searchParams
+    .get("ids")
+    ?.split(",")
+    .map((id) => id.trim())
+    .filter(Boolean)
+    .slice(0, 60);
 
   const tipo =
     tipoParam && (Object.values(TipoImovel) as string[]).includes(tipoParam)
@@ -44,6 +52,18 @@ export async function GET(request: Request) {
             }
           : {}),
         ...(cidadeParam ? { cidade: cidadeParam } : {}),
+        ...(ids && ids.length > 0 ? { id: { in: ids } } : {}),
+        ...(q
+          ? {
+              OR: [
+                { titulo: { contains: q, mode: "insensitive" as const } },
+                { descricao: { contains: q, mode: "insensitive" as const } },
+                { bairro: { contains: q, mode: "insensitive" as const } },
+                { cidade: { contains: q, mode: "insensitive" as const } },
+                { codigo: { contains: q, mode: "insensitive" as const } },
+              ],
+            }
+          : {}),
       },
       include: { fotos: { orderBy: { ordem: "asc" } } },
       orderBy: [{ destaque: "desc" }, { atualizadoEm: "desc" }],

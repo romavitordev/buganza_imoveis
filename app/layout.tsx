@@ -20,12 +20,37 @@ export const metadata: Metadata = {
     "Imóveis Buganza: compra, venda e locação de imóveis residenciais e comerciais em Sorocaba e região. CRECI 118400. Fale conosco pelo WhatsApp.",
 };
 
+// Dados estruturados do negócio (Google) — telefone fica de fora de
+// propósito: o número de WhatsApp é server-only (ver /api/contato)
+const negocioJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: "Imóveis Buganza",
+  description:
+    "Compra, venda e locação de imóveis residenciais e comerciais em Sorocaba e região.",
+  url: siteUrl(),
+  identifier: "CRECI 118400",
+  areaServed: "Sorocaba e região, SP",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Sorocaba",
+    addressRegion: "SP",
+    addressCountry: "BR",
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(negocioJsonLd) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
