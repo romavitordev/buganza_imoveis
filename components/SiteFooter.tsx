@@ -6,6 +6,7 @@ import { linkWhatsAppGeral, linkWhatsAppAnunciar } from "@/lib/whatsapp";
 const NAVEGACAO = [
   { href: "/", rotulo: "Início" },
   { href: "/imoveis", rotulo: "Imóveis" },
+  { href: "/favoritos", rotulo: "Favoritos" },
   { href: "/#como-funciona", rotulo: "Como funciona" },
   { href: "/#quem-somos", rotulo: "Quem somos" },
   { href: "/#faq", rotulo: "Perguntas frequentes" },

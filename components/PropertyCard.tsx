@@ -13,7 +13,7 @@ import { capaDoImovel } from "@/lib/dto";
 import FavoriteButton from "@/components/FavoriteButton";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { linkWhatsAppImovel } from "@/lib/whatsapp";
-import { TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
+import { SUBTIPO_LABEL, TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 import { precoPrincipal, precoSecundario } from "@/lib/format";
 import { BLUR_DATA_URL } from "@/lib/blur";
 
@@ -76,7 +76,9 @@ export default function PropertyCard({
           </span>
         )}
         <span className="absolute left-3 top-3 rounded-pill bg-white/90 px-3 py-1.5 text-[11px] font-medium text-black backdrop-blur">
-          {TIPO_LABEL[imovel.tipo]} · {TRANSACAO_LABEL[imovel.transacao]}
+          {imovel.subtipo ? SUBTIPO_LABEL[imovel.subtipo] : TIPO_LABEL[imovel.tipo]}
+          {" · "}
+          {TRANSACAO_LABEL[imovel.transacao]}
         </span>
       </Link>
 

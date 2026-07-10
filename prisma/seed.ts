@@ -1,4 +1,9 @@
-import { PrismaClient, TipoImovel, Transacao } from "@prisma/client";
+import {
+  PrismaClient,
+  SubtipoImovel,
+  TipoImovel,
+  Transacao,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -36,14 +41,20 @@ async function main() {
       descricao:
         "Casa térrea impecável em rua tranquila do Jardim Europa. São 3 quartos (1 suíte), sala ampla com pé-direito alto, cozinha planejada, área gourmet com churrasqueira e quintal com espaço para jardim. Garagem coberta para 2 carros. Documentação em dia, pronta para morar.\n\nAgende uma visita pelo WhatsApp — teremos prazer em apresentar cada detalhe pessoalmente.",
       tipo: TipoImovel.RESIDENCIAL,
+      subtipo: SubtipoImovel.CASA,
       transacao: Transacao.VENDA,
       destaque: true,
       cidade: "Sorocaba",
       bairro: "Jardim Europa",
       quartos: 3,
+      suites: 1,
       banheiros: 2,
       vagas: 2,
       areaM2: 180,
+      areaTerrenoM2: 300,
+      condominioMensal: null,
+      iptuAnual: "1900",
+      comodidades: ["churrasqueira", "area-gourmet", "quintal", "lavanderia"],
       precoVenda: "750000",
       precoLocacao: null,
       fotos: [
@@ -59,14 +70,20 @@ async function main() {
       descricao:
         "Sala comercial em edifício com portaria, elevador e localização estratégica no Centro de Sorocaba. Ideal para escritórios, consultórios e prestadores de serviço. Banheiro privativo, boa iluminação natural e fácil acesso a transporte público.\n\nDisponível para locação imediata. Fale conosco pelo WhatsApp para agendar uma visita.",
       tipo: TipoImovel.COMERCIAL,
+      subtipo: SubtipoImovel.SALA_COMERCIAL,
       transacao: Transacao.LOCACAO,
       destaque: true,
       cidade: "Sorocaba",
       bairro: "Centro",
       quartos: null,
+      suites: null,
       banheiros: 1,
       vagas: 1,
       areaM2: 40,
+      areaTerrenoM2: null,
+      condominioMensal: "380",
+      iptuAnual: null,
+      comodidades: ["portaria-24h", "elevador", "ar-condicionado"],
       precoVenda: null,
       precoLocacao: "2200",
       fotos: [
@@ -81,14 +98,27 @@ async function main() {
       descricao:
         "Apartamento moderno no Parque Campolim, uma das regiões mais valorizadas de Sorocaba. São 2 quartos (1 suíte), varanda gourmet, sala integrada e cozinha americana. Condomínio com piscina, academia e salão de festas. Disponível para venda ou locação.\n\nConsulte condições pelo WhatsApp — respondemos rápido!",
       tipo: TipoImovel.RESIDENCIAL,
+      subtipo: SubtipoImovel.APARTAMENTO,
       transacao: Transacao.VENDA_LOCACAO,
       destaque: true,
       cidade: "Sorocaba",
       bairro: "Parque Campolim",
       quartos: 2,
+      suites: 1,
       banheiros: 2,
       vagas: 1,
       areaM2: 68,
+      areaTerrenoM2: null,
+      condominioMensal: "780",
+      iptuAnual: "1400",
+      comodidades: [
+        "piscina",
+        "academia",
+        "salao-festas",
+        "portaria-24h",
+        "elevador",
+        "varanda",
+      ],
       precoVenda: "520000",
       precoLocacao: "2800",
       fotos: [
@@ -102,9 +132,17 @@ async function main() {
   for (const { fotos, ...dados } of imoveis) {
     const property = await prisma.property.upsert({
       where: { codigo: dados.codigo },
+      // Rodar o seed de novo atualiza os campos de exibição dos exemplos
+      // (preços e a ficha profissional) sem duplicar nem mexer nas fotos
       update: {
         precoVenda: dados.precoVenda,
         precoLocacao: dados.precoLocacao,
+        subtipo: dados.subtipo ?? null,
+        suites: dados.suites ?? null,
+        areaTerrenoM2: dados.areaTerrenoM2 ?? null,
+        condominioMensal: dados.condominioMensal ?? null,
+        iptuAnual: dados.iptuAnual ?? null,
+        comodidades: dados.comodidades ?? [],
       },
       create: dados,
     });

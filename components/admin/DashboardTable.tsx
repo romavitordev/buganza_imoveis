@@ -10,6 +10,8 @@ import {
   ChevronRight,
   ChevronsUpDown,
   ChevronUp,
+  Copy,
+  ExternalLink,
   Eye,
   ImageOff,
   LogOut,
@@ -19,8 +21,10 @@ import {
   Search,
   Star,
   Trash2,
+  UserRound,
 } from "lucide-react";
 import type { AdminProperty } from "@/lib/admin-types";
+import TrafficChart, { type DiaTrafego } from "@/components/admin/TrafficChart";
 import { STATUS_LABEL, TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 
 const STATUS_ESTILO: Record<AdminProperty["status"], string> = {
@@ -113,9 +117,11 @@ interface Resumo7d {
 export default function DashboardTable({
   propertiesIniciais,
   resumo7d,
+  serie30d,
 }: {
   propertiesIniciais: AdminProperty[];
   resumo7d: Resumo7d;
+  serie30d: DiaTrafego[];
 }) {
   const router = useRouter();
   const [properties, setProperties] = useState(propertiesIniciais);
@@ -127,6 +133,9 @@ export default function DashboardTable({
     asc: false,
   });
   const [pagina, setPagina] = useState(1);
+  const [filtroStatus, setFiltroStatus] = useState<
+    AdminProperty["status"] | "TODOS"
+  >("TODOS");
 
   function ordenarPor(campo: CampoOrdenavel) {
     setOrdenacao((atual) =>
@@ -145,20 +154,32 @@ export default function DashboardTable({
     return ordenadas[0]?.visualizacoes ? ordenadas[0] : null;
   }, [properties]);
 
+  const contagemStatus = useMemo(() => {
+    const contagem = new Map<AdminProperty["status"], number>();
+    for (const p of properties) {
+      contagem.set(p.status, (contagem.get(p.status) ?? 0) + 1);
+    }
+    return contagem;
+  }, [properties]);
+
   const filtradas = useMemo(() => {
     const termo = busca.trim().toLowerCase();
-    const base = termo
-      ? properties.filter(
-          (p) =>
-            p.titulo.toLowerCase().includes(termo) ||
-            p.codigo.toLowerCase().includes(termo)
-        )
-      : properties;
+    const base = properties.filter((p) => {
+      if (filtroStatus !== "TODOS" && p.status !== filtroStatus) return false;
+      if (
+        termo &&
+        !p.titulo.toLowerCase().includes(termo) &&
+        !p.codigo.toLowerCase().includes(termo)
+      ) {
+        return false;
+      }
+      return true;
+    });
     const sinal = ordenacao.asc ? 1 : -1;
     return base
       .slice()
       .sort((a, b) => sinal * compararPor(a, b, ordenacao.campo));
-  }, [properties, busca, ordenacao]);
+  }, [properties, busca, ordenacao, filtroStatus]);
 
   const totalPaginas = Math.max(1, Math.ceil(filtradas.length / POR_PAGINA));
   // Exclusões/busca podem deixar a página atual além do fim — recua no render
@@ -191,6 +212,58 @@ export default function DashboardTable({
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Erro ao atualizar destaque.");
     } finally {
+      setOcupadoId(null);
+    }
+  }
+
+  async function mudarStatus(
+    property: AdminProperty,
+    novo: AdminProperty["status"]
+  ) {
+    if (novo === property.status) return;
+    setOcupadoId(property.id);
+    setErro(null);
+    try {
+      const res = await fetch(`/api/admin/properties/${property.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: novo }),
+      });
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as {
+          erro?: string;
+        } | null;
+        throw new Error(body?.erro ?? "Erro ao mudar o status.");
+      }
+      setProperties((atual) =>
+        atual.map((p) => (p.id === property.id ? { ...p, status: novo } : p))
+      );
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Erro ao mudar o status.");
+    } finally {
+      setOcupadoId(null);
+    }
+  }
+
+  async function duplicar(property: AdminProperty) {
+    setOcupadoId(property.id);
+    setErro(null);
+    try {
+      const res = await fetch(
+        `/api/admin/properties/${property.id}/duplicate`,
+        { method: "POST" }
+      );
+      const body = (await res.json().catch(() => null)) as {
+        erro?: string;
+        property?: { id: string };
+      } | null;
+      if (!res.ok || !body?.property?.id) {
+        throw new Error(body?.erro ?? "Erro ao duplicar o imóvel.");
+      }
+      // A cópia nasce pausada — abre direto na edição para ajustar
+      router.push(`/admin/imoveis/${body.property.id}`);
+    } catch (e) {
+      setErro(e instanceof Error ? e.message : "Erro ao duplicar o imóvel.");
       setOcupadoId(null);
     }
   }
@@ -252,6 +325,13 @@ export default function DashboardTable({
           >
             <Plus size={14} aria-hidden="true" />
             Novo imóvel
+          </Link>
+          <Link
+            href="/admin/conta"
+            aria-label="Minha conta"
+            className="inline-flex items-center gap-2 rounded-pill border border-black/15 p-2.5 text-black/70 transition-colors hover:border-black"
+          >
+            <UserRound size={14} aria-hidden="true" />
           </Link>
           <button
             type="button"
@@ -335,23 +415,69 @@ export default function DashboardTable({
         </div>
       </div>
 
-      <div className="relative mb-6 max-w-sm">
-        <Search
-          size={15}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
-          aria-hidden="true"
-        />
-        <input
-          type="search"
-          value={busca}
-          onChange={(e) => {
-            setBusca(e.target.value);
-            setPagina(1);
-          }}
-          placeholder="Buscar por título ou código…"
-          aria-label="Buscar imóveis"
-          className="w-full rounded-pill border border-black/15 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-black"
-        />
+      <div className="mb-8">
+        <TrafficChart serie={serie30d} />
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <div className="relative max-w-sm flex-1">
+          <Search
+            size={15}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            value={busca}
+            onChange={(e) => {
+              setBusca(e.target.value);
+              setPagina(1);
+            }}
+            placeholder="Buscar por título ou código…"
+            aria-label="Buscar imóveis"
+            className="w-full rounded-pill border border-black/15 py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-black"
+          />
+        </div>
+
+        <div
+          className="flex flex-wrap items-center gap-1.5"
+          role="group"
+          aria-label="Filtrar por status"
+        >
+          {(
+            ["TODOS", ...Object.keys(STATUS_LABEL)] as (
+              | AdminProperty["status"]
+              | "TODOS"
+            )[]
+          ).map((valor) => {
+            const ativo = filtroStatus === valor;
+            const quantidade =
+              valor === "TODOS"
+                ? properties.length
+                : (contagemStatus.get(valor) ?? 0);
+            return (
+              <button
+                key={valor}
+                type="button"
+                onClick={() => {
+                  setFiltroStatus(valor);
+                  setPagina(1);
+                }}
+                aria-pressed={ativo}
+                className={`rounded-pill border px-3.5 py-1.5 text-[12px] font-medium transition-colors ${
+                  ativo
+                    ? "border-black bg-black text-white"
+                    : "border-black/12 bg-white text-black/60 hover:border-black/40"
+                }`}
+              >
+                {valor === "TODOS" ? "Todos" : STATUS_LABEL[valor]}{" "}
+                <span className={ativo ? "opacity-70" : "text-black/35"}>
+                  {quantidade}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {erro && (
@@ -447,11 +573,27 @@ export default function DashboardTable({
                       {TRANSACAO_LABEL[p.transacao]}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-block rounded-pill px-3 py-1 text-[11px] font-medium ${STATUS_ESTILO[p.status]}`}
+                      {/* Status editável direto na linha (VENDIDO sem abrir a edição) */}
+                      <select
+                        value={p.status}
+                        disabled={ocupado}
+                        onChange={(e) =>
+                          mudarStatus(
+                            p,
+                            e.target.value as AdminProperty["status"]
+                          )
+                        }
+                        aria-label={`Status de ${p.codigo}`}
+                        className={`cursor-pointer appearance-none rounded-pill px-3 py-1 text-[11px] font-medium outline-none transition-opacity hover:opacity-80 ${STATUS_ESTILO[p.status]}`}
                       >
-                        {STATUS_LABEL[p.status]}
-                      </span>
+                        {Object.entries(STATUS_LABEL).map(
+                          ([valor, rotulo]) => (
+                            <option key={valor} value={valor}>
+                              {rotulo}
+                            </option>
+                          )
+                        )}
+                      </select>
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
@@ -488,6 +630,26 @@ export default function DashboardTable({
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
+                        {p.status === "ATIVO" && (
+                          <a
+                            href={`/imoveis/${p.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Ver ${p.codigo} no site`}
+                            className="rounded-full p-2 text-black/60 transition-colors hover:bg-mist hover:text-black"
+                          >
+                            <ExternalLink size={15} aria-hidden="true" />
+                          </a>
+                        )}
+                        <button
+                          type="button"
+                          disabled={ocupado}
+                          onClick={() => duplicar(p)}
+                          aria-label={`Duplicar ${p.codigo}`}
+                          className="rounded-full p-2 text-black/60 transition-colors hover:bg-mist hover:text-black"
+                        >
+                          <Copy size={15} aria-hidden="true" />
+                        </button>
                         <Link
                           href={`/admin/imoveis/${p.id}`}
                           aria-label={`Editar ${p.codigo}`}

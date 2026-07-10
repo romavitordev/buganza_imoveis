@@ -13,7 +13,7 @@ import { toPublicPropertyDTOList } from "@/lib/dto";
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const destaques = await prisma.property
+  let destaques = await prisma.property
     .findMany({
       where: { destaque: true, status: "ATIVO" },
       include: { fotos: { orderBy: { ordem: "asc" } } },
@@ -22,6 +22,22 @@ export default async function HomePage() {
     })
     .then(toPublicPropertyDTOList)
     .catch(() => []);
+
+  // Nenhum destaque marcado → mostra os últimos publicados em vez de
+  // esconder a seção (a home nunca fica sem imóveis)
+  let tituloSecao = "Em destaque";
+  if (destaques.length === 0) {
+    tituloSecao = "Últimos publicados";
+    destaques = await prisma.property
+      .findMany({
+        where: { status: "ATIVO" },
+        include: { fotos: { orderBy: { ordem: "asc" } } },
+        orderBy: { atualizadoEm: "desc" },
+        take: 6,
+      })
+      .then(toPublicPropertyDTOList)
+      .catch(() => []);
+  }
 
   return (
     <main>
@@ -43,7 +59,7 @@ export default async function HomePage() {
                 id="destaques-titulo"
                 className="text-3xl tracking-tight md:text-4xl"
               >
-                Em destaque
+                {tituloSecao}
               </h2>
             </div>
             <Link

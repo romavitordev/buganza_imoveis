@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { StatusImovel } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { uniqueSlug, slugify } from "@/lib/slug";
 import { deletePropertyPhotos } from "@/lib/storage";
@@ -55,6 +56,29 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ property });
   }
 
+  // Atualização rápida de status (marcar VENDIDO direto na tabela)
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    Object.keys(payload).length === 1 &&
+    "status" in payload
+  ) {
+    const status = (payload as { status: unknown }).status;
+    if (
+      typeof status !== "string" ||
+      !(Object.values(StatusImovel) as string[]).includes(status)
+    ) {
+      return NextResponse.json({ erro: "Status inválido." }, { status: 400 });
+    }
+    const property = await prisma.property.update({
+      where: { id: params.id },
+      data: { status: status as StatusImovel },
+      include: { fotos: { orderBy: { ordem: "asc" } } },
+    });
+    revalidarPaginasPublicas(property.slug);
+    return NextResponse.json({ property });
+  }
+
   const input = parsePropertyInput(payload);
   if (isValidationError(input)) {
     return NextResponse.json(input, { status: 400 });
@@ -73,6 +97,7 @@ export async function PATCH(request: Request, { params }: Params) {
         titulo: input.titulo,
         descricao: input.descricao,
         tipo: input.tipo,
+        subtipo: input.subtipo,
         transacao: input.transacao,
         status: input.status,
         destaque: input.destaque,
@@ -80,12 +105,17 @@ export async function PATCH(request: Request, { params }: Params) {
         bairro: input.bairro,
         enderecoMapa: input.enderecoMapa,
         quartos: input.quartos,
+        suites: input.suites,
         banheiros: input.banheiros,
         vagas: input.vagas,
         areaM2: input.areaM2,
+        areaTerrenoM2: input.areaTerrenoM2,
         precoVenda: input.precoVenda,
         precoLocacao: input.precoLocacao,
         precoInterno: input.precoInterno,
+        condominioMensal: input.condominioMensal,
+        iptuAnual: input.iptuAnual,
+        comodidades: input.comodidades,
       },
       include: { fotos: { orderBy: { ordem: "asc" } } },
     });

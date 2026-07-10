@@ -11,9 +11,16 @@ export const metadata = {
 
 export default async function AdminDashboardPage() {
   const seteDiasAtras = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const trintaDiasAtras = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-  const [properties, eventosTotais, eventos7d, dispositivos7d, origens7d] =
-    await Promise.all([
+  const [
+    properties,
+    eventosTotais,
+    eventos7d,
+    dispositivos7d,
+    origens7d,
+    eventos30d,
+  ] = await Promise.all([
       prisma.property.findMany({
         orderBy: { atualizadoEm: "desc" },
         include: { fotos: { orderBy: { ordem: "asc" } } },
@@ -42,7 +49,29 @@ export default async function AdminDashboardPage() {
         orderBy: { _count: { origem: "desc" } },
         take: 3,
       }),
+      prisma.propertyEvent.findMany({
+        where: { criadoEm: { gte: trintaDiasAtras } },
+        select: { tipo: true, criadoEm: true },
+      }),
     ]);
+
+  // Série diária dos últimos 30 dias (dias sem evento entram zerados)
+  const porDia = new Map<string, { visualizacoes: number; cliques: number }>();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+    porDia.set(d.toISOString().slice(0, 10), { visualizacoes: 0, cliques: 0 });
+  }
+  for (const evento of eventos30d) {
+    const dia = evento.criadoEm.toISOString().slice(0, 10);
+    const registro = porDia.get(dia);
+    if (!registro) continue;
+    if (evento.tipo === "VISUALIZACAO") registro.visualizacoes++;
+    else registro.cliques++;
+  }
+  const serie30d = Array.from(porDia.entries()).map(([dia, valores]) => ({
+    dia,
+    ...valores,
+  }));
 
   const contagem = new Map<string, { views: number; cliques: number }>();
   for (const evento of eventosTotais) {
@@ -59,6 +88,7 @@ export default async function AdminDashboardPage() {
     titulo: p.titulo,
     descricao: p.descricao,
     tipo: p.tipo,
+    subtipo: p.subtipo,
     transacao: p.transacao,
     status: p.status,
     destaque: p.destaque,
@@ -66,12 +96,17 @@ export default async function AdminDashboardPage() {
     bairro: p.bairro,
     enderecoMapa: p.enderecoMapa,
     quartos: p.quartos,
+    suites: p.suites,
     banheiros: p.banheiros,
     vagas: p.vagas,
     areaM2: p.areaM2,
+    areaTerrenoM2: p.areaTerrenoM2,
     precoVenda: p.precoVenda?.toString() ?? null,
     precoLocacao: p.precoLocacao?.toString() ?? null,
     precoInterno: p.precoInterno?.toString() ?? null,
+    condominioMensal: p.condominioMensal?.toString() ?? null,
+    iptuAnual: p.iptuAnual?.toString() ?? null,
+    comodidades: p.comodidades,
     videoUrl: p.videoUrl,
     atualizadoEm: p.atualizadoEm.toISOString(),
     fotos: p.fotos.map((f) => ({
@@ -108,6 +143,10 @@ export default async function AdminDashboardPage() {
   };
 
   return (
-    <DashboardTable propertiesIniciais={serializadas} resumo7d={resumo7d} />
+    <DashboardTable
+      propertiesIniciais={serializadas}
+      resumo7d={resumo7d}
+      serie30d={serie30d}
+    />
   );
 }

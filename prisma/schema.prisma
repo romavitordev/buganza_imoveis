@@ -27,6 +27,21 @@ enum TipoImovel {
   TERRENO
 }
 
+// Subtipo refina o tipo: "Residencial" não deixa ninguém buscar
+// "apartamento". Opcional — anúncios antigos seguem válidos sem ele.
+enum SubtipoImovel {
+  CASA
+  SOBRADO
+  APARTAMENTO
+  KITNET
+  CHACARA
+  SALA_COMERCIAL
+  LOJA
+  GALPAO
+  TERRENO_URBANO
+  TERRENO_CONDOMINIO
+}
+
 enum Transacao {
   VENDA
   LOCACAO
@@ -70,10 +85,24 @@ model Property {
   // Vazio = mapa mostra a região do bairro (localização aproximada).
   enderecoMapa String?
 
+  subtipo      SubtipoImovel?
+
   quartos      Int?
+  // Suítes contam DENTRO de quartos (3 quartos, sendo 1 suíte)
+  suites       Int?
   banheiros    Int?
   vagas        Int?
-  areaM2       Int?
+  // areaM2 = área útil/construída; terreno tem campo próprio
+  areaM2        Int?
+  areaTerrenoM2 Int?
+
+  // Custos recorrentes — exibidos na ficha do imóvel quando preenchidos
+  condominioMensal Decimal? @db.Decimal(12, 2)
+  iptuAnual        Decimal? @db.Decimal(12, 2)
+
+  // Comodidades estruturadas (valores do catálogo em lib/comodidades.ts) —
+  // viram badges com ícone no site e filtros no futuro
+  comodidades  String[]     @default([])
 
   // Preços PÚBLICOS — exibidos no site (cards e detalhe).
   // Ausente = "Sob consulta".
