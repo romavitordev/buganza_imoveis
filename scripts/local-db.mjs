@@ -54,6 +54,11 @@ const pg = new EmbeddedPostgres({
   password: "postgres",
   port: PORT,
   persistent: true,
+  // Sem isso o initdb no Windows cria o cluster em WIN1252 e textos com
+  // emoji/caracteres especiais falham com "22P05". Só vale para cluster
+  // NOVO — para aplicar num .pgdata existente, apague a pasta e rode
+  // db:push + db:seed de novo.
+  initdbFlags: ["--encoding=UTF8", "--locale=C"],
 });
 
 const jaInicializado = existsSync(path.join(DATA_DIR, "PG_VERSION"));

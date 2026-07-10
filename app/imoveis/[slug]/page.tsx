@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -31,12 +32,26 @@ import {
 // ISR por slug: gerada sob demanda e servida do cache; mutações no admin
 // invalidam via revalidatePath (lib/revalidate.ts)
 export const revalidate = 300;
+export const dynamicParams = true;
+
+// Sem generateStaticParams o Next renderiza a rota a cada request
+// (Cache-Control: no-store) — com ele, os ativos são pré-gerados no build
+// e novos slugs entram no cache sob demanda
+export async function generateStaticParams() {
+  const imoveis = await prisma.property
+    .findMany({ where: { status: "ATIVO" }, select: { slug: true } })
+    // Banco fora do ar no build → nenhuma pré-gerada; todas sob demanda
+    .catch(() => []);
+  return imoveis.map(({ slug }) => ({ slug }));
+}
 
 interface PageProps {
   params: { slug: string };
 }
 
-async function buscarImovelAtivo(slug: string) {
+// cache(): generateMetadata e a página pedem o mesmo imóvel na mesma
+// renderização — deduplica para uma única query
+const buscarImovelAtivo = cache(async (slug: string) => {
   const property = await prisma.property.findUnique({
     where: { slug },
     include: { fotos: { orderBy: { ordem: "asc" } } },
@@ -44,7 +59,7 @@ async function buscarImovelAtivo(slug: string) {
   // Imóvel inexistente ou fora do ar → 404 (não vaza pausados/vendidos)
   if (!property || property.status !== "ATIVO") return null;
   return toPublicPropertyDTO(property);
-}
+});
 
 export async function generateMetadata({
   params,

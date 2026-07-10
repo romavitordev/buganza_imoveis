@@ -46,14 +46,39 @@ function inteiroOpcional(value: unknown, campo: string): number | null {
   return n;
 }
 
+/**
+ * Aceita preço em pt-BR ("550.000", "1.234,56") E em formato decimal de
+ * API ("2200.50") — o form de edição reenvia o valor exatamente como a
+ * API devolveu, então tratar ponto sempre como milhar corrompia preços
+ * com centavos (2200.50 virava 220050).
+ */
 function decimalOpcional(value: unknown, campo: string): Prisma.Decimal | null {
   if (value === null || value === undefined || value === "") return null;
-  const texto = String(value)
-    .replace(/[R$\s]/g, "")
-    .replace(/\./g, "")
-    .replace(",", ".");
-  const numero = Number(typeof value === "number" ? value : texto);
-  if (!Number.isFinite(numero) || numero < 0) {
+
+  let numero: number;
+  if (typeof value === "number") {
+    numero = value;
+  } else {
+    const bruto = String(value).replace(/[R$\s]/g, "");
+    let normalizado: string;
+    if (bruto.includes(",")) {
+      // Tem vírgula → formato pt-BR: pontos são milhar, vírgula é decimal
+      normalizado = bruto.replace(/\./g, "").replace(",", ".");
+    } else if (
+      (bruto.match(/\./g) ?? []).length === 1 &&
+      /\.\d{1,2}$/.test(bruto)
+    ) {
+      // Ponto único com 1–2 dígitos no fim = separador decimal ("2200.50")
+      normalizado = bruto;
+    } else {
+      // Pontos como milhar ("550.000", "1.234.567") ou sem pontos
+      normalizado = bruto.replace(/\./g, "");
+    }
+    numero = Number(normalizado);
+  }
+
+  // Teto de sanidade: evita erros de digitação absurdos (> R$ 1 bilhão)
+  if (!Number.isFinite(numero) || numero < 0 || numero > 1_000_000_000) {
     throw new Error(`Campo "${campo}" inválido.`);
   }
   return new Prisma.Decimal(numero.toFixed(2));

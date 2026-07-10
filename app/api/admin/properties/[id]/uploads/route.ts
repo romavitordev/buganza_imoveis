@@ -179,10 +179,8 @@ export async function PUT(request: Request, { params }: Params) {
   try {
     if (kind === "video") {
       const storageKey = chaves[0];
-      // Substitui o vídeo anterior (remove o arquivo antigo do storage)
-      if (property.videoStorageKey) {
-        await deletePropertyVideo(property.videoStorageKey);
-      }
+      // Primeiro o banco, depois o storage: se o update falhar, o vídeo
+      // antigo continua íntegro (apagar antes deixaria a URL órfã)
       const atualizado = await prisma.property.update({
         where: { id: property.id },
         data: {
@@ -191,6 +189,9 @@ export async function PUT(request: Request, { params }: Params) {
         },
         select: { videoUrl: true },
       });
+      if (property.videoStorageKey) {
+        await deletePropertyVideo(property.videoStorageKey);
+      }
       revalidarPaginasPublicas(property.slug);
       return NextResponse.json({ videoUrl: atualizado.videoUrl }, { status: 201 });
     }
