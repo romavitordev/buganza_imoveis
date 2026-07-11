@@ -3,6 +3,7 @@
 import { ChangeEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Video } from "lucide-react";
+import ConfirmDialog from "@/components/admin/ConfirmDialog";
 
 const MAX_TAMANHO_BYTES = 50 * 1024 * 1024;
 
@@ -116,8 +117,10 @@ export default function VideoManager({
     }
   }
 
+  const [confirmandoRemocao, setConfirmandoRemocao] = useState(false);
+
   async function remover() {
-    if (!window.confirm("Remover o vídeo deste imóvel?")) return;
+    setConfirmandoRemocao(false);
     setEnviando(true);
     setErro(null);
     try {
@@ -164,7 +167,7 @@ export default function VideoManager({
           {videoUrl && (
             <button
               type="button"
-              onClick={remover}
+              onClick={() => setConfirmandoRemocao(true)}
               disabled={enviando}
               aria-label="Remover vídeo"
               className="rounded-full p-2.5 text-black/60 transition-colors hover:bg-mist hover:text-black disabled:opacity-60"
@@ -211,6 +214,15 @@ export default function VideoManager({
           grave na horizontal, com o celular estabilizado.
         </div>
       )}
+
+      <ConfirmDialog
+        aberto={confirmandoRemocao}
+        titulo="Remover o vídeo deste imóvel?"
+        descricao="O arquivo será apagado do storage. Você pode enviar outro depois."
+        rotuloConfirmar="Remover vídeo"
+        onConfirmar={remover}
+        onCancelar={() => setConfirmandoRemocao(false)}
+      />
     </section>
   );
 }

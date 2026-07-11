@@ -125,7 +125,9 @@ export default function PropertyForm({ property }: PropertyFormProps) {
   const [tipo, setTipo] = useState(property?.tipo ?? "RESIDENCIAL");
   const [subtipo, setSubtipo] = useState<string>(property?.subtipo ?? "");
   const [transacao, setTransacao] = useState(property?.transacao ?? "VENDA");
-  const [status, setStatus] = useState(property?.status ?? "ATIVO");
+  // Imóvel novo nasce PAUSADO: o fluxo é dados → fotos → Publicar
+  // (botão no assistente de publicação da tela de edição)
+  const [status, setStatus] = useState(property?.status ?? "PAUSADO");
   const [destaque, setDestaque] = useState(property?.destaque ?? false);
   const [cidade, setCidade] = useState(property?.cidade ?? "Sorocaba");
   const [bairro, setBairro] = useState(property?.bairro ?? "");
@@ -577,7 +579,11 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
       <Secao
         titulo="Publicação"
-        descricao="Só imóveis Ativos aparecem no site. Pausado some na hora."
+        descricao={
+          editando
+            ? "Só imóveis Ativos aparecem no site. Pausado some na hora."
+            : "O imóvel nasce Pausado — publique depois de subir as fotos, no botão “Publicar imóvel”."
+        }
       >
         <label className={labelCls}>
           <span className={legendaCls}>Status *</span>

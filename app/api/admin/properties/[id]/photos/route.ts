@@ -13,6 +13,89 @@ interface Params {
   params: { id: string };
 }
 
+/**
+ * PATCH — reordena TODAS as fotos de uma vez (drag-and-drop no admin).
+ * Body: { ordem: [photoId, photoId, ...] } — precisa conter exatamente
+ * os ids das fotos do imóvel, na nova ordem.
+ */
+export async function PATCH(request: Request, { params }: Params) {
+  const property = await prisma.property.findUnique({
+    where: { id: params.id },
+    select: { id: true, slug: true },
+  });
+  if (!property) {
+    return NextResponse.json(
+      { erro: "Imóvel não encontrado." },
+      { status: 404 }
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { erro: "Corpo da requisição inválido." },
+      { status: 400 }
+    );
+  }
+
+  const ordem =
+    typeof body === "object" && body !== null && "ordem" in body
+      ? (body as { ordem: unknown }).ordem
+      : null;
+
+  if (
+    !Array.isArray(ordem) ||
+    !ordem.every((id): id is string => typeof id === "string")
+  ) {
+    return NextResponse.json(
+      { erro: "Informe { ordem: [ids das fotos] }." },
+      { status: 400 }
+    );
+  }
+
+  const existentes = await prisma.propertyPhoto.findMany({
+    where: { propertyId: property.id },
+    select: { id: true },
+  });
+  const idsExistentes = new Set(existentes.map((f) => f.id));
+  const idsRecebidos = new Set(ordem);
+  if (
+    idsExistentes.size !== idsRecebidos.size ||
+    ordem.some((id) => !idsExistentes.has(id))
+  ) {
+    return NextResponse.json(
+      { erro: "A lista precisa conter exatamente as fotos deste imóvel." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    await prisma.$transaction(
+      ordem.map((id, indice) =>
+        prisma.propertyPhoto.update({
+          where: { id },
+          data: { ordem: indice },
+        })
+      )
+    );
+
+    const fotos = await prisma.propertyPhoto.findMany({
+      where: { propertyId: property.id },
+      orderBy: { ordem: "asc" },
+    });
+    revalidarPaginasPublicas(property.slug);
+    return NextResponse.json({ fotos });
+  } catch (e) {
+    console.error("[admin/photos PATCH ordem]", e);
+    return NextResponse.json(
+      { erro: "Erro ao salvar a nova ordem. Tente novamente." },
+      { status: 500 }
+    );
+  }
+}
+
 /** POST — upload de uma ou mais fotos (multipart/form-data, campo "fotos"). */
 export async function POST(request: Request, { params }: Params) {
   const property = await prisma.property.findUnique({

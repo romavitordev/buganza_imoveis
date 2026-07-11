@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { AdminProperty } from "@/lib/admin-types";
 import PropertyForm from "@/components/admin/PropertyForm";
 import PhotoManager from "@/components/admin/PhotoManager";
+import QualidadeAnuncio from "@/components/admin/QualidadeAnuncio";
 import VideoManager from "@/components/admin/VideoManager";
 
 export const dynamic = "force-dynamic";
@@ -66,6 +67,7 @@ export default async function EditarImovelPage({
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-12 px-4 py-10 md:px-8">
       <PropertyForm property={property} />
+      <QualidadeAnuncio property={property} />
       <hr className="border-black/10" />
       <PhotoManager propertyId={property.id} fotosIniciais={property.fotos} />
       <hr className="border-black/10" />

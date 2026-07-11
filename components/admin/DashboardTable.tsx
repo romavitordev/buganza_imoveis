@@ -24,6 +24,7 @@ import {
   UserRound,
 } from "lucide-react";
 import type { AdminProperty } from "@/lib/admin-types";
+import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import TrafficChart, { type DiaTrafego } from "@/components/admin/TrafficChart";
 import { STATUS_LABEL, TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 
@@ -72,12 +73,14 @@ function ThOrdenavel({
   ordenacao,
   onOrdenar,
   alinhar,
+  className = "",
   children,
 }: {
   campo: CampoOrdenavel;
   ordenacao: Ordenacao;
   onOrdenar: (campo: CampoOrdenavel) => void;
   alinhar?: "right";
+  className?: string;
   children: React.ReactNode;
 }) {
   const ativo = ordenacao.campo === campo;
@@ -88,7 +91,7 @@ function ThOrdenavel({
     : ChevronsUpDown;
   return (
     <th
-      className={`px-4 py-3 font-medium ${alinhar === "right" ? "text-right" : ""}`}
+      className={`px-4 py-3 font-medium ${alinhar === "right" ? "text-right" : ""} ${className}`}
       aria-sort={ativo ? (ordenacao.asc ? "ascending" : "descending") : undefined}
     >
       <button
@@ -268,12 +271,11 @@ export default function DashboardTable({
     }
   }
 
-  async function excluir(property: AdminProperty) {
-    const confirmado = window.confirm(
-      `Excluir "${property.titulo}" (${property.codigo})?\n\nAs fotos também serão apagadas do storage. Essa ação não pode ser desfeita.`
-    );
-    if (!confirmado) return;
+  // Imóvel aguardando confirmação de exclusão no modal
+  const [paraExcluir, setParaExcluir] = useState<AdminProperty | null>(null);
 
+  async function excluir(property: AdminProperty) {
+    setParaExcluir(null);
     setOcupadoId(property.id);
     setErro(null);
     try {
@@ -498,26 +500,25 @@ export default function DashboardTable({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-black/10">
-          <table className="w-full min-w-[820px] text-left text-[13px]">
+        <div className="rounded-2xl border border-black/10">
+          {/* Sem min-width: as colunas consolidadas cabem na tela, sem
+              scroll lateral. Em telas estreitas, colunas secundárias somem. */}
+          <table className="w-full text-left text-[13px]">
             <thead>
               <tr className="border-b border-black/10 bg-mist/60 text-[11px] uppercase tracking-wide text-black/45">
-                <th className="px-4 py-3 font-medium">Foto</th>
-                <ThOrdenavel campo="codigo" ordenacao={ordenacao} onOrdenar={ordenarPor}>
-                  Código
-                </ThOrdenavel>
                 <ThOrdenavel campo="titulo" ordenacao={ordenacao} onOrdenar={ordenarPor}>
-                  Título
+                  Imóvel
                 </ThOrdenavel>
-                <th className="px-4 py-3 font-medium">Tipo</th>
-                <th className="px-4 py-3 font-medium">Transação</th>
                 <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 text-center font-medium">Destaque</th>
+                <th className="hidden px-2 py-3 text-center font-medium sm:table-cell">
+                  ★
+                </th>
                 <ThOrdenavel
                   campo="visualizacoes"
                   ordenacao={ordenacao}
                   onOrdenar={ordenarPor}
                   alinhar="right"
+                  className="hidden md:table-cell"
                 >
                   Views
                 </ThOrdenavel>
@@ -526,10 +527,16 @@ export default function DashboardTable({
                   ordenacao={ordenacao}
                   onOrdenar={ordenarPor}
                   alinhar="right"
+                  className="hidden md:table-cell"
                 >
-                  Cliques WA
+                  Cliques
                 </ThOrdenavel>
-                <ThOrdenavel campo="atualizadoEm" ordenacao={ordenacao} onOrdenar={ordenarPor}>
+                <ThOrdenavel
+                  campo="atualizadoEm"
+                  ordenacao={ordenacao}
+                  onOrdenar={ordenarPor}
+                  className="hidden lg:table-cell"
+                >
                   Atualizado
                 </ThOrdenavel>
                 <th className="px-4 py-3 text-right font-medium">Ações</th>
@@ -545,32 +552,33 @@ export default function DashboardTable({
                     className={ocupado ? "opacity-50" : undefined}
                   >
                     <td className="px-4 py-3">
-                      <span className="relative block h-12 w-16 overflow-hidden rounded-lg bg-mist">
-                        {capa ? (
-                          <Image
-                            src={capa.url}
-                            alt=""
-                            fill
-                            sizes="64px"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="flex h-full items-center justify-center text-black/25">
-                            <ImageOff size={16} aria-hidden="true" />
+                      <div className="flex items-center gap-3">
+                        <span className="relative block h-11 w-14 shrink-0 overflow-hidden rounded-lg bg-mist">
+                          {capa ? (
+                            <Image
+                              src={capa.url}
+                              alt=""
+                              fill
+                              sizes="56px"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <span className="flex h-full items-center justify-center text-black/25">
+                              <ImageOff size={16} aria-hidden="true" />
+                            </span>
+                          )}
+                        </span>
+                        <div className="min-w-0">
+                          <span className="line-clamp-1 font-medium">
+                            {p.titulo}
                           </span>
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-medium">{p.codigo}</td>
-                    <td className="max-w-[240px] px-4 py-3">
-                      <span className="line-clamp-2">{p.titulo}</span>
-                      <span className="mt-0.5 block text-[11px] text-black/45">
-                        {p.bairro} · {p.cidade}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">{TIPO_LABEL[p.tipo]}</td>
-                    <td className="px-4 py-3">
-                      {TRANSACAO_LABEL[p.transacao]}
+                          <span className="mt-0.5 block truncate text-[11px] text-black/45">
+                            {p.codigo} · {TIPO_LABEL[p.tipo]} ·{" "}
+                            {TRANSACAO_LABEL[p.transacao]} — {p.bairro},{" "}
+                            {p.cidade}
+                          </span>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       {/* Status editável direto na linha (VENDIDO sem abrir a edição) */}
@@ -595,7 +603,7 @@ export default function DashboardTable({
                         )}
                       </select>
                     </td>
-                    <td className="px-4 py-3 text-center">
+                    <td className="hidden px-2 py-3 text-center sm:table-cell">
                       <button
                         type="button"
                         disabled={ocupado}
@@ -619,13 +627,13 @@ export default function DashboardTable({
                         />
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums">
+                    <td className="hidden px-4 py-3 text-right tabular-nums md:table-cell">
                       {p.visualizacoes}
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums">
+                    <td className="hidden px-4 py-3 text-right tabular-nums md:table-cell">
                       {p.cliquesWhatsApp}
                     </td>
-                    <td className="px-4 py-3 text-black/55">
+                    <td className="hidden px-4 py-3 text-black/55 lg:table-cell">
                       {dataCurta(p.atualizadoEm)}
                     </td>
                     <td className="px-4 py-3">
@@ -660,7 +668,7 @@ export default function DashboardTable({
                         <button
                           type="button"
                           disabled={ocupado}
-                          onClick={() => excluir(p)}
+                          onClick={() => setParaExcluir(p)}
                           aria-label={`Excluir ${p.codigo}`}
                           className="rounded-full p-2 text-black/60 transition-colors hover:bg-mist hover:text-black"
                         >
@@ -707,6 +715,23 @@ export default function DashboardTable({
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        aberto={paraExcluir !== null}
+        titulo={
+          paraExcluir
+            ? `Excluir "${paraExcluir.titulo}"?`
+            : "Excluir imóvel?"
+        }
+        descricao={
+          paraExcluir
+            ? `${paraExcluir.codigo} — as fotos também serão apagadas do storage. Essa ação não pode ser desfeita.`
+            : undefined
+        }
+        rotuloConfirmar="Excluir imóvel"
+        onConfirmar={() => paraExcluir && excluir(paraExcluir)}
+        onCancelar={() => setParaExcluir(null)}
+      />
     </main>
   );
 }

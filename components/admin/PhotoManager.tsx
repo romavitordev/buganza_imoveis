@@ -12,6 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import type { AdminPhoto } from "@/lib/admin-types";
+import ConfirmDialog from "@/components/admin/ConfirmDialog";
 
 const MAX_TAMANHO_BYTES = 5 * 1024 * 1024;
 
@@ -176,10 +177,51 @@ export default function PhotoManager({
     }
   }
 
-  async function excluir(foto: AdminPhoto) {
-    if (!window.confirm("Excluir esta foto? Ela será removida do storage.")) {
-      return;
+  // Foto aguardando confirmação de exclusão no modal
+  const [paraExcluir, setParaExcluir] = useState<AdminPhoto | null>(null);
+
+  // Drag-and-drop de reordenação (as setas seguem como fallback de teclado)
+  const [arrastandoId, setArrastandoId] = useState<string | null>(null);
+  const [sobreId, setSobreId] = useState<string | null>(null);
+
+  async function salvarOrdem(novaLista: AdminPhoto[]) {
+    // Otimista: aplica localmente e persiste em uma chamada só
+    setFotos(novaLista.map((f, i) => ({ ...f, ordem: i })));
+    setErro(null);
+    try {
+      const res = await fetch(`/api/admin/properties/${propertyId}/photos`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ordem: novaLista.map((f) => f.id) }),
+      });
+      const body = (await res.json().catch(() => null)) as {
+        erro?: string;
+        fotos?: AdminPhoto[];
+      } | null;
+      if (!res.ok) throw new Error(body?.erro ?? "Erro ao salvar a ordem.");
+      if (body?.fotos) setFotos(body.fotos);
+      router.refresh();
+    } catch (err) {
+      setErro(
+        err instanceof Error ? err.message : "Erro ao salvar a nova ordem."
+      );
+      router.refresh();
     }
+  }
+
+  function soltarSobre(alvo: AdminPhoto) {
+    if (!arrastandoId || arrastandoId === alvo.id) return;
+    const lista = ordenadas.slice();
+    const de = lista.findIndex((f) => f.id === arrastandoId);
+    const para = lista.findIndex((f) => f.id === alvo.id);
+    if (de < 0 || para < 0) return;
+    const [movida] = lista.splice(de, 1);
+    lista.splice(para, 0, movida);
+    salvarOrdem(lista);
+  }
+
+  async function excluir(foto: AdminPhoto) {
+    setParaExcluir(null);
     setOcupadaId(foto.id);
     setErro(null);
     try {
@@ -232,7 +274,7 @@ export default function PhotoManager({
 
       <p className="text-[12px] text-black/45">
         Formatos de imagem até 5 MB cada. A foto marcada com ★ é a capa do
-        anúncio.
+        anúncio. Arraste as fotos para reordenar.
       </p>
 
       {erro && (
@@ -253,12 +295,38 @@ export default function PhotoManager({
         <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
           {ordenadas.map((foto, i) => {
             const ocupada = ocupadaId === foto.id;
+            const arrastando = arrastandoId === foto.id;
+            const alvoDeDrop = sobreId === foto.id && !arrastando;
             return (
               <li
                 key={foto.id}
-                className={`flex flex-col gap-2 ${ocupada ? "opacity-50" : ""}`}
+                draggable
+                onDragStart={() => setArrastandoId(foto.id)}
+                onDragEnd={() => {
+                  setArrastandoId(null);
+                  setSobreId(null);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setSobreId(foto.id);
+                }}
+                onDragLeave={() =>
+                  setSobreId((atual) => (atual === foto.id ? null : atual))
+                }
+                onDrop={(e) => {
+                  e.preventDefault();
+                  soltarSobre(foto);
+                  setSobreId(null);
+                }}
+                className={`flex cursor-grab flex-col gap-2 active:cursor-grabbing ${
+                  ocupada ? "opacity-50" : ""
+                } ${arrastando ? "opacity-40" : ""}`}
               >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-mist">
+                <div
+                  className={`relative aspect-[4/3] overflow-hidden rounded-xl bg-mist transition-shadow ${
+                    alvoDeDrop ? "ring-2 ring-black ring-offset-2" : ""
+                  }`}
+                >
                   <Image
                     src={foto.url}
                     alt={`Foto ${i + 1}`}
@@ -308,7 +376,7 @@ export default function PhotoManager({
                   <button
                     type="button"
                     disabled={ocupada}
-                    onClick={() => excluir(foto)}
+                    onClick={() => setParaExcluir(foto)}
                     aria-label="Excluir foto"
                     className="rounded-full p-1.5 text-black/60 transition-colors hover:bg-mist hover:text-black"
                   >
@@ -320,6 +388,15 @@ export default function PhotoManager({
           })}
         </ul>
       )}
+
+      <ConfirmDialog
+        aberto={paraExcluir !== null}
+        titulo="Excluir esta foto?"
+        descricao="Ela será removida do storage. Se for a capa, a próxima foto assume automaticamente."
+        rotuloConfirmar="Excluir foto"
+        onConfirmar={() => paraExcluir && excluir(paraExcluir)}
+        onCancelar={() => setParaExcluir(null)}
+      />
     </section>
   );
 }
