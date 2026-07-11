@@ -18,6 +18,7 @@ import {
   Tag,
 } from "lucide-react";
 import ComodidadesList from "@/components/ComodidadesList";
+import LeadForm from "@/components/LeadForm";
 import Gallery from "@/components/Gallery";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
@@ -379,6 +380,8 @@ export default async function ImovelPage({ params }: PageProps) {
             </div>
 
             <ComodidadesList valores={imovel.comodidades} />
+
+            <LeadForm slug={imovel.slug} />
 
             <section aria-labelledby="descricao-titulo">
               <h2

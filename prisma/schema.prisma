@@ -60,6 +60,12 @@ enum TipoEvento {
   CLIQUE_WHATSAPP
 }
 
+enum StatusLead {
+  NOVO
+  CONTATADO
+  DESCARTADO
+}
+
 model AdminUser {
   id           String   @id @default(cuid())
   nome         String
@@ -121,6 +127,7 @@ model Property {
 
   fotos        PropertyPhoto[]
   eventos      PropertyEvent[]
+  leads        Lead[]
   criadoEm     DateTime     @default(now())
   atualizadoEm DateTime     @updatedAt
 
@@ -147,6 +154,26 @@ model PropertyEvent {
 
   @@index([propertyId, tipo, criadoEm])
   @@index([dedupeHash, tipo, criadoEm])
+}
+
+// Lead do site: visitante que deixou contato no formulário "Tenho
+// interesse" em vez de (ou além de) abrir o WhatsApp.
+//
+// LGPD: dados coletados com consentimento explícito no formulário,
+// usados apenas para retornar o contato sobre o imóvel.
+model Lead {
+  id         String     @id @default(cuid())
+  // SetNull: excluir o imóvel não apaga o lead (o contato ainda vale)
+  property   Property?  @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  propertyId String?
+  nome       String
+  whatsapp   String
+  mensagem   String?    @db.Text
+  origem     String?
+  status     StatusLead @default(NOVO)
+  criadoEm   DateTime   @default(now())
+
+  @@index([status, criadoEm])
 }
 
 model PropertyPhoto {

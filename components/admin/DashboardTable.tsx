@@ -121,10 +121,12 @@ export default function DashboardTable({
   propertiesIniciais,
   resumo7d,
   serie30d,
+  leadsNovos,
 }: {
   propertiesIniciais: AdminProperty[];
   resumo7d: Resumo7d;
   serie30d: DiaTrafego[];
+  leadsNovos: number;
 }) {
   const router = useRouter();
   const [properties, setProperties] = useState(propertiesIniciais);
@@ -327,6 +329,18 @@ export default function DashboardTable({
           >
             <Plus size={14} aria-hidden="true" />
             Novo imóvel
+          </Link>
+          <Link
+            href="/admin/leads"
+            className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-black/70 transition-colors hover:border-black"
+          >
+            <MessageCircle size={14} aria-hidden="true" />
+            Leads
+            {leadsNovos > 0 && (
+              <span className="rounded-pill bg-black px-2 py-0.5 text-[10px] font-semibold text-white">
+                {leadsNovos}
+              </span>
+            )}
           </Link>
           <Link
             href="/admin/conta"

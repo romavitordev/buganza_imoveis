@@ -84,6 +84,34 @@ export default function PrivacidadePage() {
             </p>
           </section>
 
+          <section aria-labelledby="pp-leads">
+            <h2
+              id="pp-leads"
+              className="mb-2 text-xl font-medium tracking-tight text-black"
+            >
+              Formulário “Tenho interesse”
+            </h2>
+            <p>
+              Se você optar por deixar seu contato no formulário de um imóvel,
+              guardamos{" "}
+              <strong className="font-medium text-black">
+                nome, WhatsApp e a mensagem
+              </strong>{" "}
+              que você escreveu — com o seu consentimento (art. 7º, I da
+              LGPD) e para a finalidade única de retornar o contato sobre o
+              imóvel de interesse. Não usamos esses dados para mala direta nem
+              os compartilhamos com terceiros. Para pedir a exclusão dos seus
+              dados, é só chamar no WhatsApp ou escrever para{" "}
+              <a
+                href="mailto:imoveisbuganza@gmail.com"
+                className="underline underline-offset-2"
+              >
+                imoveisbuganza@gmail.com
+              </a>
+              .
+            </p>
+          </section>
+
           <section aria-labelledby="pp-armazenamento">
             <h2
               id="pp-armazenamento"

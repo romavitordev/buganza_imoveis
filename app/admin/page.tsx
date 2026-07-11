@@ -55,6 +55,10 @@ export default async function AdminDashboardPage() {
       }),
     ]);
 
+  const leadsNovos = await prisma.lead
+    .count({ where: { status: "NOVO" } })
+    .catch(() => 0);
+
   // Série diária dos últimos 30 dias (dias sem evento entram zerados)
   const porDia = new Map<string, { visualizacoes: number; cliques: number }>();
   for (let i = 29; i >= 0; i--) {
@@ -147,6 +151,7 @@ export default async function AdminDashboardPage() {
       propertiesIniciais={serializadas}
       resumo7d={resumo7d}
       serie30d={serie30d}
+      leadsNovos={leadsNovos}
     />
   );
 }
