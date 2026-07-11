@@ -2,6 +2,7 @@ import Link from "next/link";
 import Hero from "@/components/Hero";
 import PropertyCard from "@/components/PropertyCard";
 import ComoFunciona from "@/components/ComoFunciona";
+import Depoimentos from "@/components/Depoimentos";
 import QuemSomos from "@/components/QuemSomos";
 import Faq from "@/components/Faq";
 import AnuncieBanner from "@/components/AnuncieBanner";
@@ -81,6 +82,8 @@ export default async function HomePage() {
       <ComoFunciona />
 
       <QuemSomos />
+
+      <Depoimentos />
 
       <Faq />
 

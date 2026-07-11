@@ -565,7 +565,11 @@ export default function DashboardTable({
                     key={p.id}
                     className={ocupado ? "opacity-50" : undefined}
                   >
-                    <td className="px-4 py-3">
+                    {/* w-full + max-w-0: a célula absorve a largura restante
+                        e o truncate funciona — sem isso, título longo estica
+                        a tabela para fora do card (células dimensionam pelo
+                        conteúdo e ignoram min-w-0) */}
+                    <td className="w-full max-w-0 px-4 py-3">
                       <div className="flex items-center gap-3">
                         <span className="relative block h-11 w-14 shrink-0 overflow-hidden rounded-lg bg-mist">
                           {capa ? (
@@ -582,8 +586,8 @@ export default function DashboardTable({
                             </span>
                           )}
                         </span>
-                        <div className="min-w-0">
-                          <span className="line-clamp-1 font-medium">
+                        <div className="min-w-0 flex-1">
+                          <span className="block truncate font-medium">
                             {p.titulo}
                           </span>
                           <span className="mt-0.5 block truncate text-[11px] text-black/45">
@@ -647,7 +651,7 @@ export default function DashboardTable({
                     <td className="hidden px-4 py-3 text-right tabular-nums md:table-cell">
                       {p.cliquesWhatsApp}
                     </td>
-                    <td className="hidden px-4 py-3 text-black/55 lg:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 text-black/55 lg:table-cell">
                       {dataCurta(p.atualizadoEm)}
                     </td>
                     <td className="px-4 py-3">
