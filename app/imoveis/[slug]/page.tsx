@@ -7,15 +7,11 @@ import {
   Bath,
   BedDouble,
   BedSingle,
-  Building2,
   Car,
   LandPlot,
-  Landmark,
   MapPin,
   MessageCircle,
-  Receipt,
   Ruler,
-  Tag,
 } from "lucide-react";
 import ComodidadesList from "@/components/ComodidadesList";
 import LeadForm from "@/components/LeadForm";
@@ -98,33 +94,27 @@ export default async function ImovelPage({ params }: PageProps) {
   if (!imovel) notFound();
 
   const whatsappHref = linkWhatsAppImovel(imovel.slug);
-  const temPreco =
-    Boolean(formatarPreco(imovel.precoVenda)) ||
-    Boolean(precoLocacaoFormatado(imovel));
+  const precoVenda = formatarPreco(imovel.precoVenda);
+  const precoLocacao = precoLocacaoFormatado(imovel);
+  const temPreco = Boolean(precoVenda) || Boolean(precoLocacao);
   const rotuloCta = temPreco
     ? "Tenho interesse — chamar no WhatsApp"
     : "Consultar valor no WhatsApp";
 
+  // Custos recorrentes ficam junto do preço (é a conta que o comprador faz)
+  const custos = [
+    formatarPreco(imovel.condominioMensal)
+      ? `Condomínio ${formatarPreco(imovel.condominioMensal)}/mês`
+      : null,
+    formatarPreco(imovel.iptuAnual)
+      ? `IPTU ${formatarPreco(imovel.iptuAnual)}/ano`
+      : null,
+  ].filter(Boolean);
+
+  // Só os números do imóvel — tipo/transação/localização vivem no cabeçalho
   const caracteristicas = [
-    {
-      icone: Building2,
-      rotulo: "Tipo",
-      valor: imovel.subtipo
-        ? SUBTIPO_LABEL[imovel.subtipo]
-        : TIPO_LABEL[imovel.tipo],
-    },
-    { icone: Tag, rotulo: "Transação", valor: TRANSACAO_LABEL[imovel.transacao] },
-    {
-      icone: MapPin,
-      rotulo: "Localização",
-      valor: `${imovel.bairro} · ${imovel.cidade}`,
-    },
     imovel.quartos !== null
-      ? {
-          icone: BedDouble,
-          rotulo: "Quartos",
-          valor: String(imovel.quartos),
-        }
+      ? { icone: BedDouble, rotulo: "Quartos", valor: String(imovel.quartos) }
       : null,
     imovel.suites !== null && imovel.suites > 0
       ? { icone: BedSingle, rotulo: "Suítes", valor: String(imovel.suites) }
@@ -149,24 +139,8 @@ export default async function ImovelPage({ params }: PageProps) {
           valor: `${imovel.areaTerrenoM2} m²`,
         }
       : null,
-    formatarPreco(imovel.condominioMensal)
-      ? {
-          icone: Receipt,
-          rotulo: "Condomínio",
-          valor: `${formatarPreco(imovel.condominioMensal)}/mês`,
-        }
-      : null,
-    formatarPreco(imovel.iptuAnual)
-      ? {
-          icone: Landmark,
-          rotulo: "IPTU",
-          valor: `${formatarPreco(imovel.iptuAnual)}/ano`,
-        }
-      : null,
   ].filter(
-    (
-      c
-    ): c is { icone: typeof Building2; rotulo: string; valor: string } =>
+    (c): c is { icone: typeof BedDouble; rotulo: string; valor: string } =>
       c !== null
   );
 
@@ -232,7 +206,7 @@ export default async function ImovelPage({ params }: PageProps) {
       />
 
       <main className="mx-auto max-w-6xl px-4 pb-44 pt-24 md:px-8 md:pb-20 md:pt-36">
-        <div className="mb-8 flex items-center justify-between gap-4">
+        <div className="mb-6 flex items-center justify-between gap-4">
           <Link
             href="/imoveis"
             className="inline-flex items-center gap-2 text-[13px] font-medium text-black/55 transition-colors hover:text-black"
@@ -243,10 +217,153 @@ export default async function ImovelPage({ params }: PageProps) {
           <ShareButton titulo={imovel.titulo} />
         </div>
 
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[3fr_2fr]">
-          {/* Galeria + vídeo (o vídeo nunca é a capa) */}
-          <div className="flex flex-col gap-8">
+        {/* Cabeçalho do anúncio — identidade completa antes de tudo */}
+        <header className="mb-8">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="rounded-pill bg-black px-3 py-1 text-[11px] font-medium text-white">
+              {imovel.subtipo
+                ? SUBTIPO_LABEL[imovel.subtipo]
+                : TIPO_LABEL[imovel.tipo]}
+            </span>
+            <span className="rounded-pill border border-black/15 px-3 py-1 text-[11px] font-medium text-black/70">
+              {TRANSACAO_LABEL[imovel.transacao]}
+            </span>
+            <span className="text-[11px] font-medium uppercase tracking-wide text-black/40">
+              Cód. {imovel.codigo}
+            </span>
+          </div>
+          <h1 className="max-w-3xl text-3xl leading-tight tracking-tight md:text-4xl">
+            {imovel.titulo}
+          </h1>
+          <p className="mt-2 flex items-center gap-1.5 text-sm text-black/55">
+            <MapPin size={14} aria-hidden="true" />
+            {imovel.bairro} · {imovel.cidade}
+          </p>
+        </header>
+
+        {/* Duas colunas: conteúdo largo + card de conversão sticky.
+            No mobile, o card de preço vem logo depois da galeria. */}
+        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
+          <div className="lg:col-start-1 lg:row-start-1">
             <Gallery fotos={imovel.fotos} titulo={imovel.titulo} />
+          </div>
+
+          {/* Card de conversão: preço, custos, WhatsApp e o formulário de
+              contato — tudo que fecha negócio num lugar só, seguindo o
+              scroll no desktop */}
+          <aside
+            aria-label="Preço e contato"
+            className="rounded-2xl border border-black/10 bg-white p-6 lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+          >
+            <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
+              {precoVenda && (
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+                    Venda
+                  </p>
+                  <p className="text-3xl font-semibold tracking-tight">
+                    {precoVenda}
+                  </p>
+                </div>
+              )}
+              {precoLocacao && (
+                <div>
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+                    Locação
+                  </p>
+                  <p className="text-3xl font-semibold tracking-tight">
+                    {precoLocacao}
+                  </p>
+                </div>
+              )}
+              {!temPreco && (
+                <div>
+                  <p className="text-3xl font-semibold tracking-tight">
+                    Sob consulta
+                  </p>
+                  <p className="mt-1 text-[12px] text-black/50">
+                    Chame no WhatsApp — respondemos rápido
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {custos.length > 0 && (
+              <p className="mt-3 border-t border-black/8 pt-3 text-[12px] text-black/55">
+                {custos.join(" · ")}
+              </p>
+            )}
+
+            <WhatsAppLink
+              href={whatsappHref}
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-pill bg-black px-6 py-4 text-sm font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
+            >
+              <MessageCircle
+                size={16}
+                strokeWidth={2.5}
+                className="text-[#25D366]"
+                aria-hidden="true"
+              />
+              {rotuloCta}
+            </WhatsAppLink>
+            <p className="mt-2 text-center text-[11px] text-black/40">
+              Resposta rápida · atendimento direto com os corretores
+            </p>
+
+            <hr className="my-5 border-black/10" />
+
+            <LeadForm slug={imovel.slug} />
+          </aside>
+
+          {/* Conteúdo: leitura em sequência natural */}
+          <div className="flex flex-col gap-10 lg:col-start-1 lg:row-start-2">
+            {caracteristicas.length > 0 && (
+              <section aria-labelledby="caracteristicas-titulo">
+                <h2
+                  id="caracteristicas-titulo"
+                  className="mb-4 text-lg font-normal tracking-tight"
+                >
+                  Características
+                </h2>
+                <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {caracteristicas.map(({ icone: Icone, rotulo, valor }) => (
+                    <li
+                      key={rotulo}
+                      className="rounded-xl border border-black/10 p-4"
+                    >
+                      <Icone
+                        size={18}
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                        className="text-black/40"
+                      />
+                      <p className="mt-2 text-lg font-semibold tracking-tight">
+                        {valor}
+                      </p>
+                      <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+                        {rotulo}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            <ComodidadesList valores={imovel.comodidades} />
+
+            <section aria-labelledby="descricao-titulo">
+              <h2
+                id="descricao-titulo"
+                className="mb-3 text-lg font-normal tracking-tight"
+              >
+                Sobre este imóvel
+              </h2>
+              <div className="max-w-2xl space-y-3 text-[15px] leading-relaxed text-black/70">
+                {imovel.descricao.split(/\n{2,}/).map((paragrafo, i) => (
+                  <p key={i}>{paragrafo}</p>
+                ))}
+              </div>
+            </section>
 
             {imovel.videoUrl && (
               <section aria-labelledby="video-imovel-titulo">
@@ -292,109 +409,6 @@ export default async function ImovelPage({ params }: PageProps) {
                   ? `${imovel.enderecoMapa} · ${imovel.bairro}, ${imovel.cidade}`
                   : `Localização aproximada (${imovel.bairro}) — passamos o endereço completo no atendimento pelo WhatsApp.`}
               </p>
-            </section>
-          </div>
-
-          {/* Ficha */}
-          <div className="flex flex-col gap-6">
-            <header>
-              <p className="mb-2 text-[12px] font-medium uppercase tracking-wide text-black/40">
-                Cód. {imovel.codigo}
-              </p>
-              <h1 className="text-3xl leading-tight tracking-tight md:text-4xl">
-                {imovel.titulo}
-              </h1>
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-black/55">
-                <MapPin size={14} aria-hidden="true" />
-                {imovel.bairro} · {imovel.cidade}
-              </p>
-            </header>
-
-            {/* Preços */}
-            <div className="flex flex-wrap items-end gap-x-6 gap-y-2 rounded-2xl bg-mist px-5 py-4">
-              {formatarPreco(imovel.precoVenda) && (
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
-                    Venda
-                  </p>
-                  <p className="text-2xl font-semibold tracking-tight">
-                    {formatarPreco(imovel.precoVenda)}
-                  </p>
-                </div>
-              )}
-              {precoLocacaoFormatado(imovel) && (
-                <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
-                    Locação
-                  </p>
-                  <p className="text-2xl font-semibold tracking-tight">
-                    {precoLocacaoFormatado(imovel)}
-                  </p>
-                </div>
-              )}
-              {!formatarPreco(imovel.precoVenda) &&
-                !precoLocacaoFormatado(imovel) && (
-                  <div>
-                    <p className="text-2xl font-semibold tracking-tight">
-                      Sob consulta
-                    </p>
-                    <p className="text-[12px] text-black/50">
-                      Chame no WhatsApp — respondemos rápido
-                    </p>
-                  </div>
-                )}
-            </div>
-
-            <ul className="flex flex-col divide-y divide-black/8 rounded-2xl border border-black/10">
-              {caracteristicas.map(({ icone: Icone, rotulo, valor }) => (
-                <li
-                  key={rotulo}
-                  className="flex items-center justify-between px-5 py-3.5"
-                >
-                  <span className="flex items-center gap-2.5 text-[13px] text-black/55">
-                    <Icone size={15} strokeWidth={1.75} aria-hidden="true" />
-                    {rotulo}
-                  </span>
-                  <span className="text-[13px] font-medium">{valor}</span>
-                </li>
-              ))}
-            </ul>
-
-            {/* CTA desktop */}
-            <div className="hidden flex-col gap-3 md:flex">
-              <WhatsAppLink
-                href={whatsappHref}
-                className="inline-flex items-center justify-center gap-2 rounded-pill bg-black px-7 py-4 text-sm font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
-              >
-                <MessageCircle
-                  size={16}
-                  strokeWidth={2.5}
-                  className="text-[#25D366]"
-                  aria-hidden="true"
-                />
-                {rotuloCta}
-              </WhatsAppLink>
-              <p className="text-center text-[11px] text-black/40">
-                Resposta rápida · atendimento direto com os corretores
-              </p>
-            </div>
-
-            <ComodidadesList valores={imovel.comodidades} />
-
-            <LeadForm slug={imovel.slug} />
-
-            <section aria-labelledby="descricao-titulo">
-              <h2
-                id="descricao-titulo"
-                className="mb-3 text-lg font-normal tracking-tight"
-              >
-                Sobre este imóvel
-              </h2>
-              <div className="space-y-3 text-[15px] leading-relaxed text-black/70">
-                {imovel.descricao.split(/\n{2,}/).map((paragrafo, i) => (
-                  <p key={i}>{paragrafo}</p>
-                ))}
-              </div>
             </section>
           </div>
         </div>
