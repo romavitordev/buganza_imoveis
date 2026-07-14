@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "up": "node scripts/up.mjs",
     "postinstall": "prisma generate",
     "build": "next build",
     "start": "next start",
