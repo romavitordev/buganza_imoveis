@@ -54,6 +54,10 @@ npm run db:push   # cria as tabelas
 npm run db:seed   # cria o admin + 3 imóveis de exemplo
 ```
 
+> **Atalho:** `npm run up` sobe o banco, espera ele ficar pronto, roda
+> `db:push`/`db:seed` na primeira vez e abre o site — tudo em ordem, num
+> comando só. `Ctrl+C` encerra banco e site juntos.
+
 > **Sem Postgres nenhum?** `npm run db:local` sobe um Postgres portátil
 > (binários em node_modules, dados em `.pgdata/`) na porta 5502 — o `.env`
 > de exemplo já aponta para ele. Deixe rodando em um terminal separado.
