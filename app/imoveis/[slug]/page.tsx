@@ -260,19 +260,18 @@ export default async function ImovelPage({ params }: PageProps) {
           </p>
         </header>
 
-        {/* Duas colunas: conteúdo largo + card de conversão sticky.
-            No mobile, o card de preço vem logo depois da galeria. */}
+        {/* Topo: galeria + card de conversão lado a lado. O card fica
+            ancorado ao lado das imagens (não segue o scroll); o conteúdo
+            corre em largura cheia abaixo. No mobile, o card vem logo
+            depois da galeria. */}
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-12">
-          <div className="lg:col-start-1 lg:row-start-1">
-            <Gallery fotos={imovel.fotos} titulo={imovel.titulo} />
-          </div>
+          <Gallery fotos={imovel.fotos} titulo={imovel.titulo} />
 
           {/* Card de conversão: preço, custos, WhatsApp e o formulário de
-              contato — tudo que fecha negócio num lugar só, seguindo o
-              scroll no desktop */}
+              contato — tudo que fecha negócio num lugar só */}
           <aside
             aria-label="Preço e contato"
-            className="rounded-2xl border border-black/10 bg-white p-6 lg:sticky lg:top-28 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+            className="rounded-2xl border border-black/10 bg-white p-6"
           >
             <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
               {precoVenda && (
@@ -333,9 +332,10 @@ export default async function ImovelPage({ params }: PageProps) {
 
             <LeadForm slug={imovel.slug} />
           </aside>
+        </div>
 
-          {/* Conteúdo: leitura em sequência natural */}
-          <div className="flex flex-col gap-10 lg:col-start-1 lg:row-start-2">
+        {/* Conteúdo em largura cheia, abaixo da galeria e do card */}
+        <div className="mt-12 flex flex-col gap-10 md:mt-14">
             {caracteristicas.length > 0 && (
               <section aria-labelledby="caracteristicas-titulo">
                 <h2
@@ -429,7 +429,6 @@ export default async function ImovelPage({ params }: PageProps) {
                   : `Localização aproximada (${imovel.bairro}) — passamos o endereço completo no atendimento pelo WhatsApp.`}
               </p>
             </section>
-          </div>
         </div>
 
         {semelhantes.length > 0 && (
