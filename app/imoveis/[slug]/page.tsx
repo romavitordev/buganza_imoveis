@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import ComodidadesList from "@/components/ComodidadesList";
 import ImoveisSemelhantes from "@/components/ImoveisSemelhantes";
-import LeadForm from "@/components/LeadForm";
 import Gallery from "@/components/Gallery";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
@@ -327,10 +326,6 @@ export default async function ImovelPage({ params }: PageProps) {
             <p className="mt-2 text-center text-[11px] text-black/40">
               Resposta rápida · atendimento direto com os corretores
             </p>
-
-            <hr className="my-5 border-black/10" />
-
-            <LeadForm slug={imovel.slug} />
           </aside>
         </div>
 

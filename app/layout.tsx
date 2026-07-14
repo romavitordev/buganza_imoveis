@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { siteUrl } from "@/lib/site-url";
+import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
 
 const inter = Inter({
@@ -50,6 +51,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(negocioJsonLd) }}
         />
         {children}
+        <ChatWidget />
       </body>
     </html>
   );
