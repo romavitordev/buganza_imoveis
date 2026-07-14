@@ -14,6 +14,7 @@ import {
   Ruler,
 } from "lucide-react";
 import ComodidadesList from "@/components/ComodidadesList";
+import ImoveisSemelhantes from "@/components/ImoveisSemelhantes";
 import LeadForm from "@/components/LeadForm";
 import Gallery from "@/components/Gallery";
 import SiteNav from "@/components/SiteNav";
@@ -23,7 +24,8 @@ import TrackView from "@/components/TrackView";
 import WhatsAppLink from "@/components/WhatsAppLink";
 import { prisma } from "@/lib/prisma";
 import { siteUrl } from "@/lib/site-url";
-import { toPublicPropertyDTO, capaDoImovel } from "@/lib/dto";
+import { toPublicPropertyDTO, toPublicPropertyDTOList, capaDoImovel } from "@/lib/dto";
+import { ranquearSemelhantes } from "@/lib/semelhantes";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
 import { SUBTIPO_LABEL, TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 import {
@@ -92,6 +94,23 @@ export async function generateMetadata({
 export default async function ImovelPage({ params }: PageProps) {
   const imovel = await buscarImovelAtivo(params.slug);
   if (!imovel) notFound();
+
+  // Imóveis parecidos: puxa candidatos ATIVOS da mesma cidade e ranqueia
+  // por afinidade (lib/semelhantes.ts). Banco fora do ar → seção some.
+  const semelhantes = await prisma.property
+    .findMany({
+      where: {
+        status: "ATIVO",
+        cidade: imovel.cidade,
+        slug: { not: imovel.slug },
+      },
+      include: { fotos: { orderBy: { ordem: "asc" } } },
+      orderBy: { atualizadoEm: "desc" },
+      take: 12,
+    })
+    .then(toPublicPropertyDTOList)
+    .then((lista) => ranquearSemelhantes(imovel, lista, 3))
+    .catch(() => []);
 
   const whatsappHref = linkWhatsAppImovel(imovel.slug);
   const precoVenda = formatarPreco(imovel.precoVenda);
@@ -412,6 +431,12 @@ export default async function ImovelPage({ params }: PageProps) {
             </section>
           </div>
         </div>
+
+        {semelhantes.length > 0 && (
+          <div className="mt-16 md:mt-24">
+            <ImoveisSemelhantes imoveis={semelhantes} />
+          </div>
+        )}
       </main>
 
       {/* CTA sticky no mobile — acima da bottom nav */}
