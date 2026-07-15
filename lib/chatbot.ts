@@ -6,8 +6,18 @@
  * Para editar as respostas, mexa só neste arquivo.
  */
 
+/** Categorias que agrupam os assuntos no widget, na ordem de exibição. */
+export const CATEGORIAS = [
+  "Comprar ou alugar",
+  "Anunciar meu imóvel",
+  "Sobre a Buganza",
+] as const;
+
+export type Categoria = (typeof CATEGORIAS)[number];
+
 export interface TopicoChat {
   id: string;
+  categoria: Categoria;
   /** Texto do botão de resposta rápida (chip). */
   titulo: string;
   /** Palavras/radicais que ativam este tópico quando o usuário digita. */
@@ -18,20 +28,31 @@ export interface TopicoChat {
 export const TOPICOS: TopicoChat[] = [
   {
     id: "visita",
-    titulo: "Como agendar uma visita",
+    categoria: "Comprar ou alugar",
+    titulo: "Agendar uma visita",
     chaves: ["visita", "visitar", "agendar", "agendamento", "conhecer", "ver o imovel"],
     resposta:
       "Para agendar uma visita é rapidinho: escolha o imóvel, toque em “Falar no WhatsApp” e a gente combina o melhor dia e horário — fazemos visitas inclusive aos sábados. Quer que eu te leve ao WhatsApp agora?",
   },
   {
+    id: "precos",
+    categoria: "Comprar ou alugar",
+    titulo: "Preços e negociação",
+    chaves: ["preco", "preço", "valor", "valores", "quanto custa", "quanto e", "quanto é", "negociar", "desconto", "proposta"],
+    resposta:
+      "O valor de cada imóvel aparece no próprio anúncio (ausência = “Sob consulta”). Para fazer uma proposta ou negociar condições, o melhor caminho é falar direto com um corretor pelo WhatsApp — a negociação é sempre transparente.",
+  },
+  {
     id: "financiamento",
-    titulo: "Ajuda com financiamento",
+    categoria: "Comprar ou alugar",
+    titulo: "Financiamento",
     chaves: ["financiamento", "financiar", "financia", "banco", "fgts", "parcelar", "credito", "crédito", "entrada"],
     resposta:
       "Sim, cuidamos disso com você: fazemos a simulação nos principais bancos, orientamos sobre o uso do FGTS e acompanhamos todo o processo — sem custo adicional. Posso te conectar com um corretor pelo WhatsApp para simular seu caso.",
   },
   {
     id: "documentos",
+    categoria: "Comprar ou alugar",
     titulo: "Documentos para alugar",
     chaves: ["documento", "documentos", "documentacao", "documentação", "alugar", "aluguel", "locacao", "locação", "fiador", "caucao", "caução"],
     resposta:
@@ -39,33 +60,40 @@ export const TOPICOS: TopicoChat[] = [
   },
   {
     id: "anunciar",
-    titulo: "Quero anunciar meu imóvel",
+    categoria: "Anunciar meu imóvel",
+    titulo: "Como anunciar meu imóvel",
     chaves: ["anunciar", "anuncio", "anúncio", "vender", "vender meu", "colocar a venda", "colocar à venda", "comissao", "comissão", "taxa", "custo para anunciar"],
     resposta:
       "Anunciar com a Buganza é sem taxa, sem mensalidade e sem exclusividade forçada — você só paga a comissão de corretagem quando o negócio fecha. Cuidamos das fotos, do anúncio e da divulgação. Chame no WhatsApp que fazemos uma avaliação do seu imóvel.",
   },
   {
     id: "cidades",
+    categoria: "Sobre a Buganza",
     titulo: "Cidades atendidas",
     chaves: ["cidade", "cidades", "regiao", "região", "onde", "atuam", "atende", "atendem", "sorocaba", "votorantim"],
     resposta:
       "Atuamos em Sorocaba e região — Votorantim, Araçoiaba da Serra, Itu e arredores. Se o imóvel que você procura estiver fora dessa área, indicamos parceiros de confiança.",
   },
   {
-    id: "precos",
-    titulo: "Preços e negociação",
-    chaves: ["preco", "preço", "valor", "valores", "quanto custa", "quanto e", "quanto é", "negociar", "desconto", "proposta"],
-    resposta:
-      "O valor de cada imóvel aparece no próprio anúncio (ausência = “Sob consulta”). Para fazer uma proposta ou negociar condições, o melhor caminho é falar direto com um corretor pelo WhatsApp — a negociação é sempre transparente.",
-  },
-  {
     id: "atendimento",
+    categoria: "Sobre a Buganza",
     titulo: "Horário de atendimento",
     chaves: ["horario", "horário", "atendimento", "funciona", "aberto", "sabado", "sábado", "domingo", "quando"],
     resposta:
       "Atendemos de segunda a sábado, com flexibilidade para agendar visitas no horário que for melhor para você. Pelo WhatsApp costumamos responder no mesmo dia.",
   },
 ];
+
+/** Tópicos agrupados por categoria, na ordem de CATEGORIAS. */
+export function topicosPorCategoria(): {
+  categoria: Categoria;
+  topicos: TopicoChat[];
+}[] {
+  return CATEGORIAS.map((categoria) => ({
+    categoria,
+    topicos: TOPICOS.filter((t) => t.categoria === categoria),
+  })).filter((g) => g.topicos.length > 0);
+}
 
 export interface RespostaChat {
   /** true se alguma regra casou; false = fallback para WhatsApp. */

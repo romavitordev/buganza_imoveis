@@ -10,7 +10,12 @@ import {
 import { usePathname } from "next/navigation";
 import { Check, Loader2, MessageCircle, Send, X } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
-import { TOPICOS, responder, respostaDoTopico } from "@/lib/chatbot";
+import {
+  TOPICOS,
+  responder,
+  respostaDoTopico,
+  topicosPorCategoria,
+} from "@/lib/chatbot";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
 
 /**
@@ -203,18 +208,28 @@ export default function ChatWidget() {
               </div>
             ))}
 
-            {/* Chips de assunto — só enquanto ninguém digitou ainda */}
+            {/* Chips de assunto agrupados por categoria — só enquanto
+                ninguém digitou ainda */}
             {mensagens.length === 1 && !modoContato && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {TOPICOS.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => onChip(t.id)}
-                    className="rounded-pill border border-black/15 bg-white px-3 py-1.5 text-[12px] font-medium text-black/70 transition-colors hover:border-black hover:text-black"
-                  >
-                    {t.titulo}
-                  </button>
+              <div className="flex flex-col gap-3 pt-1">
+                {topicosPorCategoria().map(({ categoria, topicos }) => (
+                  <div key={categoria}>
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/35">
+                      {categoria}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {topicos.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => onChip(t.id)}
+                          className="rounded-pill border border-black/15 bg-white px-3 py-1.5 text-[12px] font-medium text-black/70 transition-colors hover:border-black hover:text-black"
+                        >
+                          {t.titulo}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
