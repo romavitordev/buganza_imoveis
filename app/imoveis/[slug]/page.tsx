@@ -326,43 +326,38 @@ export default async function ImovelPage({ params }: PageProps) {
             <p className="mt-2 text-center text-[11px] text-black/40">
               Resposta rápida · atendimento direto com os corretores
             </p>
+
+            {/* Ficha de características no próprio card — preenche a coluna
+                ao lado da galeria e resume os números do imóvel */}
+            {caracteristicas.length > 0 && (
+              <div className="mt-6 border-t border-black/10 pt-5">
+                <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-black/45">
+                  Características
+                </p>
+                <ul className="grid grid-cols-2 gap-x-4 gap-y-4">
+                  {caracteristicas.map(({ icone: Icone, rotulo, valor }) => (
+                    <li key={rotulo} className="flex items-center gap-2.5">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-mist text-black/55">
+                        <Icone size={16} strokeWidth={1.75} aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold leading-tight tracking-tight">
+                          {valor}
+                        </span>
+                        <span className="block truncate text-[10px] font-medium uppercase tracking-wide text-black/45">
+                          {rotulo}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </aside>
         </div>
 
         {/* Conteúdo em largura cheia, abaixo da galeria e do card */}
         <div className="mt-12 flex flex-col gap-10 md:mt-14">
-            {caracteristicas.length > 0 && (
-              <section aria-labelledby="caracteristicas-titulo">
-                <h2
-                  id="caracteristicas-titulo"
-                  className="mb-4 text-lg font-normal tracking-tight"
-                >
-                  Características
-                </h2>
-                <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {caracteristicas.map(({ icone: Icone, rotulo, valor }) => (
-                    <li
-                      key={rotulo}
-                      className="rounded-xl border border-black/10 p-4"
-                    >
-                      <Icone
-                        size={18}
-                        strokeWidth={1.5}
-                        aria-hidden="true"
-                        className="text-black/40"
-                      />
-                      <p className="mt-2 text-lg font-semibold tracking-tight">
-                        {valor}
-                      </p>
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
-                        {rotulo}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
             <ComodidadesList valores={imovel.comodidades} />
 
             <section aria-labelledby="descricao-titulo">
