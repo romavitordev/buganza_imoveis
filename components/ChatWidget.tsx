@@ -148,9 +148,9 @@ export default function ChatWidget() {
           type="button"
           onClick={() => setAberto(true)}
           aria-label="Abrir atendimento Buganza Suporte"
-          className="fixed right-4 bottom-[5.5rem] z-[70] inline-flex items-center gap-2 rounded-pill bg-black px-5 py-3.5 text-[13px] font-medium text-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:bottom-6"
+          className="fixed right-4 bottom-[5.5rem] z-[70] inline-flex items-center gap-2.5 rounded-pill bg-black px-6 py-4 text-[15px] font-medium text-white shadow-[0_10px_36px_rgba(0,0,0,0.28)] transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:bottom-5 md:right-5"
         >
-          <MessageCircle size={18} strokeWidth={2} aria-hidden="true" />
+          <MessageCircle size={22} strokeWidth={2} aria-hidden="true" />
           Suporte
         </button>
       )}
