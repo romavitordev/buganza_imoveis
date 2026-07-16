@@ -2,14 +2,21 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import type { PublicPhotoDTO } from "@/lib/dto";
 import { BLUR_DATA_URL } from "@/lib/blur";
 
 interface GalleryProps {
   fotos: PublicPhotoDTO[];
   titulo: string;
+  /** Vídeo do imóvel — entra na galeria APÓS as fotos, nunca como capa. */
+  videoUrl?: string | null;
 }
+
+/** Item de mídia unificado: foto ou vídeo. */
+type Midia =
+  | { tipo: "foto"; url: string }
+  | { tipo: "video"; url: string };
 
 const DURACAO_FECHAR = 240; // deve casar com a animação bzZoomOut/bzBackdropOut
 
@@ -21,14 +28,23 @@ function prefereMenosMovimento(): boolean {
 }
 
 /**
- * Galeria da página de detalhe: capa grande + thumbnails clicáveis e
- * lightbox com animação fluida de abrir/fechar, transição ao trocar de
- * foto e navegação por teclado.
+ * Galeria da página de detalhe: mídia grande + thumbnails clicáveis e
+ * lightbox com animação fluida. Fotos + vídeo convivem na mesma fileira
+ * (padrão Mercado Livre): o vídeo é a última miniatura, com ícone de
+ * play, e nunca é a capa.
  */
-export default function Gallery({ fotos, titulo }: GalleryProps) {
+export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
   const ordenadas = fotos
     .slice()
     .sort((a, b) => Number(b.capa) - Number(a.capa) || a.ordem - b.ordem);
+
+  // Mídias na ordem de exibição: fotos primeiro, vídeo por último
+  const midias: Midia[] = [
+    ...ordenadas.map((f): Midia => ({ tipo: "foto", url: f.url })),
+    ...(videoUrl ? [{ tipo: "video" as const, url: videoUrl }] : []),
+  ];
+  const total = midias.length;
+  const capaUrl = ordenadas[0]?.url;
 
   const [indiceAtivo, setIndiceAtivo] = useState(0);
   // montado = presente no DOM; fechando = tocando animação de saída
@@ -39,8 +55,6 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
   const fecharBtnRef = useRef<HTMLButtonElement>(null);
   // Elemento focado antes de abrir o lightbox — o foco volta para ele ao fechar
   const focoAnteriorRef = useRef<HTMLElement | null>(null);
-
-  const total = ordenadas.length;
 
   const navegar = useCallback(
     (delta: number) => {
@@ -69,7 +83,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
     }, ms);
   }, []);
 
-  // Swipe horizontal (mobile): troca de foto na capa e no lightbox
+  // Swipe horizontal (mobile): troca de mídia na capa e no lightbox
   const toqueRef = useRef<{ x: number; y: number } | null>(null);
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
@@ -107,7 +121,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
       // Trap de foco: Tab circula apenas pelos controles do lightbox
       if (e.key === "Tab") {
         const focaveis = dialogRef.current?.querySelectorAll<HTMLElement>(
-          "button, [href], [tabindex]:not([tabindex='-1'])"
+          "button, [href], video, [tabindex]:not([tabindex='-1'])"
         );
         if (!focaveis || focaveis.length === 0) return;
         const primeiro = focaveis[0];
@@ -145,41 +159,55 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
     );
   }
 
-  const ativa = ordenadas[indiceAtivo];
+  const ativa = midias[indiceAtivo];
+  const legenda = (i: number) =>
+    midias[i].tipo === "video" ? "Vídeo do imóvel" : `Foto ${i + 1}`;
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Foto principal — setas prev/next direto na capa, sem abrir o lightbox.
-          touch-pan-y: o navegador cuida do scroll vertical; swipe horizontal é nosso */}
+      {/* Mídia principal. touch-pan-y: o navegador cuida do scroll
+          vertical; swipe horizontal é nosso */}
       <div
         className="group relative aspect-[4/3] w-full touch-pan-y overflow-hidden rounded-2xl bg-mist"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <button
-          type="button"
-          onClick={abrir}
-          className="absolute inset-0 block h-full w-full cursor-zoom-in"
-          aria-label={`Ampliar foto ${indiceAtivo + 1} de ${total}`}
-        >
-          <Image
+        {ativa.tipo === "foto" ? (
+          <button
+            type="button"
+            onClick={abrir}
+            className="absolute inset-0 block h-full w-full cursor-zoom-in"
+            aria-label={`Ampliar foto ${indiceAtivo + 1} de ${total}`}
+          >
+            <Image
+              src={ativa.url}
+              alt={`${titulo} — foto ${indiceAtivo + 1}`}
+              fill
+              priority
+              placeholder="blur"
+              blurDataURL={BLUR_DATA_URL}
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              className="object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.03]"
+            />
+          </button>
+        ) : (
+          // key força remontar (e parar/reiniciar o player) ao voltar ao vídeo
+          <video
+            key={indiceAtivo}
             src={ativa.url}
-            alt={`${titulo} — foto ${indiceAtivo + 1} de ${total}`}
-            fill
-            priority
-            placeholder="blur"
-            blurDataURL={BLUR_DATA_URL}
-            sizes="(max-width: 1024px) 100vw, 60vw"
-            className="object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.03]"
+            controls
+            preload="metadata"
+            playsInline
+            className="absolute inset-0 h-full w-full bg-black object-contain"
           />
-        </button>
+        )}
 
         {total > 1 && (
           <>
             <button
               type="button"
               onClick={() => navegar(-1)}
-              aria-label="Foto anterior"
+              aria-label="Mídia anterior"
               className="absolute left-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black shadow-[0_2px_12px_rgba(0,0,0,0.14)] backdrop-blur transition-all duration-200 ease-premium hover:scale-110 active:scale-95 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
             >
               <ChevronLeft size={18} aria-hidden="true" />
@@ -187,7 +215,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
             <button
               type="button"
               onClick={() => navegar(1)}
-              aria-label="Próxima foto"
+              aria-label="Próxima mídia"
               className="absolute right-3 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-black shadow-[0_2px_12px_rgba(0,0,0,0.14)] backdrop-blur transition-all duration-200 ease-premium hover:scale-110 active:scale-95 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100"
             >
               <ChevronRight size={18} aria-hidden="true" />
@@ -204,14 +232,18 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
         <div
           className="grid grid-cols-5 gap-2 md:grid-cols-6"
           role="group"
-          aria-label="Miniaturas das fotos"
+          aria-label="Miniaturas"
         >
-          {ordenadas.map((foto, i) => (
+          {midias.map((midia, i) => (
             <button
-              key={`${foto.url}-${i}`}
+              key={`${midia.url}-${i}`}
               type="button"
               onClick={() => setIndiceAtivo(i)}
-              aria-label={`Ver foto ${i + 1}`}
+              aria-label={
+                midia.tipo === "video"
+                  ? "Reproduzir vídeo do imóvel"
+                  : `Ver foto ${i + 1}`
+              }
               aria-current={i === indiceAtivo ? "true" : undefined}
               className={`relative aspect-square overflow-hidden rounded-lg bg-mist transition-all duration-300 ease-premium ${
                 i === indiceAtivo
@@ -219,15 +251,35 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
                   : "opacity-70 hover:opacity-100"
               }`}
             >
-              <Image
-                src={foto.url}
-                alt=""
-                fill
-                placeholder="blur"
-                blurDataURL={BLUR_DATA_URL}
-                sizes="120px"
-                className="object-cover"
-              />
+              {midia.tipo === "foto" ? (
+                <Image
+                  src={midia.url}
+                  alt=""
+                  fill
+                  placeholder="blur"
+                  blurDataURL={BLUR_DATA_URL}
+                  sizes="120px"
+                  className="object-cover"
+                />
+              ) : (
+                <>
+                  {/* Capa como fundo escurecido + ícone de play (padrão ML) */}
+                  {capaUrl && (
+                    <Image
+                      src={capaUrl}
+                      alt=""
+                      fill
+                      sizes="120px"
+                      className="object-cover opacity-45"
+                    />
+                  )}
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-black shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+                      <Play size={13} className="ml-0.5 fill-black" aria-hidden="true" />
+                    </span>
+                  </span>
+                </>
+              )}
             </button>
           ))}
         </div>
@@ -242,7 +294,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
           }`}
           role="dialog"
           aria-modal="true"
-          aria-label={`Galeria de fotos de ${titulo}`}
+          aria-label={`Galeria de ${titulo}`}
           onClick={fechar}
         >
           <button
@@ -263,7 +315,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
                   e.stopPropagation();
                   navegar(-1);
                 }}
-                aria-label="Foto anterior"
+                aria-label="Mídia anterior"
                 className="bz-lightbox-controls absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95 md:left-6"
               >
                 <ChevronLeft size={22} aria-hidden="true" />
@@ -274,7 +326,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
                   e.stopPropagation();
                   navegar(1);
                 }}
-                aria-label="Próxima foto"
+                aria-label="Próxima mídia"
                 className="bz-lightbox-controls absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95 md:right-6"
               >
                 <ChevronRight size={22} aria-hidden="true" />
@@ -288,15 +340,25 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
-            {/* key por índice → replay do fade a cada troca de foto */}
+            {/* key por índice → replay do fade / remonta o vídeo ao trocar */}
             <div key={indiceAtivo} className="bz-lightbox-img absolute inset-0">
-              <Image
-                src={ativa.url}
-                alt={`${titulo} — foto ${indiceAtivo + 1} de ${total}`}
-                fill
-                sizes="100vw"
-                className="object-contain"
-              />
+              {ativa.tipo === "foto" ? (
+                <Image
+                  src={ativa.url}
+                  alt={`${titulo} — foto ${indiceAtivo + 1}`}
+                  fill
+                  sizes="100vw"
+                  className="object-contain"
+                />
+              ) : (
+                <video
+                  src={ativa.url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="h-full w-full object-contain"
+                />
+              )}
             </div>
           </div>
 
@@ -305,7 +367,7 @@ export default function Gallery({ fotos, titulo }: GalleryProps) {
               aria-live="polite"
               className="bz-lightbox-controls absolute bottom-6 rounded-pill bg-white/10 px-4 py-1.5 text-[12px] font-medium text-white"
             >
-              {indiceAtivo + 1} / {total}
+              {legenda(indiceAtivo)} · {indiceAtivo + 1} / {total}
             </span>
           )}
         </div>

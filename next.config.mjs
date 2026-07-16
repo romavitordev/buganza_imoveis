@@ -20,6 +20,8 @@ const csp = [
   `script-src 'self' 'unsafe-inline'${ehDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
+  // Vídeo do imóvel vem do Supabase (https) ou de /uploads local ('self')
+  "media-src 'self' blob: https:",
   "font-src 'self'",
   "connect-src 'self'",
   "frame-src https://maps.google.com https://www.google.com",
