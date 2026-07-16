@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { exigirSessao } from "@/lib/session";
 import type { AdminProperty } from "@/lib/admin-types";
 import PropertyForm from "@/components/admin/PropertyForm";
 import PhotoManager from "@/components/admin/PhotoManager";
@@ -18,6 +19,7 @@ export default async function EditarImovelPage({
 }: {
   params: { id: string };
 }) {
+  await exigirSessao(); // defense in depth além do middleware
   const p = await prisma.property.findUnique({
     where: { id: params.id },
     include: { fotos: { orderBy: { ordem: "asc" } } },

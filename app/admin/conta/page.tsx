@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { getCurrentSession } from "@/lib/session";
+import { exigirSessao } from "@/lib/session";
 import PasswordForm from "@/components/admin/PasswordForm";
 
 export const dynamic = "force-dynamic";
@@ -11,8 +11,8 @@ export const metadata = {
 };
 
 export default async function ContaPage() {
-  // O middleware já barra sem sessão; aqui é só para exibir o e-mail
-  const sessao = await getCurrentSession();
+  // Exige sessão (defense in depth) e usa o e-mail no cabeçalho
+  const sessao = await exigirSessao();
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-8 px-4 py-10 md:px-8">

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { exigirSessao } from "@/lib/session";
 import type { AdminProperty } from "@/lib/admin-types";
 import DashboardTable from "@/components/admin/DashboardTable";
 
@@ -10,6 +11,7 @@ export const metadata = {
 };
 
 export default async function AdminDashboardPage() {
+  await exigirSessao(); // defense in depth além do middleware
   const seteDiasAtras = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const trintaDiasAtras = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 

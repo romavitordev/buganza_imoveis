@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const SESSION_COOKIE = "bz_admin";
 const SESSION_DURATION_SECONDS = 8 * 60 * 60; // 8 horas
@@ -70,4 +71,16 @@ export async function getCurrentSession(): Promise<SessionPayload | null> {
   const token = cookies().get(SESSION_COOKIE)?.value;
   if (!token) return null;
   return verifySessionToken(token);
+}
+
+/**
+ * Exige sessão de admin numa página do painel (server component) — segunda
+ * camada além do middleware.ts (defense in depth): se o middleware não
+ * rodar por qualquer motivo, a página redireciona para o login antes de
+ * renderizar qualquer dado. Retorna a sessão para uso na página.
+ */
+export async function exigirSessao(): Promise<SessionPayload> {
+  const sessao = await getCurrentSession();
+  if (!sessao) redirect("/admin/login");
+  return sessao;
 }

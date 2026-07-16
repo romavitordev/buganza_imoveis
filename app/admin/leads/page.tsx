@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { exigirSessao } from "@/lib/session";
 import LeadsList, { type AdminLead } from "@/components/admin/LeadsList";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,7 @@ export const metadata = {
 };
 
 export default async function LeadsPage() {
+  await exigirSessao(); // defense in depth além do middleware
   const leads = await prisma.lead.findMany({
     orderBy: { criadoEm: "desc" },
     take: 200,

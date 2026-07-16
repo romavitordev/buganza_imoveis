@@ -80,10 +80,10 @@ export default function TrafficChart({ serie }: { serie: DiaTrafego[] }) {
           const hCliques = alturaDe(d.cliques);
           return (
             <g key={d.dia}>
-              <title>
-                {dataCurta(d.dia)}: {d.visualizacoes} visualizações,{" "}
-                {d.cliques} cliques
-              </title>
+              {/* String única (não interpolação em vários nós): <title>
+                  colapsa o conteúdo num só text node, e vários nós quebram
+                  a hidratação do React */}
+              <title>{`${dataCurta(d.dia)}: ${d.visualizacoes} visualizações, ${d.cliques} cliques`}</title>
               <rect
                 x={x}
                 y={ALTURA - hViews}
