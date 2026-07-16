@@ -140,6 +140,10 @@ export default function ChatWidget() {
     });
   }
 
+  // O widget é para visitantes do site — não aparece no painel admin.
+  // (return depois dos hooks para não violar as regras do React)
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
     <>
       {/* Botão flutuante — fica acima da bottom nav no mobile */}
