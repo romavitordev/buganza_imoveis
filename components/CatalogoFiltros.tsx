@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpDown, Search, SlidersHorizontal, X } from "lucide-react";
@@ -57,9 +57,11 @@ const rotuloCls =
   "text-[11px] font-medium uppercase tracking-wide text-black/40";
 
 /**
- * Barra de filtros do catálogo — tudo via URL (GET), então filtros são
- * compartilháveis e funcionam sem JavaScript. Desktop: linha compacta;
- * mobile: botão "Filtros" abre o painel. Chips removem filtros ativos.
+ * Barra de filtros do catálogo — tudo via URL (filtros compartilháveis).
+ * A filtragem é AUTOMÁTICA: selects navegam na hora; busca e faixa de
+ * preço navegam com um pequeno atraso (debounce) enquanto digita. Sem
+ * botão "Filtrar". Desktop: linha compacta; mobile: botão "Filtros" abre
+ * o painel. Chips removem filtros ativos.
  */
 export default function CatalogoFiltros({
   filtros,
@@ -74,6 +76,49 @@ export default function CatalogoFiltros({
 }) {
   const router = useRouter();
   const [aberto, setAberto] = useState(false);
+
+  // Campos de texto: estado local + debounce (navegar a cada tecla seria
+  // ruim). Selects não precisam — navegam direto no onChange.
+  const [busca, setBusca] = useState(filtros.q ?? "");
+  const [precoMin, setPrecoMin] = useState(
+    filtros.precoMin ? String(filtros.precoMin) : ""
+  );
+  const [precoMax, setPrecoMax] = useState(
+    filtros.precoMax ? String(filtros.precoMax) : ""
+  );
+
+  // Ressincroniza os campos quando os filtros da URL mudam (ex.: clicar
+  // num chip para remover, ou "Limpar tudo")
+  useEffect(() => {
+    setBusca(filtros.q ?? "");
+    setPrecoMin(filtros.precoMin ? String(filtros.precoMin) : "");
+    setPrecoMax(filtros.precoMax ? String(filtros.precoMax) : "");
+  }, [filtros.q, filtros.precoMin, filtros.precoMax]);
+
+  const primeiraRenderRef = useRef(true);
+  useEffect(() => {
+    // não navega no primeiro render (evita reload logo ao abrir a página)
+    if (primeiraRenderRef.current) {
+      primeiraRenderRef.current = false;
+      return;
+    }
+    const t = setTimeout(() => {
+      const destino = montarUrl(filtros, {
+        q: busca.trim() || undefined,
+        precoMin: precoMin.trim() || undefined,
+        precoMax: precoMax.trim() || undefined,
+      });
+      // só navega se algo realmente mudou em relação ao que já está na URL
+      if (destino !== montarUrl(filtros, {})) router.push(destino);
+    }, 500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busca, precoMin, precoMax]);
+
+  /** Navega imediatamente ao trocar um select. */
+  function aoTrocarSelect(campo: keyof FiltrosCatalogo, valor: string) {
+    router.push(montarUrl(filtros, { [campo]: valor || undefined }));
+  }
 
   // Chips dos filtros ativos (busca incluída) — cada um com o X que remove
   const chips: { chave: keyof FiltrosCatalogo; rotulo: string }[] = [];
@@ -114,21 +159,10 @@ export default function CatalogoFiltros({
 
   return (
     <div className="mb-10 flex flex-col gap-4">
-      {/* Busca + botão de filtros (mobile) — form GET puro, funciona sem JS */}
-      <form
-        action="/imoveis"
-        method="GET"
-        role="search"
-        className="flex flex-col gap-3"
-      >
-        {/* Filtros ativos que não estão em campos deste form viram hidden
-            para a busca não descartá-los */}
-        {filtros.ordem !== "recentes" && (
-          <input type="hidden" name="ordem" value={filtros.ordem} />
-        )}
-
+      <div className="flex flex-col gap-3">
+        {/* Busca + botão de filtros (mobile) */}
         <div className="flex items-center gap-2">
-          <div className="relative flex-1 md:max-w-md">
+          <div className="relative flex-1 md:max-w-md" role="search">
             <Search
               size={15}
               className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
@@ -136,19 +170,13 @@ export default function CatalogoFiltros({
             />
             <input
               type="search"
-              name="q"
-              defaultValue={filtros.q ?? ""}
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar por bairro, título ou código…"
               aria-label="Buscar imóveis por texto"
               className="w-full rounded-pill border border-black/15 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-black"
             />
           </div>
-          <button
-            type="submit"
-            className="rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
-          >
-            Buscar
-          </button>
           <button
             type="button"
             onClick={() => setAberto((a) => !a)}
@@ -176,8 +204,8 @@ export default function CatalogoFiltros({
           <div className={campoCls}>
             <span className={rotuloCls}>Tipo</span>
             <select
-              name="tipo"
-              defaultValue={filtros.tipo ?? ""}
+              value={filtros.tipo ?? ""}
+              onChange={(e) => aoTrocarSelect("tipo", e.target.value)}
               className={selectCls}
               aria-label="Filtrar por tipo"
             >
@@ -193,8 +221,8 @@ export default function CatalogoFiltros({
           <div className={campoCls}>
             <span className={rotuloCls}>Transação</span>
             <select
-              name="transacao"
-              defaultValue={filtros.transacao ?? ""}
+              value={filtros.transacao ?? ""}
+              onChange={(e) => aoTrocarSelect("transacao", e.target.value)}
               className={selectCls}
               aria-label="Filtrar por transação"
             >
@@ -208,8 +236,8 @@ export default function CatalogoFiltros({
             <div className={campoCls}>
               <span className={rotuloCls}>Cidade</span>
               <select
-                name="cidade"
-                defaultValue={filtros.cidade ?? ""}
+                value={filtros.cidade ?? ""}
+                onChange={(e) => aoTrocarSelect("cidade", e.target.value)}
                 className={selectCls}
                 aria-label="Filtrar por cidade"
               >
@@ -227,8 +255,8 @@ export default function CatalogoFiltros({
             <div className={campoCls}>
               <span className={rotuloCls}>Bairro</span>
               <select
-                name="bairro"
-                defaultValue={filtros.bairro ?? ""}
+                value={filtros.bairro ?? ""}
+                onChange={(e) => aoTrocarSelect("bairro", e.target.value)}
                 className={selectCls}
                 aria-label="Filtrar por bairro"
               >
@@ -245,8 +273,8 @@ export default function CatalogoFiltros({
           <div className={campoCls}>
             <span className={rotuloCls}>Quartos</span>
             <select
-              name="quartos"
-              defaultValue={filtros.quartos ? String(filtros.quartos) : ""}
+              value={filtros.quartos ? String(filtros.quartos) : ""}
+              onChange={(e) => aoTrocarSelect("quartos", e.target.value)}
               className={selectCls}
               aria-label="Mínimo de quartos"
             >
@@ -262,9 +290,9 @@ export default function CatalogoFiltros({
           <div className={campoCls}>
             <span className={rotuloCls}>Preço mín. (R$)</span>
             <input
-              name="precoMin"
               inputMode="numeric"
-              defaultValue={filtros.precoMin ? String(filtros.precoMin) : ""}
+              value={precoMin}
+              onChange={(e) => setPrecoMin(e.target.value)}
               placeholder="0"
               className={`${selectCls} md:w-28`}
               aria-label="Preço mínimo"
@@ -274,23 +302,16 @@ export default function CatalogoFiltros({
           <div className={campoCls}>
             <span className={rotuloCls}>Preço máx. (R$)</span>
             <input
-              name="precoMax"
               inputMode="numeric"
-              defaultValue={filtros.precoMax ? String(filtros.precoMax) : ""}
+              value={precoMax}
+              onChange={(e) => setPrecoMax(e.target.value)}
               placeholder="Sem limite"
               className={`${selectCls} md:w-28`}
               aria-label="Preço máximo"
             />
           </div>
-
-          <button
-            type="submit"
-            className="col-span-2 rounded-pill bg-black px-6 py-2.5 text-[13px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:col-span-1"
-          >
-            Filtrar
-          </button>
         </div>
-      </form>
+      </div>
 
       {/* Chips dos filtros ativos */}
       {chips.length > 0 && (
