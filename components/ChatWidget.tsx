@@ -75,8 +75,13 @@ export default function ChatWidget() {
     setMensagens((atual) => [...atual, bolha]);
   }
 
-  /** Bloco de ações que sempre acompanha uma resposta do bot. */
-  function acoesBot(): ReactNode {
+  /**
+   * Bloco que acompanha cada resposta do bot: CTAs (WhatsApp / contato) e
+   * — para a conversa não "acabar" — chips com OUTRAS dúvidas (menos a que
+   * acabou de ser respondida), para o visitante continuar perguntando.
+   */
+  function acoesBot(topicoRespondidoId?: string): ReactNode {
+    const outros = TOPICOS.filter((t) => t.id !== topicoRespondidoId);
     return (
       <div className="mt-3 flex flex-col gap-2">
         <a
@@ -100,6 +105,26 @@ export default function ChatWidget() {
         >
           Deixar meu contato
         </button>
+
+        {outros.length > 0 && (
+          <div className="mt-1 border-t border-black/8 pt-2.5">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/35">
+              Posso ajudar em mais algo?
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {outros.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => onChip(t.id)}
+                  className="rounded-pill border border-black/15 bg-white px-2.5 py-1 text-[11px] font-medium text-black/70 transition-colors hover:border-black hover:text-black"
+                >
+                  {t.titulo}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -111,7 +136,7 @@ export default function ChatWidget() {
       texto: (
         <>
           {resposta.texto}
-          {acoesBot()}
+          {acoesBot(resposta.topicoId)}
         </>
       ),
     });
