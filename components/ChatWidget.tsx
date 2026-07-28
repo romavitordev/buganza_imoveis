@@ -12,9 +12,13 @@ import { Check, Loader2, MessageCircle, Send, X } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 import {
   TOPICOS,
+  TOPICOS_IMOVEL,
   responder,
+  responderSobreImovel,
   respostaDoTopico,
+  respostaDoTopicoImovel,
   topicosPorCategoria,
+  type ImovelChat,
 } from "@/lib/chatbot";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
 
@@ -56,6 +60,33 @@ export default function ChatWidget() {
     ? linkWhatsAppImovel(slugImovel)
     : linkWhatsAppGeral();
 
+  // Dados reais do imóvel em tela (modo "ciente do imóvel"). Carregado
+  // na primeira abertura do chat; falha silenciosa = segue o modo geral.
+  const [imovel, setImovel] = useState<ImovelChat | null>(null);
+  const slugCarregadoRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!aberto || !slugImovel) return;
+    if (slugCarregadoRef.current === slugImovel) return;
+    slugCarregadoRef.current = slugImovel;
+    fetch(`/api/chatbot/imovel?slug=${encodeURIComponent(slugImovel)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body: { imovel?: ImovelChat } | null) => {
+        if (body?.imovel) setImovel(body.imovel);
+      })
+      .catch(() => {
+        // Sem dados do imóvel o bot só perde o "modo contextual" — a
+        // conversa geral continua funcionando normalmente.
+      });
+  }, [aberto, slugImovel]);
+
+  // Troca de página = o imóvel em tela mudou
+  useEffect(() => {
+    if (slugCarregadoRef.current && slugCarregadoRef.current !== slugImovel) {
+      slugCarregadoRef.current = null;
+      setImovel(null);
+    }
+  }, [slugImovel]);
+
   // Rola para a última mensagem a cada atualização
   useEffect(() => {
     if (aberto) fimRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -75,13 +106,38 @@ export default function ChatWidget() {
     setMensagens((atual) => [...atual, bolha]);
   }
 
+  // Saudação contextual: quando os dados do imóvel chegam e a conversa
+  // ainda não começou, o bot se apresenta já "sabendo" qual anúncio é.
+  useEffect(() => {
+    if (!imovel) return;
+    setMensagens((atual) =>
+      atual.length === 1 && atual[0].de === "bot"
+        ? [
+            {
+              de: "bot",
+              texto:
+                `Olá! Você está vendo o anúncio “${imovel.titulo}” ` +
+                `(${imovel.codigo}). Posso responder sobre preço, custos, ` +
+                "características e localização dele — ou qualquer outra dúvida. 👋",
+            },
+          ]
+        : atual
+    );
+  }, [imovel]);
+
   /**
    * Bloco que acompanha cada resposta do bot: CTAs (WhatsApp / contato) e
    * — para a conversa não "acabar" — chips com OUTRAS dúvidas (menos a que
    * acabou de ser respondida), para o visitante continuar perguntando.
    */
   function acoesBot(topicoRespondidoId?: string): ReactNode {
-    const outros = TOPICOS.filter((t) => t.id !== topicoRespondidoId);
+    const chipsImovel = imovel
+      ? TOPICOS_IMOVEL.filter((t) => t.id !== topicoRespondidoId)
+      : [];
+    const outros = [
+      ...chipsImovel,
+      ...TOPICOS.filter((t) => t.id !== topicoRespondidoId),
+    ];
     return (
       <div className="mt-3 flex flex-col gap-2">
         <a
@@ -143,6 +199,12 @@ export default function ChatWidget() {
   }
 
   function onChip(id: string) {
+    // Chips do imóvel em tela têm prioridade sobre os assuntos gerais
+    const topicoImovel = TOPICOS_IMOVEL.find((t) => t.id === id);
+    if (topicoImovel && imovel) {
+      responderTexto(topicoImovel.titulo, respostaDoTopicoImovel(id, imovel));
+      return;
+    }
     const topico = TOPICOS.find((t) => t.id === id);
     if (!topico) return;
     responderTexto(topico.titulo, respostaDoTopico(id));
@@ -153,7 +215,10 @@ export default function ChatWidget() {
     const texto = entrada.trim();
     if (!texto) return;
     setEntrada("");
-    responderTexto(texto, responder(texto));
+    // Na página de um anúncio, tenta primeiro responder com os dados
+    // REAIS daquele imóvel; só depois cai nas regras gerais.
+    const contextual = imovel ? responderSobreImovel(texto, imovel) : null;
+    responderTexto(texto, contextual ?? responder(texto));
   }
 
   function iniciarContato() {
@@ -241,6 +306,25 @@ export default function ChatWidget() {
                 ninguém digitou ainda */}
             {mensagens.length === 1 && !modoContato && (
               <div className="flex flex-col gap-3 pt-1">
+                {imovel && (
+                  <div>
+                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/35">
+                      Sobre este imóvel
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {TOPICOS_IMOVEL.map((t) => (
+                        <button
+                          key={t.id}
+                          type="button"
+                          onClick={() => onChip(t.id)}
+                          className="rounded-pill border border-black bg-black px-3 py-1.5 text-[12px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
+                        >
+                          {t.titulo}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {topicosPorCategoria().map(({ categoria, topicos }) => (
                   <div key={categoria}>
                     <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/35">

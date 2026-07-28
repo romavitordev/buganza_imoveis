@@ -6,6 +6,9 @@
  * Para editar as respostas, mexa só neste arquivo.
  */
 
+import { formatarPreco } from "@/lib/format";
+import { COMODIDADES, COMODIDADE_LABEL } from "@/lib/comodidades";
+
 /** Categorias que agrupam os assuntos no widget, na ordem de exibição. */
 export const CATEGORIAS = [
   "Comprar ou alugar",
@@ -148,4 +151,236 @@ export function respostaDoTopico(id: string): RespostaChat {
   return topico
     ? { encontrou: true, texto: topico.resposta, topicoId: topico.id }
     : { encontrou: false, texto: FALLBACK };
+}
+
+/* ------------------------------------------------------------------ */
+/* Modo "ciente do imóvel": na página de um anúncio, o bot responde     */
+/* perguntas com os DADOS REAIS daquele imóvel (rota /api/chatbot/      */
+/* imovel). Sem IA: intenção por palavras-chave + resposta montada do   */
+/* banco — nunca inventa informação.                                    */
+/* ------------------------------------------------------------------ */
+
+/** Subconjunto público do imóvel que o chat usa (espelho da rota). */
+export interface ImovelChat {
+  titulo: string;
+  codigo: string;
+  tipo: string;
+  subtipo: string | null;
+  transacao: "VENDA" | "LOCACAO" | "VENDA_LOCACAO";
+  cidade: string;
+  bairro: string;
+  quartos: number | null;
+  suites: number | null;
+  banheiros: number | null;
+  vagas: number | null;
+  areaM2: number | null;
+  areaTerrenoM2: number | null;
+  precoVenda: string | null;
+  precoLocacao: string | null;
+  condominioMensal: string | null;
+  iptuAnual: string | null;
+  comodidades: string[];
+}
+
+/** Chips extras exibidos quando a conversa acontece num anúncio. */
+export const TOPICOS_IMOVEL = [
+  { id: "im-precos", titulo: "Preço e custos" },
+  { id: "im-caracteristicas", titulo: "Características" },
+  { id: "im-localizacao", titulo: "Localização" },
+] as const;
+
+function resumoPrecos(im: ImovelChat): string {
+  const venda = formatarPreco(im.precoVenda);
+  const locacao = formatarPreco(im.precoLocacao);
+  const partes: string[] = [];
+  if (venda) partes.push(`Venda: ${venda}`);
+  if (locacao) partes.push(`Locação: ${locacao}/mês`);
+  let texto =
+    partes.length > 0
+      ? `${partes.join(" · ")}.`
+      : "O preço deste imóvel está sob consulta — o corretor passa o valor e as condições direto no WhatsApp.";
+
+  const custos: string[] = [];
+  const cond = formatarPreco(im.condominioMensal);
+  const iptu = formatarPreco(im.iptuAnual);
+  if (cond) custos.push(`condomínio de ${cond}/mês`);
+  if (iptu) custos.push(`IPTU de ${iptu}/ano`);
+  if (custos.length > 0) texto += ` Custos: ${custos.join(" e ")}.`;
+  if (partes.length > 0) {
+    texto += " Para propostas e condições, é só chamar o corretor. 😉";
+  }
+  return texto;
+}
+
+function resumoCaracteristicas(im: ImovelChat): string {
+  const partes: string[] = [];
+  if (im.quartos) {
+    partes.push(
+      im.suites
+        ? `${im.quartos} quarto${im.quartos > 1 ? "s" : ""} (${im.suites} suíte${im.suites > 1 ? "s" : ""})`
+        : `${im.quartos} quarto${im.quartos > 1 ? "s" : ""}`
+    );
+  }
+  if (im.banheiros) partes.push(`${im.banheiros} banheiro${im.banheiros > 1 ? "s" : ""}`);
+  if (im.vagas) partes.push(`${im.vagas} vaga${im.vagas > 1 ? "s" : ""}`);
+  if (im.areaM2) partes.push(`${im.areaM2} m²`);
+  if (im.areaTerrenoM2) partes.push(`terreno de ${im.areaTerrenoM2} m²`);
+
+  let texto =
+    partes.length > 0
+      ? `Este imóvel tem ${partes.join(" · ")}.`
+      : "A ficha completa está na própria página do anúncio.";
+
+  if (im.comodidades.length > 0) {
+    const rotulos = im.comodidades
+      .slice(0, 6)
+      .map((c) => COMODIDADE_LABEL[c] ?? c);
+    texto += ` Destaques: ${rotulos.join(", ")}${im.comodidades.length > 6 ? "…" : "."}`;
+  }
+  return texto;
+}
+
+function resumoLocalizacao(im: ImovelChat): string {
+  return (
+    `Fica no bairro ${im.bairro}, em ${im.cidade}. O mapa da região está ` +
+    "na própria página do anúncio, logo abaixo das fotos. O endereço " +
+    "exato é passado pelo corretor ao agendar a visita."
+  );
+}
+
+/** Resposta de um chip de imóvel (id de TOPICOS_IMOVEL). */
+export function respostaDoTopicoImovel(
+  id: string,
+  im: ImovelChat
+): RespostaChat {
+  if (id === "im-precos") {
+    return { encontrou: true, texto: resumoPrecos(im), topicoId: id };
+  }
+  if (id === "im-caracteristicas") {
+    return { encontrou: true, texto: resumoCaracteristicas(im), topicoId: id };
+  }
+  if (id === "im-localizacao") {
+    return { encontrou: true, texto: resumoLocalizacao(im), topicoId: id };
+  }
+  return { encontrou: false, texto: FALLBACK };
+}
+
+/**
+ * Tenta responder o texto com os dados do imóvel em tela. Retorna null
+ * quando a pergunta não é sobre o imóvel — o chamador cai nas regras
+ * gerais (responder). A ORDEM importa: condomínio/IPTU antes de preço,
+ * senão "valor do condomínio" cairia na resposta de preço.
+ */
+export function responderSobreImovel(
+  texto: string,
+  im: ImovelChat
+): RespostaChat | null {
+  const alvo = normalizar(texto);
+  if (!alvo.trim()) return null;
+
+  const tem = (...radicais: string[]) =>
+    radicais.some((r) => alvo.includes(normalizar(r)));
+
+  if (tem("condominio")) {
+    const cond = formatarPreco(im.condominioMensal);
+    return {
+      encontrou: true,
+      texto: cond
+        ? `O condomínio deste imóvel é de ${cond}/mês.`
+        : "Este anúncio não informa valor de condomínio — o corretor confirma na hora pelo WhatsApp.",
+      topicoId: "im-precos",
+    };
+  }
+
+  if (tem("iptu", "imposto")) {
+    const iptu = formatarPreco(im.iptuAnual);
+    return {
+      encontrou: true,
+      texto: iptu
+        ? `O IPTU deste imóvel é de ${iptu}/ano.`
+        : "Este anúncio não informa o IPTU — o corretor confirma na hora pelo WhatsApp.",
+      topicoId: "im-precos",
+    };
+  }
+
+  if (tem("preco", "valor", "quanto custa", "quanto e", "quanto ta", "quanto sai")) {
+    return { encontrou: true, texto: resumoPrecos(im), topicoId: "im-precos" };
+  }
+
+  if (tem("quarto", "dormitorio", "suite")) {
+    return {
+      encontrou: true,
+      texto: resumoCaracteristicas(im),
+      topicoId: "im-caracteristicas",
+    };
+  }
+
+  if (tem("banheiro", "lavabo")) {
+    return {
+      encontrou: true,
+      texto: im.banheiros
+        ? `São ${im.banheiros} banheiro${im.banheiros > 1 ? "s" : ""}.`
+        : "O anúncio não detalha os banheiros — o corretor confirma rapidinho.",
+      topicoId: "im-caracteristicas",
+    };
+  }
+
+  if (tem("vaga", "garagem", "estacionamento", "carro")) {
+    return {
+      encontrou: true,
+      texto: im.vagas
+        ? `Tem ${im.vagas} vaga${im.vagas > 1 ? "s" : ""} de garagem.`
+        : "Este anúncio não lista vaga de garagem — vale confirmar com o corretor.",
+      topicoId: "im-caracteristicas",
+    };
+  }
+
+  if (tem("area", "metragem", "m2", "metro", "tamanho")) {
+    const partes: string[] = [];
+    if (im.areaM2) partes.push(`${im.areaM2} m² de área útil`);
+    if (im.areaTerrenoM2) partes.push(`${im.areaTerrenoM2} m² de terreno`);
+    return {
+      encontrou: true,
+      texto:
+        partes.length > 0
+          ? `São ${partes.join(" e ")}.`
+          : "O anúncio não informa a metragem — o corretor confirma na hora.",
+      topicoId: "im-caracteristicas",
+    };
+  }
+
+  if (tem("onde fica", "localizacao", "endereco", "bairro", "regiao", "mapa", "perto de")) {
+    return {
+      encontrou: true,
+      texto: resumoLocalizacao(im),
+      topicoId: "im-localizacao",
+    };
+  }
+
+  if (tem("codigo", "referencia")) {
+    return {
+      encontrou: true,
+      texto: `O código deste anúncio é ${im.codigo} — cite-o ao falar com o corretor que agiliza. 😉`,
+      topicoId: "im-caracteristicas",
+    };
+  }
+
+  // Comodidade específica: "tem piscina?", "aceita pet?"…
+  for (const c of COMODIDADES) {
+    const pedacos = normalizar(c.rotulo)
+      .split(/[\s/]+/)
+      .filter((p) => p.length >= 4);
+    if (tem(c.valor, ...pedacos)) {
+      const possui = im.comodidades.includes(c.valor);
+      return {
+        encontrou: true,
+        texto: possui
+          ? `Sim! Este imóvel tem ${COMODIDADE_LABEL[c.valor].toLowerCase()}. ✅`
+          : `Este anúncio não lista "${COMODIDADE_LABEL[c.valor]}" — mas vale confirmar com o corretor, às vezes o condomínio oferece.`,
+        topicoId: "im-caracteristicas",
+      };
+    }
+  }
+
+  return null;
 }
