@@ -84,11 +84,11 @@ export default function PropertyCard({
 
       <div className="flex flex-1 flex-col gap-2 px-1">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="text-lg font-semibold tracking-tight">
+          <p className="bz-num text-lg font-semibold tracking-tight">
             {preco ?? "Sob consulta"}
           </p>
           {precoExtra && (
-            <p className="text-[12px] font-medium text-black/50">
+            <p className="bz-num text-[12px] font-medium text-black/50">
               ou {precoExtra}
             </p>
           )}

@@ -282,7 +282,7 @@ export default async function ImovelPage({ params }: PageProps) {
                   <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
                     Venda
                   </p>
-                  <p className="text-3xl font-semibold tracking-tight">
+                  <p className="bz-num text-3xl font-semibold tracking-tight">
                     {precoVenda}
                   </p>
                 </div>
@@ -292,14 +292,14 @@ export default async function ImovelPage({ params }: PageProps) {
                   <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
                     Locação
                   </p>
-                  <p className="text-3xl font-semibold tracking-tight">
+                  <p className="bz-num text-3xl font-semibold tracking-tight">
                     {precoLocacao}
                   </p>
                 </div>
               )}
               {!temPreco && (
                 <div>
-                  <p className="text-3xl font-semibold tracking-tight">
+                  <p className="bz-num text-3xl font-semibold tracking-tight">
                     Sob consulta
                   </p>
                   <p className="mt-1 text-[12px] text-black/50">

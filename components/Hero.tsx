@@ -60,12 +60,8 @@ export default function Hero() {
             CRECI 118400 · Sorocaba/SP e região
           </div>
         </div>
-
-        <div className="bz-right-tags bz-anim bz-btns-anim">
-          <span>Compra</span>
-          <span>Venda</span>
-          <span>Locação</span>
-        </div>
+        {/* O canto inferior direito fica livre de propósito: é onde mora
+            o botão flutuante "Suporte". */}
       </div>
 
       {/* Convite sutil ao scroll (só desktop — no mobile o conteúdo já guia) */}

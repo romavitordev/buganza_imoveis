@@ -23,6 +23,10 @@ body {
   font-family: "Inter", system-ui, sans-serif;
   background: #ffffff;
   color: #000;
+  /* A Inter foi desenhada para render antialiasado; sem isto o texto
+     fica encorpado demais no macOS e perde a leveza do peso 300 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -30,6 +34,14 @@ h2,
 h3 {
   font-weight: 300;
   letter-spacing: -0.03em;
+}
+
+/* Números tabulares onde há valor: preços, áreas e métricas ficam com
+   todos os dígitos da mesma largura, então uma coluna de preços alinha
+   certinho (a Inter usa figuras proporcionais por padrão). */
+.bz-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
 }
 
 *:focus-visible {
@@ -188,7 +200,7 @@ h3 {
 }
 .bz-contact-label {
   display: none;
-  font-size: 11px;
+  font-size: 12px;
   color: #000;
   font-weight: 500;
   padding-right: 12px;
@@ -198,8 +210,10 @@ h3 {
 .bz-footer {
   position: relative;
   z-index: 30;
-  /* padding extra embaixo no mobile por causa da bottom nav fixa */
-  padding: 24px 16px 92px;
+  /* Reserva embaixo, no mobile, o espaço de DOIS elementos fixos: a
+     bottom nav (~72px) e o botão flutuante "Suporte" logo acima dela.
+     Sem isso o botão cobre o CTA "Ver Imóveis" e a linha do CRECI. */
+  padding: 24px 16px 152px;
   background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
   display: flex;
   flex-direction: column;
@@ -259,7 +273,14 @@ h3 {
   }
 }
 
-.bz-trust { font-size: 11px; color: rgba(0,0,0,0.45); }
+/* Linha do CRECI: era 11px em preto 45% (contraste 3,4:1 — abaixo do
+   mínimo AA de 4,5:1 e difícil de ler no claro). 12px em 58% dá 5,3:1
+   e continua discreta ao lado do heading. */
+.bz-trust {
+  font-size: 12px;
+  color: rgba(0,0,0,0.58);
+  letter-spacing: 0.01em;
+}
 
 .bz-btn-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
@@ -281,23 +302,6 @@ h3 {
 .bz-btn-primary svg { color: #25D366; }
 .bz-btn-secondary { background: transparent; color: #000; border: 1px solid rgba(0,0,0,0.35); }
 .bz-btn-secondary:hover { border-color: #000; transform: translateY(-2px); }
-
-.bz-right-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  /* mobile: centralizadas; desktop volta ao alinhamento à direita */
-  justify-content: center;
-}
-.bz-right-tags span {
-  font-size: 11px;
-  color: rgba(0,0,0,0.75);
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.12);
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-weight: 500;
-}
 
 /* ---------- desktop (768px+) ---------- */
 @media (min-width: 768px) {
