@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   extrairBusca,
+  extrairContinuacao,
+  mesclarBusca,
   queryDaBusca,
   urlCatalogoDaBusca,
 } from "@/lib/chatbot-busca";
@@ -72,5 +74,84 @@ describe("queryDaBusca / urlCatalogoDaBusca", () => {
     expect(url).toContain("precoMax=3000");
     // catálogo não tem filtro de subtipo — vira busca textual
     expect(url).toContain("q=apartamento");
+  });
+});
+
+describe("preço mínimo, faixa e formas soltas (correções)", () => {
+  it("entende 'por mais de 550 mil' como preço MÍNIMO", () => {
+    const b = extrairBusca("apartamento de 2 quartos por mais de 550 mil")!;
+    expect(b.precoMin).toBe(550_000);
+    expect(b.precoMax).toBeUndefined();
+    expect(b.quartosMin).toBe(2);
+    expect(b.resumo).toContain("acima de 550.000");
+  });
+
+  it("entende 'acima de' e 'a partir de'", () => {
+    expect(extrairBusca("casa acima de 400 mil")?.precoMin).toBe(400_000);
+    expect(extrairBusca("casa a partir de r$ 300.000")?.precoMin).toBe(300_000);
+  });
+
+  it("entende faixa 'entre 300 e 500 mil' (unidade herdada)", () => {
+    const b = extrairBusca("apartamento entre 300 e 500 mil")!;
+    expect(b.precoMin).toBe(300_000);
+    expect(b.precoMax).toBe(500_000);
+  });
+
+  it("entende faixa 'de 300 a 500 mil'", () => {
+    const b = extrairBusca("casa de 300 a 500 mil")!;
+    expect(b.precoMin).toBe(300_000);
+    expect(b.precoMax).toBe(500_000);
+  });
+
+  it("'de 2 a 3 quartos' NAO vira faixa de preco", () => {
+    const b = extrairBusca("apartamento de 2 a 3 quartos")!;
+    expect(b.precoMin).toBeUndefined();
+    expect(b.precoMax).toBeUndefined();
+    expect(b.quartosMin).toBe(2);
+  });
+
+  it("valor solto com unidade vira teto: 'apartamento 550 mil'", () => {
+    expect(extrairBusca("apartamento 550 mil")?.precoMax).toBe(550_000);
+  });
+
+  it("numeros por extenso: 'dois quartos', 'duas vagas'", () => {
+    const b = extrairBusca("casa com dois quartos e duas vagas")!;
+    expect(b.quartosMin).toBe(2);
+    expect(b.vagasMin).toBe(2);
+  });
+});
+
+describe("continuidade da conversa", () => {
+  it("extrairContinuacao aceita so o preco ('e por mais de 550 mil?')", () => {
+    const c = extrairContinuacao("e por mais de 550 mil?")!;
+    expect(c.precoMin).toBe(550_000);
+  });
+
+  it("extrairContinuacao aceita so a transacao ('e para alugar?')", () => {
+    expect(extrairContinuacao("e para alugar?")?.transacao).toBe("LOCACAO");
+  });
+
+  it("extrairContinuacao devolve null sem nenhum filtro", () => {
+    expect(extrairContinuacao("obrigado!")).toBeNull();
+  });
+
+  it("mesclarBusca: preco novo substitui a faixa antiga EM BLOCO", () => {
+    const anterior = extrairBusca("apartamento 2 quartos por menos de 550 mil")!;
+    const nova = extrairContinuacao("e por mais de 550 mil?")!;
+    const m = mesclarBusca(anterior, nova);
+    expect(m.subtipo).toBe("APARTAMENTO");
+    expect(m.quartosMin).toBe(2);
+    expect(m.precoMin).toBe(550_000);
+    expect(m.precoMax).toBeUndefined(); // o "menos de" antigo sumiu
+    expect(m.resumo).toContain("acima de 550.000");
+  });
+
+  it("mesclarBusca: transacao nova mantem o resto", () => {
+    const anterior = extrairBusca("casa 3 quartos até 400 mil")!;
+    const nova = extrairContinuacao("e para alugar?")!;
+    const m = mesclarBusca(anterior, nova);
+    expect(m.transacao).toBe("LOCACAO");
+    expect(m.subtipo).toBe("CASA");
+    expect(m.precoMax).toBe(400_000);
   });
 });

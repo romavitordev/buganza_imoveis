@@ -23,7 +23,11 @@ import {
 } from "@/lib/chatbot";
 import {
   extrairBusca,
+  extrairContinuacao,
+  mesclarBusca,
   queryDaBusca,
+  semPreco,
+  temFiltroDePreco,
   urlCatalogoDaBusca,
   type IntencaoBusca,
 } from "@/lib/chatbot-busca";
@@ -219,12 +223,69 @@ export default function ChatWidget() {
     responderTexto(topico.titulo, respostaDoTopico(id));
   }
 
+  // Última busca respondida — permite continuar a conversa ("e por mais
+  // de 550 mil?", "e para alugar?") sem repetir tudo.
+  const ultimaBuscaRef = useRef<IntencaoBusca | null>(null);
+
+  function cardsDeImoveis(resultados: PublicPropertyDTO[]): ReactNode {
+    return (
+      <span className="mt-2.5 flex flex-col gap-2">
+        {resultados.map((p) => {
+          const capa = capaDoImovel(p);
+          const preco = precoPrincipal(p) ?? "Sob consulta";
+          return (
+            <a
+              key={p.slug}
+              href={`/imoveis/${p.slug}`}
+              className="flex items-center gap-2.5 rounded-xl border border-black/10 bg-white p-2 transition-colors hover:border-black"
+            >
+              <span className="relative h-12 w-16 flex-none overflow-hidden rounded-lg bg-mist">
+                {capa && (
+                  <Image
+                    src={capa.url}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                  />
+                )}
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate text-[12px] font-medium text-black">
+                  {p.titulo}
+                </span>
+                <span className="block text-[11px] text-black/50">
+                  {p.bairro} · <strong>{preco}</strong>
+                </span>
+              </span>
+            </a>
+          );
+        })}
+      </span>
+    );
+  }
+
+  async function pesquisar(intencao: IntencaoBusca): Promise<PublicPropertyDTO[]> {
+    try {
+      const res = await fetch(`/api/properties?${queryDaBusca(intencao)}`);
+      const body = (await res.json().catch(() => null)) as {
+        properties?: PublicPropertyDTO[];
+      } | null;
+      return body?.properties ?? [];
+    } catch {
+      // Falha de rede: trata como "nenhum resultado" e oferece o catálogo
+      return [];
+    }
+  }
+
   /**
    * Busca por conversa: consulta o catálogo com os filtros extraídos da
-   * frase e responde com mini-cards clicáveis. Erros caem num convite ao
-   * catálogo — a conversa nunca "quebra".
+   * frase e responde com mini-cards clicáveis. Sem resultado na faixa de
+   * preço pedida, o bot é HONESTO: avisa que não achou e mostra o que
+   * tem de mais próximo fora da faixa. A conversa nunca "quebra".
    */
   async function buscarImoveis(texto: string, intencao: IntencaoBusca) {
+    ultimaBuscaRef.current = intencao;
     empurrar({ de: "user", texto });
     empurrar({
       de: "bot",
@@ -235,22 +296,56 @@ export default function ChatWidget() {
         </span>
       ),
     });
-    let resultados: PublicPropertyDTO[] = [];
-    try {
-      const res = await fetch(`/api/properties?${queryDaBusca(intencao)}`);
-      const body = (await res.json().catch(() => null)) as {
-        properties?: PublicPropertyDTO[];
-      } | null;
-      resultados = body?.properties ?? [];
-    } catch {
-      // Falha de rede: trata como "nenhum resultado" e oferece o catálogo
+
+    const resultados = await pesquisar(intencao);
+    const urlCatalogo = urlCatalogoDaBusca(intencao);
+
+    if (resultados.length > 0) {
+      empurrar({
+        de: "bot",
+        texto: (
+          <>
+            Encontrei{" "}
+            {resultados.length === 1 ? "este imóvel" : "estes imóveis"} para
+            você: 👇
+            {cardsDeImoveis(resultados)}
+            <a
+              href={urlCatalogo}
+              className="mt-2 inline-block text-[12px] font-medium underline underline-offset-2"
+            >
+              Ver todos no catálogo →
+            </a>
+          </>
+        ),
+      });
+      return;
     }
 
-    const urlCatalogo = urlCatalogoDaBusca(intencao);
+    // Plano B: nada na faixa de preço → mostra o mais próximo fora dela,
+    // deixando CLARO que está fora do que foi pedido.
+    const alternativas = temFiltroDePreco(intencao)
+      ? (await pesquisar(semPreco(intencao))).slice(0, 2)
+      : [];
+
     empurrar({
       de: "bot",
       texto:
-        resultados.length === 0 ? (
+        alternativas.length > 0 ? (
+          <>
+            Não encontrei {intencao.resumo} no momento. 😕 Mas, fora dessa
+            faixa de preço, tenho{" "}
+            {alternativas.length === 1 ? "esta opção" : "estas opções"} que
+            pode{alternativas.length === 1 ? "" : "m"} valer a pena:
+            {cardsDeImoveis(alternativas)}
+            <a
+              href={urlCatalogo}
+              className="mt-2 inline-block text-[12px] font-medium underline underline-offset-2"
+            >
+              Ver o catálogo com esses filtros →
+            </a>
+            {acoesBot()}
+          </>
+        ) : (
           <>
             Não encontrei nada com esse perfil agora — mas imóveis novos
             entram toda semana.{" "}
@@ -262,50 +357,6 @@ export default function ChatWidget() {
             </a>{" "}
             ou deixe seu contato que avisamos quando chegar algo assim.
             {acoesBot()}
-          </>
-        ) : (
-          <>
-            Encontrei {resultados.length === 1 ? "este imóvel" : "estes imóveis"}{" "}
-            para você: 👇
-            <span className="mt-2.5 flex flex-col gap-2">
-              {resultados.map((p) => {
-                const capa = capaDoImovel(p);
-                const preco = precoPrincipal(p) ?? "Sob consulta";
-                return (
-                  <a
-                    key={p.slug}
-                    href={`/imoveis/${p.slug}`}
-                    className="flex items-center gap-2.5 rounded-xl border border-black/10 bg-white p-2 transition-colors hover:border-black"
-                  >
-                    <span className="relative h-12 w-16 flex-none overflow-hidden rounded-lg bg-mist">
-                      {capa && (
-                        <Image
-                          src={capa.url}
-                          alt=""
-                          fill
-                          sizes="64px"
-                          className="object-cover"
-                        />
-                      )}
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block truncate text-[12px] font-medium text-black">
-                        {p.titulo}
-                      </span>
-                      <span className="block text-[11px] text-black/50">
-                        {p.bairro} · <strong>{preco}</strong>
-                      </span>
-                    </span>
-                  </a>
-                );
-              })}
-            </span>
-            <a
-              href={urlCatalogo}
-              className="mt-2 inline-block text-[12px] font-medium underline underline-offset-2"
-            >
-              Ver todos no catálogo →
-            </a>
           </>
         ),
     });
@@ -338,19 +389,40 @@ export default function ChatWidget() {
       return;
     }
     if (busca) {
-      void buscarImoveis(texto, busca);
+      // Busca "fraca" (sem tipo de imóvel) logo após outra busca é um
+      // refinamento: "e por mais de 550 mil?" herda "apartamento, 2+
+      // quartos" da conversa. Busca forte (acima) sempre começa do zero.
+      const alvo = ultimaBuscaRef.current
+        ? mesclarBusca(ultimaBuscaRef.current, busca)
+        : busca;
+      void buscarImoveis(texto, alvo);
       return;
     }
     const resposta = responder(texto);
-    if (!resposta.encontrou) {
-      // Pergunta sem resposta vira aprendizado: registra (só o texto,
-      // nada do visitante) para o painel mostrar o que falta na base.
-      void fetch("/api/chatbot/pergunta", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ texto }),
-      }).catch(() => {});
+    if (resposta.encontrou) {
+      responderTexto(texto, resposta);
+      return;
     }
+    // Continuidade da busca: os tópicos gerais não souberam, mas há uma
+    // busca anterior e a frase traz um pedaço de filtro ("e por mais de
+    // 550 mil?", "e para alugar?") → refaz a busca combinando os dois.
+    const continuacao = ultimaBuscaRef.current
+      ? extrairContinuacao(texto)
+      : null;
+    if (continuacao && ultimaBuscaRef.current) {
+      void buscarImoveis(
+        texto,
+        mesclarBusca(ultimaBuscaRef.current, continuacao)
+      );
+      return;
+    }
+    // Pergunta sem resposta vira aprendizado: registra (só o texto,
+    // nada do visitante) para o painel mostrar o que falta na base.
+    void fetch("/api/chatbot/pergunta", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ texto }),
+    }).catch(() => {});
     responderTexto(texto, resposta);
   }
 
