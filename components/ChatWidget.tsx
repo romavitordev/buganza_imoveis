@@ -26,10 +26,13 @@ import {
   extrairContinuacao,
   mesclarBusca,
   queryDaBusca,
+  semLugarNemPreco,
   semPreco,
+  temFiltroDeLugar,
   temFiltroDePreco,
   urlCatalogoDaBusca,
   type IntencaoBusca,
+  type Lugares,
 } from "@/lib/chatbot-busca";
 import { capaDoImovel, type PublicPropertyDTO } from "@/lib/dto";
 import { precoPrincipal } from "@/lib/format";
@@ -99,6 +102,25 @@ export default function ChatWidget() {
       setImovel(null);
     }
   }, [slugImovel]);
+
+  // Bairros/cidades que existem no catálogo — vocabulário para reconhecer
+  // lugares na conversa ("apartamento no Campolim"). Carregado uma vez,
+  // na primeira abertura; falhar só desliga o filtro por lugar.
+  const [lugares, setLugares] = useState<Lugares>({
+    bairros: [],
+    cidades: [],
+  });
+  const lugaresPedidosRef = useRef(false);
+  useEffect(() => {
+    if (!aberto || lugaresPedidosRef.current) return;
+    lugaresPedidosRef.current = true;
+    fetch("/api/chatbot/lugares")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body: Lugares | null) => {
+        if (body?.bairros) setLugares(body);
+      })
+      .catch(() => {});
+  }, [aberto]);
 
   // Rola para a última mensagem a cada atualização
   useEffect(() => {
@@ -321,21 +343,33 @@ export default function ChatWidget() {
       return;
     }
 
-    // Plano B: nada na faixa de preço → mostra o mais próximo fora dela,
-    // deixando CLARO que está fora do que foi pedido.
-    const alternativas = temFiltroDePreco(intencao)
-      ? (await pesquisar(semPreco(intencao))).slice(0, 2)
-      : [];
+    // Plano B em dois níveis: relaxa primeiro o preço, depois o bairro —
+    // sempre dizendo O QUE foi relaxado, para o visitante nunca achar que
+    // o pedido foi atendido.
+    let alternativas: PublicPropertyDTO[] = [];
+    let ressalva = "";
+
+    if (temFiltroDePreco(intencao)) {
+      alternativas = (await pesquisar(semPreco(intencao))).slice(0, 2);
+      if (alternativas.length > 0) ressalva = "fora dessa faixa de preço";
+    }
+    if (alternativas.length === 0 && temFiltroDeLugar(intencao)) {
+      alternativas = (await pesquisar(semLugarNemPreco(intencao))).slice(0, 2);
+      if (alternativas.length > 0) {
+        ressalva = temFiltroDePreco(intencao)
+          ? "em outros bairros e fora dessa faixa de preço"
+          : `em outros bairros (fora de ${intencao.bairro})`;
+      }
+    }
 
     empurrar({
       de: "bot",
       texto:
         alternativas.length > 0 ? (
           <>
-            Não encontrei {intencao.resumo} no momento. 😕 Mas, fora dessa
-            faixa de preço, tenho{" "}
-            {alternativas.length === 1 ? "esta opção" : "estas opções"} que
-            pode{alternativas.length === 1 ? "" : "m"} valer a pena:
+            Não encontrei {intencao.resumo} no momento. 😕 Mas, {ressalva},
+            tenho {alternativas.length === 1 ? "esta opção" : "estas opções"}{" "}
+            que pode{alternativas.length === 1 ? "" : "m"} valer a pena:
             {cardsDeImoveis(alternativas)}
             <a
               href={urlCatalogo}
@@ -371,12 +405,17 @@ export default function ChatWidget() {
     // "casa 3 quartos até 500 mil") → dados do imóvel em tela → busca
     // simples → regras gerais. Assim "quanto custa?" no anúncio responde
     // o preço real, mas quem descreve outro imóvel cai na busca.
-    const busca = extrairBusca(texto);
+    // Busca "forte" = pedido novo e completo (espécie do imóvel + outro
+    // atributo) → começa do zero. As demais são refinamentos e herdam a
+    // busca anterior.
+    const busca = extrairBusca(texto, lugares);
     const buscaForte =
       busca !== null &&
       (busca.tipo !== undefined || busca.subtipo !== undefined) &&
-      (busca.quartosMin !== undefined ||
+      (busca.bairro !== undefined ||
+        busca.quartosMin !== undefined ||
         busca.vagasMin !== undefined ||
+        busca.precoMin !== undefined ||
         busca.precoMax !== undefined ||
         busca.transacao !== undefined);
     if (busca && buscaForte) {
@@ -407,7 +446,7 @@ export default function ChatWidget() {
     // busca anterior e a frase traz um pedaço de filtro ("e por mais de
     // 550 mil?", "e para alugar?") → refaz a busca combinando os dois.
     const continuacao = ultimaBuscaRef.current
-      ? extrairContinuacao(texto)
+      ? extrairContinuacao(texto, lugares)
       : null;
     if (continuacao && ultimaBuscaRef.current) {
       void buscarImoveis(

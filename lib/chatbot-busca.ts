@@ -17,12 +17,101 @@ export interface IntencaoBusca {
   tipo?: "RESIDENCIAL" | "COMERCIAL" | "TERRENO";
   subtipo?: "CASA" | "SOBRADO" | "APARTAMENTO" | "KITNET" | "CHACARA";
   transacao?: "VENDA" | "LOCACAO";
+  /** Nome EXATO como está no banco (veio de /api/chatbot/lugares). */
+  bairro?: string;
+  cidade?: string;
   quartosMin?: number;
   vagasMin?: number;
   precoMin?: number;
   precoMax?: number;
   /** Rótulo humano do que foi entendido — ecoado na resposta do bot. */
   resumo: string;
+}
+
+/** Vocabulário de lugares do catálogo (bairros/cidades que existem). */
+export interface Lugares {
+  bairros: string[];
+  cidades: string[];
+}
+
+const SEM_LUGARES: Lugares = { bairros: [], cidades: [] };
+
+/**
+ * Palavras que aparecem em muitos bairros e, sozinhas, não identificam
+ * nenhum ("Jardim", "Parque", "Vila"…). Evita que "quero um parque" vire
+ * um filtro de bairro.
+ */
+const PREFIXOS_GENERICOS = new Set([
+  "jardim", "jd", "parque", "pq", "vila", "vl", "residencial", "conjunto",
+  "bairro", "loteamento", "nucleo", "distrito", "chacara", "chacaras",
+  "recanto", "cidade", "alto", "altos", "novo", "nova", "sao", "santa",
+  "santo", "dos", "das", "de", "do", "da",
+]);
+
+function tokens(texto: string): string[] {
+  return normalizar(texto).split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+/** `alvo` aparece dentro de `texto` como sequência de palavras inteiras? */
+function contemSequencia(texto: string[], alvo: string[]): boolean {
+  if (alvo.length === 0 || alvo.length > texto.length) return false;
+  for (let i = 0; i <= texto.length - alvo.length; i++) {
+    if (alvo.every((t, j) => texto[i + j] === t)) return true;
+  }
+  return false;
+}
+
+/**
+ * Acha na frase um lugar do catálogo. Duas passadas, da mais forte para
+ * a mais fraca:
+ *   1. nome completo, palavra por palavra — entre vários, o de MAIS
+ *      palavras ("Parque Campolim" ganha de "Campolim" quando o
+ *      visitante escreve os dois nomes)
+ *   2. só a parte distintiva ("campolim" de "Parque Campolim"), exigindo
+ *      token com 5+ letras e fora da lista de genéricos
+ *
+ * A comparação é sempre por palavra inteira: "encontro" não pode casar
+ * com o bairro "Centro". Devolve o nome EXATO do banco (para o filtro
+ * de igualdade bater) ou null.
+ */
+function acharLugar(alvo: string, nomes: string[]): string | null {
+  const doTexto = tokens(alvo);
+  let melhor: string | null = null;
+  let melhorPalavras = 0;
+
+  for (const nome of nomes) {
+    const partes = tokens(nome);
+    if (contemSequencia(doTexto, partes) && partes.length > melhorPalavras) {
+      melhor = nome;
+      melhorPalavras = partes.length;
+    }
+  }
+  if (melhor) return melhor;
+
+  const conjunto = new Set(doTexto);
+  for (const nome of nomes) {
+    const distintivos = tokens(nome).filter(
+      (t) => t.length >= 5 && !PREFIXOS_GENERICOS.has(t)
+    );
+    if (distintivos.length === 0) continue;
+    if (distintivos.every((t) => conjunto.has(t))) {
+      if (!melhor || nome.length > melhor.length) melhor = nome;
+    }
+  }
+  return melhor;
+}
+
+/**
+ * Tira do texto as palavras do lugar já reconhecido. Sem isso, um bairro
+ * como "Chácara Recreio" faria o parser achar que o visitante quer uma
+ * chácara.
+ */
+function removerLugar(alvo: string, nome: string): string {
+  let resultado = alvo;
+  for (const t of tokens(nome)) {
+    resultado = resultado.replace(new RegExp(`\\b${t}\\b`, "g"), " ");
+  }
+  return resultado;
 }
 
 function normalizar(texto: string): string {
@@ -63,10 +152,26 @@ interface Filtros extends Partial<Omit<IntencaoBusca, "resumo">> {
 }
 
 /** Extrai TODOS os filtros presentes no texto, sem gatilho mínimo. */
-function extrairFiltros(texto: string): Filtros {
-  const alvo = normalizar(texto);
+function extrairFiltros(texto: string, lugares: Lugares = SEM_LUGARES): Filtros {
+  let alvo = normalizar(texto);
   const f: Filtros = { partes: [] };
   if (!alvo.trim()) return f;
+
+  // ---- lugar (bairro/cidade) PRIMEIRO ---------------------------------
+  // O nome sai do texto depois de reconhecido: sem isso, um bairro como
+  // "Chácara Recreio" faria o parser achar que o visitante quer chácara.
+  const bairro = acharLugar(alvo, lugares.bairros);
+  if (bairro) {
+    f.bairro = bairro;
+    f.partes.push(`em ${bairro}`);
+    alvo = removerLugar(alvo, bairro);
+  }
+  const cidade = acharLugar(alvo, lugares.cidades);
+  if (cidade) {
+    f.cidade = cidade;
+    if (!bairro) f.partes.push(`em ${cidade}`);
+    alvo = removerLugar(alvo, cidade);
+  }
 
   // ---- tipo / subtipo -------------------------------------------------
   if (/\b(apartamento|apto|ap)\b/.test(alvo)) {
@@ -196,11 +301,15 @@ function montar(f: Filtros): IntencaoBusca {
  * Busca "de primeira": exige atributo concreto (tipo/subtipo, quartos,
  * vagas ou preço) para não sequestrar os tópicos gerais.
  */
-export function extrairBusca(texto: string): IntencaoBusca | null {
-  const f = extrairFiltros(texto);
+export function extrairBusca(
+  texto: string,
+  lugares: Lugares = SEM_LUGARES
+): IntencaoBusca | null {
+  const f = extrairFiltros(texto, lugares);
   const temAtributo =
     f.tipo !== undefined ||
     f.subtipo !== undefined ||
+    f.bairro !== undefined ||
     f.quartosMin !== undefined ||
     f.vagasMin !== undefined ||
     f.precoMin !== undefined ||
@@ -214,12 +323,17 @@ export function extrairBusca(texto: string): IntencaoBusca | null {
  * aceita QUALQUER filtro, inclusive só a transação — o chamador garante
  * que existe busca anterior e que os tópicos gerais não responderam.
  */
-export function extrairContinuacao(texto: string): IntencaoBusca | null {
-  const f = extrairFiltros(texto);
+export function extrairContinuacao(
+  texto: string,
+  lugares: Lugares = SEM_LUGARES
+): IntencaoBusca | null {
+  const f = extrairFiltros(texto, lugares);
   const temAlgo =
     f.tipo !== undefined ||
     f.subtipo !== undefined ||
     f.transacao !== undefined ||
+    f.bairro !== undefined ||
+    f.cidade !== undefined ||
     f.quartosMin !== undefined ||
     f.vagasMin !== undefined ||
     f.precoMin !== undefined ||
@@ -239,10 +353,15 @@ export function mesclarBusca(
 ): IntencaoBusca {
   const novaTemPreco =
     nova.precoMin !== undefined || nova.precoMax !== undefined;
+  // Espécie do imóvel também troca EM BLOCO: pedir "sala comercial"
+  // depois de "casa" não pode manter o subtipo CASA junto.
+  const novaTemEspecie = nova.tipo !== undefined || nova.subtipo !== undefined;
   const combinada: IntencaoBusca = {
-    tipo: nova.tipo ?? anterior.tipo,
-    subtipo: nova.subtipo ?? anterior.subtipo,
+    tipo: novaTemEspecie ? nova.tipo : anterior.tipo,
+    subtipo: novaTemEspecie ? nova.subtipo : anterior.subtipo,
     transacao: nova.transacao ?? anterior.transacao,
+    bairro: nova.bairro ?? anterior.bairro,
+    cidade: nova.cidade ?? anterior.cidade,
     quartosMin: nova.quartosMin ?? anterior.quartosMin,
     vagasMin: nova.vagasMin ?? anterior.vagasMin,
     precoMin: novaTemPreco ? nova.precoMin : anterior.precoMin,
@@ -252,6 +371,8 @@ export function mesclarBusca(
 
   // Refaz o resumo a partir dos campos combinados
   const partes: string[] = [];
+  if (combinada.bairro) partes.push(`em ${combinada.bairro}`);
+  else if (combinada.cidade) partes.push(`em ${combinada.cidade}`);
   if (combinada.subtipo) partes.push(combinada.subtipo.toLowerCase());
   else if (combinada.tipo) partes.push(combinada.tipo.toLowerCase());
   if (combinada.transacao) {
@@ -280,12 +401,29 @@ export function semPreco(b: IntencaoBusca): IntencaoBusca {
   return { ...b, precoMin: undefined, precoMax: undefined };
 }
 
+/** A intenção restringe um bairro? (usado no "plano B" de lugar) */
+export function temFiltroDeLugar(b: IntencaoBusca): boolean {
+  return b.bairro !== undefined;
+}
+
+/** Cópia sem bairro E sem preço — última tentativa antes de desistir. */
+export function semLugarNemPreco(b: IntencaoBusca): IntencaoBusca {
+  return {
+    ...b,
+    bairro: undefined,
+    precoMin: undefined,
+    precoMax: undefined,
+  };
+}
+
 /** Query string para /api/properties a partir da intenção. */
 export function queryDaBusca(b: IntencaoBusca, limit = 4): string {
   const params = new URLSearchParams();
   if (b.tipo) params.set("tipo", b.tipo);
   if (b.subtipo) params.set("subtipo", b.subtipo);
   if (b.transacao) params.set("transacao", b.transacao);
+  if (b.bairro) params.set("bairro", b.bairro);
+  if (b.cidade) params.set("cidade", b.cidade);
   if (b.quartosMin) params.set("quartosMin", String(b.quartosMin));
   if (b.vagasMin) params.set("vagasMin", String(b.vagasMin));
   if (b.precoMin) params.set("precoMin", String(b.precoMin));
@@ -299,6 +437,8 @@ export function urlCatalogoDaBusca(b: IntencaoBusca): string {
   const params = new URLSearchParams();
   if (b.tipo) params.set("tipo", b.tipo);
   if (b.transacao) params.set("transacao", b.transacao);
+  if (b.bairro) params.set("bairro", b.bairro);
+  if (b.cidade) params.set("cidade", b.cidade);
   if (b.quartosMin) params.set("quartos", String(b.quartosMin));
   if (b.precoMin) params.set("precoMin", String(b.precoMin));
   if (b.precoMax) params.set("precoMax", String(b.precoMax));

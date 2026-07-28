@@ -14,11 +14,30 @@ function inteiro(valor: string | null, teto: number): number | undefined {
 }
 
 /**
+ * Palavra que identifica o subtipo no título — o subtipo é OPCIONAL no
+ * cadastro, e muito anúncio real fica sem ele. Filtrar só pelo campo
+ * esconderia imóveis legítimos ("Casa Moderna no Campolim" com subtipo
+ * vazio sumiria de uma busca por "casa"), então aceitamos também os
+ * NÃO classificados cujo título diz o tipo.
+ */
+const PALAVRA_DO_SUBTIPO: Record<string, string> = {
+  CASA: "casa",
+  SOBRADO: "sobrado",
+  APARTAMENTO: "apartamento",
+  KITNET: "kitnet",
+  CHACARA: "chácara",
+  SALA_COMERCIAL: "sala",
+  LOJA: "loja",
+  GALPAO: "galpão",
+};
+
+/**
  * ROTA PÚBLICA — somente imóveis ATIVOS, sempre via DTO com allowlist.
  * `precoInterno` jamais é serializado aqui (garantido por lib/dto.ts).
  * Filtros: ?tipo=RESIDENCIAL&transacao=VENDA&cidade=Sorocaba&q=campolim
- *   + subtipo/quartosMin/vagasMin/precoMin/precoMax/limit — usados pela
- *   busca por conversa do chatbot (mesma lógica de faixa do catálogo).
+ *   + subtipo/bairro/quartosMin/vagasMin/precoMin/precoMax/limit — usados
+ *   pela busca por conversa do chatbot (mesma lógica de faixa e a mesma
+ *   igualdade exata de bairro do catálogo).
  * Favoritos: ?ids=id1,id2 (máx. 60) — usado pela página /favoritos
  */
 export async function GET(request: Request) {
@@ -28,6 +47,7 @@ export async function GET(request: Request) {
   const subtipoParam = searchParams.get("subtipo");
   const transacaoParam = searchParams.get("transacao");
   const cidadeParam = searchParams.get("cidade");
+  const bairroParam = searchParams.get("bairro")?.trim() || undefined;
   const q = searchParams.get("q")?.trim().slice(0, 80) || undefined;
   const quartosMin = inteiro(searchParams.get("quartosMin"), 10);
   const vagasMin = inteiro(searchParams.get("vagasMin"), 10);
@@ -64,6 +84,25 @@ export async function GET(request: Request) {
       ? (transacaoParam as Transacao)
       : undefined;
 
+  // Subtipo tolerante: o classificado OU o não classificado cujo título
+  // diz o tipo (ver PALAVRA_DO_SUBTIPO)
+  const palavra = subtipo ? PALAVRA_DO_SUBTIPO[subtipo] : undefined;
+  const condicaoSubtipo = subtipo
+    ? {
+        OR: [
+          { subtipo },
+          ...(palavra
+            ? [
+                {
+                  subtipo: null,
+                  titulo: { contains: palavra, mode: "insensitive" as const },
+                },
+              ]
+            : []),
+        ],
+      }
+    : undefined;
+
   // Faixa de preço: mesma regra do catálogo — olha o campo da transação
   // escolhida; sem transação, vale se QUALQUER um dos preços cair na faixa
   const faixa = {
@@ -86,7 +125,6 @@ export async function GET(request: Request) {
           {
             status: "ATIVO",
             ...(tipo ? { tipo } : {}),
-            ...(subtipo ? { subtipo } : {}),
             ...(transacao
               ? {
                   // VENDA_LOCACAO atende tanto quem busca venda quanto locação
@@ -97,10 +135,12 @@ export async function GET(request: Request) {
                 }
               : {}),
             ...(cidadeParam ? { cidade: cidadeParam } : {}),
+            ...(bairroParam ? { bairro: bairroParam } : {}),
             ...(quartosMin !== undefined ? { quartos: { gte: quartosMin } } : {}),
             ...(vagasMin !== undefined ? { vagas: { gte: vagasMin } } : {}),
             ...(ids ? { id: { in: ids } } : {}),
           },
+          ...(condicaoSubtipo ? [condicaoSubtipo] : []),
           ...(condicaoPreco ? [condicaoPreco] : []),
           ...(q
             ? [

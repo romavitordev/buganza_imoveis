@@ -155,3 +155,109 @@ describe("continuidade da conversa", () => {
     expect(m.precoMax).toBe(400_000);
   });
 });
+
+// Espelha os bairros reais do catálogo, inclusive a ambiguidade
+// "Campolim" x "Parque Campolim" e um bairro com prefixo que também é
+// um tipo de imóvel ("Chácara …").
+const LUGARES = {
+  bairros: [
+    "Campolim",
+    "Parque Campolim",
+    "Jardim Europa",
+    "Vila Josefina",
+    "Centro",
+    "Chácara Recreio",
+  ],
+  cidades: ["Sorocaba", "Votorantim"],
+};
+
+describe("filtro por bairro/cidade", () => {
+  it("reconhece o bairro e mantém o tipo do imóvel", () => {
+    const b = extrairBusca("apartamento no Campolim", LUGARES)!;
+    expect(b.bairro).toBe("Campolim");
+    expect(b.subtipo).toBe("APARTAMENTO");
+    expect(b.resumo).toContain("em Campolim");
+  });
+
+  it("nome mais específico vence: 'Parque Campolim' > 'Campolim'", () => {
+    expect(extrairBusca("apartamento no Parque Campolim", LUGARES)?.bairro).toBe(
+      "Parque Campolim"
+    );
+  });
+
+  it("aceita só a parte distintiva ('na Europa' → Jardim Europa)", () => {
+    expect(extrairBusca("casa na Europa", LUGARES)?.bairro).toBe("Jardim Europa");
+    expect(extrairBusca("sala na Josefina", LUGARES)?.bairro).toBe("Vila Josefina");
+  });
+
+  it("bairro que parece tipo de imóvel NÃO vira subtipo", () => {
+    const b = extrairBusca("apartamento na Chácara Recreio", LUGARES)!;
+    expect(b.bairro).toBe("Chácara Recreio");
+    expect(b.subtipo).toBe("APARTAMENTO"); // e não CHACARA
+  });
+
+  it("palavra genérica sozinha não vira bairro", () => {
+    expect(extrairBusca("casa com parque perto", LUGARES)?.bairro).toBeUndefined();
+    expect(extrairBusca("casa com jardim", LUGARES)?.bairro).toBeUndefined();
+  });
+
+  it("casa por palavra inteira: 'encontro' não vira o bairro Centro", () => {
+    expect(extrairBusca("marcar um encontro", LUGARES)).toBeNull();
+    expect(extrairBusca("sala comercial no Centro", LUGARES)?.bairro).toBe("Centro");
+  });
+
+  it("reconhece a cidade quando não há bairro", () => {
+    const b = extrairBusca("casa em Votorantim", LUGARES)!;
+    expect(b.cidade).toBe("Votorantim");
+    expect(b.bairro).toBeUndefined();
+  });
+
+  it("bairro sozinho já dispara a busca", () => {
+    const b = extrairBusca("tem algo no Jardim Europa?", LUGARES);
+    expect(b?.bairro).toBe("Jardim Europa");
+  });
+
+  it("sem a lista de lugares, nada de bairro (degrada sem quebrar)", () => {
+    const b = extrairBusca("apartamento no Campolim")!;
+    expect(b.bairro).toBeUndefined();
+    expect(b.subtipo).toBe("APARTAMENTO");
+  });
+
+  it("continuação troca só o bairro e mantém o resto", () => {
+    const anterior = extrairBusca("apartamento 2 quartos até 600 mil", LUGARES)!;
+    const nova = extrairContinuacao("e no Centro?", LUGARES)!;
+    const m = mesclarBusca(anterior, nova);
+    expect(m.bairro).toBe("Centro");
+    expect(m.subtipo).toBe("APARTAMENTO");
+    expect(m.quartosMin).toBe(2);
+    expect(m.precoMax).toBe(600_000);
+    expect(m.resumo).toContain("em Centro");
+  });
+
+  it("bairro entra na query da API e na URL do catálogo", () => {
+    const b = extrairBusca("apartamento no Campolim", LUGARES)!;
+    expect(new URLSearchParams(queryDaBusca(b)).get("bairro")).toBe("Campolim");
+    expect(urlCatalogoDaBusca(b)).toContain("bairro=Campolim");
+  });
+});
+
+describe("troca de espécie do imóvel (não herda o tipo antigo)", () => {
+  it("pedir 'sala comercial' depois de 'casa' NÃO mantém subtipo CASA", () => {
+    const anterior = extrairBusca("casa no Campolim", LUGARES)!;
+    expect(anterior.subtipo).toBe("CASA");
+    const nova = extrairContinuacao("sala comercial no Centro", LUGARES)!;
+    const m = mesclarBusca(anterior, nova);
+    expect(m.tipo).toBe("COMERCIAL");
+    expect(m.subtipo).toBeUndefined();
+    expect(m.bairro).toBe("Centro");
+  });
+
+  it("refinamento sem espécie mantém a espécie anterior", () => {
+    const anterior = extrairBusca("casa até 800 mil", LUGARES)!;
+    const nova = extrairContinuacao("e no Jardim Europa?", LUGARES)!;
+    const m = mesclarBusca(anterior, nova);
+    expect(m.subtipo).toBe("CASA");
+    expect(m.bairro).toBe("Jardim Europa");
+    expect(m.precoMax).toBe(800_000);
+  });
+});
