@@ -11,6 +11,7 @@ import {
   limparRateLimit,
   ipDaRequisicao,
 } from "@/lib/ratelimit";
+import { verificarCodigoTotp } from "@/lib/totp";
 
 export const runtime = "nodejs";
 
@@ -38,9 +39,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const { email, password } =
+  const { email, password, codigo } =
     typeof body === "object" && body !== null
-      ? (body as { email?: unknown; password?: unknown })
+      ? (body as { email?: unknown; password?: unknown; codigo?: unknown })
       : {};
 
   if (typeof email !== "string" || typeof password !== "string") {
@@ -65,6 +66,26 @@ export async function POST(request: Request) {
       { erro: "E-mail ou senha incorretos." },
       { status: 401 }
     );
+  }
+
+  // 2FA (TOTP): quando ativado, a senha sozinha não basta. As tentativas
+  // de código passam pelo MESMO rate limit do login (só é limpo no fim).
+  if (user.totpAtivadoEm && user.totpSecret) {
+    if (typeof codigo !== "string" || codigo.trim() === "") {
+      return NextResponse.json(
+        {
+          requer2fa: true,
+          erro: "Digite o código de 6 dígitos do seu app autenticador.",
+        },
+        { status: 401 }
+      );
+    }
+    if (!verificarCodigoTotp(codigo, user.totpSecret)) {
+      return NextResponse.json(
+        { requer2fa: true, erro: "Código inválido ou expirado. Tente o atual." },
+        { status: 401 }
+      );
+    }
   }
 
   limparRateLimit(ip);

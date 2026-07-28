@@ -71,6 +71,10 @@ model AdminUser {
   nome         String
   email        String   @unique
   passwordHash String
+  /// 2FA (TOTP): segredo base32. Preenchido no inicio da configuracao;
+  /// so vale depois que totpAtivadoEm confirma o primeiro codigo.
+  totpSecret    String?
+  totpAtivadoEm DateTime?
   criadoEm     DateTime @default(now())
 }
 

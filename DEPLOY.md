@@ -114,6 +114,9 @@ medida desta lista.
 - **Número de WhatsApp server-only**: redirecionado por `/api/contato`,
   fora do "inspecionar".
 - **`robots.txt`** bloqueia `/admin` e `/api` da indexação.
+- **2FA opcional (TOTP)**: ative em **/admin → Minha conta** escaneando
+  o QR com Google Authenticator/Authy. Com ela ativa, o login exige
+  senha + código de 6 dígitos. **Recomendado ativar após o deploy.**
 - **Erros genéricos**: em produção o Next não expõe stack trace ao
   cliente; as rotas de API respondem `{ erro: "mensagem curta" }`.
 
@@ -137,8 +140,6 @@ Depois que o site estiver no ar, confirme (numa aba anônima, deslogado):
 
 ## 7. Melhorias futuras (opcionais)
 
-- **2FA no login do admin** (TOTP) — o maior salto de segurança para um
-  painel. Ver tarefa SEC3.
 - **Rate limit durável** (Upstash/Redis): o atual é em memória e, na
   Vercel serverless (que reinicia direto), ajuda pouco contra força
   bruta distribuída. Ver tarefa SEC4.

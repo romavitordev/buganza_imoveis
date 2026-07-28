@@ -11,6 +11,10 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Passo 2FA: aparece quando o servidor responde requer2fa (conta com
+  // verificação em duas etapas ativa)
+  const [codigo, setCodigo] = useState("");
+  const [pedirCodigo, setPedirCodigo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
 
@@ -23,7 +27,9 @@ function LoginForm() {
       const res = await fetch("/api/admin/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(
+          pedirCodigo ? { email, password, codigo } : { email, password }
+        ),
       });
 
       if (res.ok) {
@@ -35,7 +41,17 @@ function LoginForm() {
 
       const body = (await res.json().catch(() => null)) as {
         erro?: string;
+        requer2fa?: boolean;
       } | null;
+      if (body?.requer2fa) {
+        // Senha correta, falta o código do app — mostra o 2º passo sem
+        // tratar como erro na primeira vez
+        const primeiraVez = !pedirCodigo;
+        setPedirCodigo(true);
+        setCodigo("");
+        setErro(primeiraVez ? null : body?.erro ?? "Código inválido.");
+        return;
+      }
       setErro(body?.erro ?? "Não foi possível entrar. Tente novamente.");
     } catch {
       setErro("Falha de conexão. Verifique sua internet e tente novamente.");
@@ -89,6 +105,30 @@ function LoginForm() {
               placeholder="••••••••"
             />
           </label>
+
+          {pedirCodigo && (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-[12px] font-medium text-black/70">
+                Código do app autenticador
+              </span>
+              <input
+                autoFocus
+                required
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                autoComplete="one-time-code"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ""))}
+                className="rounded-xl border border-black/15 px-4 py-3 text-center text-sm tracking-[0.3em] outline-none transition-colors focus:border-black"
+                placeholder="000000"
+              />
+              <span className="text-[11px] text-black/45">
+                Sua conta tem verificação em duas etapas — abra o app e
+                digite o código de 6 dígitos.
+              </span>
+            </label>
+          )}
 
           {erro && (
             <p
