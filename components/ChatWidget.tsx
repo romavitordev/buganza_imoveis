@@ -341,7 +341,17 @@ export default function ChatWidget() {
       void buscarImoveis(texto, busca);
       return;
     }
-    responderTexto(texto, responder(texto));
+    const resposta = responder(texto);
+    if (!resposta.encontrou) {
+      // Pergunta sem resposta vira aprendizado: registra (só o texto,
+      // nada do visitante) para o painel mostrar o que falta na base.
+      void fetch("/api/chatbot/pergunta", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ texto }),
+      }).catch(() => {});
+    }
+    responderTexto(texto, resposta);
   }
 
   function iniciarContato() {

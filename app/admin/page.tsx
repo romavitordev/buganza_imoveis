@@ -61,6 +61,16 @@ export default async function AdminDashboardPage() {
     .count({ where: { status: "NOVO" } })
     .catch(() => 0);
 
+  // Perguntas do chat sem resposta (30d) — insumo para evoluir o bot
+  const perguntasChat = await prisma.chatPergunta
+    .findMany({
+      where: { criadoEm: { gte: trintaDiasAtras } },
+      orderBy: { criadoEm: "desc" },
+      take: 8,
+      select: { id: true, texto: true, criadoEm: true },
+    })
+    .catch(() => []);
+
   // Série diária dos últimos 30 dias (dias sem evento entram zerados)
   const porDia = new Map<string, { visualizacoes: number; cliques: number }>();
   for (let i = 29; i >= 0; i--) {
@@ -154,6 +164,11 @@ export default async function AdminDashboardPage() {
       resumo7d={resumo7d}
       serie30d={serie30d}
       leadsNovos={leadsNovos}
+      perguntasChat={perguntasChat.map((p) => ({
+        id: p.id,
+        texto: p.texto,
+        criadoEm: p.criadoEm.toISOString(),
+      }))}
     />
   );
 }

@@ -187,3 +187,13 @@ model PropertyPhoto {
 
   @@index([propertyId, ordem])
 }
+
+// Perguntas do chat que caíram no fallback ("não sei responder") — a
+// matéria-prima para evoluir a base do Buganza Suporte com o tempo.
+model ChatPergunta {
+  id       String   @id @default(cuid())
+  texto    String   @db.VarChar(200)
+  criadoEm DateTime @default(now())
+
+  @@index([criadoEm])
+}

@@ -50,3 +50,36 @@ describe("chatbot — casamento de tópicos", () => {
     expect(respostaDoTopico("inexistente").encontrou).toBe(false);
   });
 });
+
+describe("tolerância a erro de digitação (B3)", () => {
+  it("acha financiamento mesmo escrito errado", () => {
+    expect(responder("como funciona o financiamneto?").topicoId).toBe("financiamento");
+    expect(responder("quero финансиar").encontrou).toBeDefined(); // não explode com unicode
+  });
+
+  it("acha aluguel com typo leve", () => {
+    expect(responder("documentos para alugel").topicoId).toBe("documentos");
+  });
+
+  it("palavra curta não vira fuzzy (casa != caso)", () => {
+    // "caso" não deve casar com nada via "casa"
+    expect(responder("em todo caso obrigado").encontrou).toBe(false);
+  });
+});
+
+describe("tópicos novos (B3)", () => {
+  it("responde ITBI/escritura", () => {
+    expect(responder("quanto pago de itbi?").topicoId).toBe("docs-compra");
+    expect(responder("como funciona a escritura").topicoId).toBe("docs-compra");
+  });
+  it("responde garantias do aluguel", () => {
+    expect(responder("precisa de fiador?").topicoId).toBe("garantias");
+    expect(responder("aceita seguro fiança?").topicoId).toBe("garantias");
+  });
+  it("responde permuta", () => {
+    expect(responder("aceita permuta por outro imovel?").topicoId).toBe("permuta");
+  });
+  it("responde avaliação", () => {
+    expect(responder("quanto vale meu imóvel?").topicoId).toBe("avaliacao");
+  });
+});

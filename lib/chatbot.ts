@@ -57,9 +57,33 @@ export const TOPICOS: TopicoChat[] = [
     id: "documentos",
     categoria: "Comprar ou alugar",
     titulo: "Documentos para alugar",
-    chaves: ["documento", "documentos", "documentacao", "documentação", "alugar", "aluguel", "locacao", "locação", "fiador", "caucao", "caução"],
+    chaves: ["documento", "documentos", "documentacao", "documentação", "alugar", "aluguel", "locacao", "locação"],
     resposta:
-      "Em geral pedimos documento com foto, comprovante de renda e de residência. Conforme o caso, pode haver fiador, seguro-fiança ou caução — explicamos as opções e ajudamos a escolher a mais simples para você.",
+      "Em geral pedimos documento com foto, comprovante de renda e de residência. Conforme o caso, pode haver uma garantia (fiador, seguro-fiança ou caução) — explicamos as opções e ajudamos a escolher a mais simples para você.",
+  },
+  {
+    id: "garantias",
+    categoria: "Comprar ou alugar",
+    titulo: "Garantias do aluguel",
+    chaves: ["fiador", "seguro fianca", "seguro-fianca", "fianca", "caucao", "caução", "garantia", "titulo de capitalizacao"],
+    resposta:
+      "As garantias mais comuns são: fiador (com imóvel próprio), seguro-fiança (parcela mensal, sem fiador), caução (até 3 aluguéis adiantados) e título de capitalização. Cada uma tem prós e contras — o corretor te ajuda a escolher a que cabe no seu bolso.",
+  },
+  {
+    id: "docs-compra",
+    categoria: "Comprar ou alugar",
+    titulo: "Custos de comprar (ITBI, escritura)",
+    chaves: ["itbi", "escritura", "cartorio", "cartório", "registro do imovel", "registro do imóvel", "documentos para comprar", "transferencia", "transferência", "custos da compra"],
+    resposta:
+      "Além do valor do imóvel, planeje os custos de transferência: ITBI (imposto municipal), escritura e registro em cartório. O total varia conforme o valor e a cidade — na proposta a gente te passa a estimativa exata do seu caso, sem surpresa.",
+  },
+  {
+    id: "permuta",
+    categoria: "Comprar ou alugar",
+    titulo: "Aceita permuta / troca?",
+    chaves: ["permuta", "troca", "trocar", "dacao", "dação", "dar meu imovel", "entrada com imovel", "entrada com carro"],
+    resposta:
+      "Depende do proprietário: alguns aceitam outro imóvel ou veículo como parte do pagamento. Conte pro corretor o que você tem para oferecer — a gente apresenta a proposta e negocia por você.",
   },
   {
     id: "anunciar",
@@ -68,6 +92,14 @@ export const TOPICOS: TopicoChat[] = [
     chaves: ["anunciar", "anuncio", "anúncio", "vender", "vender meu", "colocar a venda", "colocar à venda", "comissao", "comissão", "taxa", "custo para anunciar"],
     resposta:
       "Anunciar com a Buganza é sem taxa, sem mensalidade e sem exclusividade forçada — você só paga a comissão de corretagem quando o negócio fecha. Cuidamos das fotos, do anúncio e da divulgação. Chame no WhatsApp que fazemos uma avaliação do seu imóvel.",
+  },
+  {
+    id: "avaliacao",
+    categoria: "Anunciar meu imóvel",
+    titulo: "Quanto vale meu imóvel?",
+    chaves: ["avaliacao", "avaliação", "avaliar", "quanto vale", "precificar", "valor do meu imovel", "valor do meu imóvel"],
+    resposta:
+      "Fazemos a avaliação do seu imóvel sem custo: comparamos com as vendas recentes da região e indicamos o preço que vende sem 'queimar' o imóvel. É rápido — chame no WhatsApp e agende com um corretor.",
   },
   {
     id: "cidades",
@@ -118,12 +150,45 @@ function normalizar(texto: string): string {
 }
 
 /**
+ * Distância de Levenshtein com teto: devolve `limite + 1` assim que a
+ * distância estoura o limite (só precisamos saber "é <= limite?").
+ */
+function distancia(a: string, b: string, limite: number): number {
+  if (Math.abs(a.length - b.length) > limite) return limite + 1;
+  let anterior = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const atual = [i];
+    let menorDaLinha = i;
+    for (let j = 1; j <= b.length; j++) {
+      atual[j] = Math.min(
+        anterior[j] + 1,
+        atual[j - 1] + 1,
+        anterior[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+      if (atual[j] < menorDaLinha) menorDaLinha = atual[j];
+    }
+    if (menorDaLinha > limite) return limite + 1;
+    anterior = atual;
+  }
+  return anterior[b.length];
+}
+
+/** Tolerância a erro de digitação por tamanho da palavra. */
+function toleranciaDe(palavra: string): number {
+  if (palavra.length >= 8) return 2; // "financiamento" ← "financiamneto"
+  if (palavra.length >= 5) return 1; // "aluguel" ← "alugel"
+  return 0; // palavras curtas: só match exato (senão "casa"≈"caso")
+}
+
+/**
  * Encontra o tópico mais relevante para o texto do usuário. Pontua por
- * número de chaves presentes; empate fica com o primeiro do catálogo.
+ * chave presente (2 pontos) ou parecida — erro de digitação — (1 ponto);
+ * empate fica com o primeiro do catálogo.
  */
 export function responder(texto: string): RespostaChat {
   const alvo = normalizar(texto);
   if (!alvo.trim()) return { encontrou: false, texto: FALLBACK };
+  const tokens = alvo.split(/[^a-z0-9$]+/).filter(Boolean);
 
   let melhor: TopicoChat | null = null;
   let melhorPontos = 0;
@@ -131,7 +196,18 @@ export function responder(texto: string): RespostaChat {
   for (const topico of TOPICOS) {
     let pontos = 0;
     for (const chave of topico.chaves) {
-      if (alvo.includes(normalizar(chave))) pontos++;
+      const chaveNorm = normalizar(chave);
+      if (alvo.includes(chaveNorm)) {
+        pontos += 2;
+        continue;
+      }
+      // Fuzzy só em chave de UMA palavra (frases exigem match direto)
+      if (chaveNorm.includes(" ")) continue;
+      const limite = toleranciaDe(chaveNorm);
+      if (limite === 0) continue;
+      if (tokens.some((t) => distancia(t, chaveNorm, limite) <= limite)) {
+        pontos += 1;
+      }
     }
     if (pontos > melhorPontos) {
       melhorPontos = pontos;

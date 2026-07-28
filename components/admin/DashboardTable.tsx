@@ -117,16 +117,25 @@ interface Resumo7d {
   origens: { origem: string; total: number }[];
 }
 
+/** Pergunta do chat que o bot não soube responder (últimos 30 dias). */
+interface PerguntaChat {
+  id: string;
+  texto: string;
+  criadoEm: string;
+}
+
 export default function DashboardTable({
   propertiesIniciais,
   resumo7d,
   serie30d,
   leadsNovos,
+  perguntasChat = [],
 }: {
   propertiesIniciais: AdminProperty[];
   resumo7d: Resumo7d;
   serie30d: DiaTrafego[];
   leadsNovos: number;
+  perguntasChat?: PerguntaChat[];
 }) {
   const router = useRouter();
   const [properties, setProperties] = useState(propertiesIniciais);
@@ -434,6 +443,34 @@ export default function DashboardTable({
       <div className="mb-8">
         <TrafficChart serie={serie30d} />
       </div>
+
+      {perguntasChat.length > 0 && (
+        <div className="mb-8 rounded-2xl border border-black/10 p-5">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+            Perguntas que o chat não soube responder (30 dias)
+          </p>
+          <p className="mt-1 text-[12px] text-black/45">
+            O que os visitantes andam perguntando — bom termômetro do que
+            adicionar à base do Buganza Suporte.
+          </p>
+          <ul className="mt-3 flex flex-col gap-1.5">
+            {perguntasChat.map((p) => (
+              <li
+                key={p.id}
+                className="flex items-baseline justify-between gap-3 text-sm"
+              >
+                <span className="truncate text-black/75">“{p.texto}”</span>
+                <span className="flex-none text-[11px] text-black/40">
+                  {new Date(p.criadoEm).toLocaleDateString("pt-BR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                  })}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="relative max-w-sm flex-1">
