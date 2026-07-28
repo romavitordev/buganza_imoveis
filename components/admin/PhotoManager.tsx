@@ -13,8 +13,16 @@ import {
 } from "lucide-react";
 import type { AdminPhoto } from "@/lib/admin-types";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
+import { comprimirImagem } from "@/lib/comprimir-imagem";
 
+/** Limite do que vai pro storage (após a compressão). */
 const MAX_TAMANHO_BYTES = 5 * 1024 * 1024;
+/**
+ * Limite do arquivo ORIGINAL selecionado. Foto de celular moderna tem
+ * 6–12 MB; a compressão no navegador (lib/comprimir-imagem) encolhe para
+ * centenas de KB antes do envio, então dá para aceitar bem mais que 5 MB.
+ */
+const MAX_ORIGINAL_BYTES = 25 * 1024 * 1024;
 
 interface PhotoManagerProps {
   propertyId: string;
@@ -119,17 +127,27 @@ export default function PhotoManager({
         setErro(`"${arquivo.name}" não é uma imagem.`);
         return;
       }
-      if (arquivo.size > MAX_TAMANHO_BYTES) {
-        setErro(`"${arquivo.name}" excede o limite de 5 MB.`);
+      if (arquivo.size > MAX_ORIGINAL_BYTES) {
+        setErro(`"${arquivo.name}" excede o limite de 25 MB.`);
         return;
       }
     }
 
     // Envia um a um para mostrar o progresso real
     for (let i = 0; i < arquivos.length; i++) {
-      setProgresso(`Enviando foto ${i + 1} de ${arquivos.length}…`);
+      setProgresso(`Otimizando foto ${i + 1} de ${arquivos.length}…`);
       try {
-        const novas = await enviarFoto(arquivos[i]);
+        // Comprime no navegador (redimensiona + re-encoda). Nunca lança:
+        // no pior caso devolve o arquivo original.
+        const otimizada = await comprimirImagem(arquivos[i]);
+        if (otimizada.size > MAX_TAMANHO_BYTES) {
+          setErro(
+            `"${arquivos[i].name}" ficou acima de 5 MB mesmo otimizada.`
+          );
+          break;
+        }
+        setProgresso(`Enviando foto ${i + 1} de ${arquivos.length}…`);
+        const novas = await enviarFoto(otimizada);
         if (novas.length > 0) {
           setFotos((atual) => [...atual, ...novas]);
         }
@@ -273,7 +291,8 @@ export default function PhotoManager({
       </div>
 
       <p className="text-[12px] text-black/45">
-        Formatos de imagem até 5 MB cada. A foto marcada com ★ é a capa do
+        Pode mandar a foto direto do celular (até 25 MB) — otimizamos
+        automaticamente antes do envio. A foto marcada com ★ é a capa do
         anúncio. Arraste as fotos para reordenar.
       </p>
 
