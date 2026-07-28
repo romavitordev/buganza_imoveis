@@ -6,18 +6,18 @@ import {
   sessionCookieOptions,
   SESSION_COOKIE,
 } from "@/lib/session";
-import {
-  verificarRateLimit,
-  limparRateLimit,
-  ipDaRequisicao,
-} from "@/lib/ratelimit";
+import { limitar, liberar, ipDaRequisicao } from "@/lib/ratelimit";
 import { verificarCodigoTotp } from "@/lib/totp";
 
 export const runtime = "nodejs";
 
+/** 5 tentativas por IP a cada 15 minutos (durável com Upstash). */
+const LOGIN_MAX = 5;
+const LOGIN_JANELA_MS = 15 * 60 * 1000;
+
 export async function POST(request: Request) {
   const ip = ipDaRequisicao(request);
-  const limite = verificarRateLimit(ip);
+  const limite = await limitar(`login:${ip}`, LOGIN_MAX, LOGIN_JANELA_MS);
 
   if (!limite.permitido) {
     const minutos = Math.max(1, Math.ceil(limite.liberaEmSegundos / 60));
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     }
   }
 
-  limparRateLimit(ip);
+  await liberar(`login:${ip}`);
 
   const token = await createSessionToken({
     sub: user.id,

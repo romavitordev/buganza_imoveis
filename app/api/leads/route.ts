@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ipDaRequisicao } from "@/lib/ratelimit";
+import { limitar, ipDaRequisicao } from "@/lib/ratelimit";
 import { notificarLeadNovo } from "@/lib/notificar";
 
 export const runtime = "nodejs";
@@ -9,34 +9,20 @@ export const dynamic = "force-dynamic";
 /**
  * ROTA PÚBLICA — recebe o formulário "Tenho interesse" do detalhe do
  * imóvel. Proteções: honeypot (campo "site" precisa vir vazio), limite
- * de 5 envios por IP por hora e validação estrita dos campos.
+ * de 5 envios por IP por hora (durável com Upstash — lib/ratelimit) e
+ * validação estrita dos campos.
  *
  * LGPD: só grava o que o visitante digitou, com consentimento explícito
  * no formulário, para a finalidade única de retornar o contato.
  */
 
-const JANELA_MS = 60 * 60 * 1000;
-const MAX_POR_JANELA = 5;
-const envios = new Map<string, { total: number; inicioJanela: number }>();
-
-function excedeuLimite(ip: string): boolean {
-  const agora = Date.now();
-  if (envios.size > 1000) {
-    Array.from(envios.entries()).forEach(([chave, valor]) => {
-      if (agora - valor.inicioJanela > JANELA_MS) envios.delete(chave);
-    });
-  }
-  const registro = envios.get(ip);
-  if (!registro || agora - registro.inicioJanela > JANELA_MS) {
-    envios.set(ip, { total: 1, inicioJanela: agora });
-    return false;
-  }
-  registro.total++;
-  return registro.total > MAX_POR_JANELA;
-}
-
 export async function POST(request: Request) {
-  if (excedeuLimite(ipDaRequisicao(request))) {
+  const limite = await limitar(
+    `leads:${ipDaRequisicao(request)}`,
+    5,
+    60 * 60 * 1000
+  );
+  if (!limite.permitido) {
     return NextResponse.json(
       { erro: "Muitos envios em pouco tempo. Tente novamente mais tarde." },
       { status: 429 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ipDaRequisicao } from "@/lib/ratelimit";
+import { limitar, ipDaRequisicao } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,33 +11,19 @@ export const dynamic = "force-dynamic";
  * o painel mostra o que os visitantes realmente perguntam.
  *
  * Privacidade: grava SÓ o texto da pergunta (máx. 200 chars), sem nome,
- * IP ou qualquer identificador do visitante.
+ * IP ou qualquer identificador do visitante. Limite de 10/h por IP
+ * (durável com Upstash — lib/ratelimit).
  */
-
-const JANELA_MS = 60 * 60 * 1000;
-const MAX_POR_JANELA = 10;
-const envios = new Map<string, { total: number; inicioJanela: number }>();
-
-function excedeuLimite(ip: string): boolean {
-  const agora = Date.now();
-  if (envios.size > 1000) {
-    Array.from(envios.entries()).forEach(([chave, valor]) => {
-      if (agora - valor.inicioJanela > JANELA_MS) envios.delete(chave);
-    });
-  }
-  const registro = envios.get(ip);
-  if (!registro || agora - registro.inicioJanela > JANELA_MS) {
-    envios.set(ip, { total: 1, inicioJanela: agora });
-    return false;
-  }
-  registro.total++;
-  return registro.total > MAX_POR_JANELA;
-}
 
 export async function POST(request: Request) {
   // Limite estourado responde "ok" mesmo assim: é telemetria, não vale a
   // pena dar dica de rate limit a um bot.
-  if (excedeuLimite(ipDaRequisicao(request))) {
+  const limite = await limitar(
+    `chatpergunta:${ipDaRequisicao(request)}`,
+    10,
+    60 * 60 * 1000
+  );
+  if (!limite.permitido) {
     return NextResponse.json({ ok: true });
   }
 

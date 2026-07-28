@@ -68,6 +68,7 @@ valores):
 | `RESEND_API_KEY` | Opcional — liga o aviso de lead por e-mail (§2.5). Secreta, só server-side. |
 | `LEAD_NOTIFY_EMAIL` | Opcional — e-mail do corretor que recebe os avisos de lead. |
 | `LEAD_NOTIFY_FROM` | Opcional — remetente com domínio verificado no Resend (§2.5). |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Recomendado em produção — torna o rate limit durável (login, leads, chat). Grátis em [upstash.com](https://upstash.com): crie um banco Redis e copie URL + token REST. |
 
 ### Gerar o `AUTH_SECRET`
 
@@ -140,8 +141,5 @@ Depois que o site estiver no ar, confirme (numa aba anônima, deslogado):
 
 ## 7. Melhorias futuras (opcionais)
 
-- **Rate limit durável** (Upstash/Redis): o atual é em memória e, na
-  Vercel serverless (que reinicia direto), ajuda pouco contra força
-  bruta distribuída. Ver tarefa SEC4.
 - **Renomear `/admin`** para um caminho discreto: camada extra contra
   robôs. Se fizer, **não** cite o novo nome no `robots.txt`.
