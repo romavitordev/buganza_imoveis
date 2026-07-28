@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { uploadPropertyVideo, deletePropertyVideo } from "@/lib/storage";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
+import { idDoYoutube, urlAssistirYoutube } from "@/lib/youtube";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -83,6 +84,69 @@ export async function POST(request: Request, { params }: Params) {
     console.error("[admin/video POST]", e);
     return NextResponse.json(
       { erro: "Erro ao enviar o vídeo. Tente novamente." },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * PATCH — define o vídeo por LINK DO YOUTUBE (recomendado: banda R$ 0).
+ * Aceita watch/shorts/live/youtu.be; grava a forma canônica. Substitui
+ * (e apaga do storage) um vídeo enviado por upload, se houver.
+ */
+export async function PATCH(request: Request, { params }: Params) {
+  const property = await prisma.property.findUnique({
+    where: { id: params.id },
+    select: { id: true, videoStorageKey: true, slug: true },
+  });
+  if (!property) {
+    return NextResponse.json(
+      { erro: "Imóvel não encontrado." },
+      { status: 404 }
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ erro: "Corpo inválido." }, { status: 400 });
+  }
+  const youtubeUrl =
+    typeof body === "object" && body !== null && "youtubeUrl" in body
+      ? String((body as { youtubeUrl: unknown }).youtubeUrl ?? "")
+      : "";
+
+  const videoId = idDoYoutube(youtubeUrl);
+  if (!videoId) {
+    return NextResponse.json(
+      {
+        erro:
+          "Link do YouTube inválido. Cole o endereço do vídeo (youtube.com/watch?v=… ou youtu.be/…).",
+      },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const atualizado = await prisma.property.update({
+      where: { id: property.id },
+      data: {
+        videoUrl: urlAssistirYoutube(videoId),
+        videoStorageKey: null,
+      },
+      select: { videoUrl: true },
+    });
+    // Vídeo antigo enviado por upload vira lixo no storage — remove
+    if (property.videoStorageKey) {
+      await deletePropertyVideo(property.videoStorageKey);
+    }
+    revalidarPaginasPublicas(property.slug);
+    return NextResponse.json({ videoUrl: atualizado.videoUrl });
+  } catch (e) {
+    console.error("[admin/video PATCH]", e);
+    return NextResponse.json(
+      { erro: "Erro ao salvar o link. Tente novamente." },
       { status: 500 }
     );
   }

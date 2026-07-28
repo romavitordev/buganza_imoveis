@@ -24,7 +24,8 @@ const csp = [
   "media-src 'self' blob: https:",
   "font-src 'self'",
   "connect-src 'self'",
-  "frame-src https://maps.google.com https://www.google.com",
+  // Mapa do Google + player do YouTube (domínio nocookie) no detalhe
+  "frame-src https://maps.google.com https://www.google.com https://www.youtube-nocookie.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

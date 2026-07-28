@@ -1,9 +1,10 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Video } from "lucide-react";
+import { Link2, Loader2, Trash2, Video } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
+import { idDoYoutube, urlEmbedYoutube } from "@/lib/youtube";
 
 const MAX_TAMANHO_BYTES = 50 * 1024 * 1024;
 
@@ -117,6 +118,36 @@ export default function VideoManager({
     }
   }
 
+  // Link do YouTube (opção recomendada: streaming grátis, storage zero)
+  const [linkYoutube, setLinkYoutube] = useState("");
+
+  async function salvarLinkYoutube(e: FormEvent) {
+    e.preventDefault();
+    const link = linkYoutube.trim();
+    if (!link) return;
+    setErro(null);
+    setEnviando(true);
+    try {
+      const res = await fetch(`/api/admin/properties/${propertyId}/video`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ youtubeUrl: link }),
+      });
+      const body = (await res.json().catch(() => null)) as {
+        erro?: string;
+        videoUrl?: string;
+      } | null;
+      if (!res.ok) throw new Error(body?.erro ?? "Erro ao salvar o link.");
+      setVideoUrl(body?.videoUrl ?? null);
+      setLinkYoutube("");
+      router.refresh();
+    } catch (err) {
+      setErro(err instanceof Error ? err.message : "Erro ao salvar o link.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   const [confirmandoRemocao, setConfirmandoRemocao] = useState(false);
 
   async function remover() {
@@ -187,9 +218,37 @@ export default function VideoManager({
       </div>
 
       <p className="text-[12px] text-black/45">
-        MP4, WebM ou MOV até 50 MB. O vídeo aparece na página do imóvel,
-        abaixo das fotos — a capa do anúncio continua sendo uma foto.
+        O vídeo aparece na galeria do anúncio — a capa continua sendo uma
+        foto. <b>Recomendado:</b> suba o vídeo no YouTube como{" "}
+        <b>não listado</b> e cole o link abaixo (não gasta armazenamento e
+        carrega mais rápido). O upload direto (MP4/WebM/MOV até 50 MB)
+        segue disponível.
       </p>
+
+      <form onSubmit={salvarLinkYoutube} className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Link2
+            size={14}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
+            aria-hidden="true"
+          />
+          <input
+            type="url"
+            value={linkYoutube}
+            onChange={(e) => setLinkYoutube(e.target.value)}
+            placeholder="Cole o link do YouTube (youtube.com/watch?v=… ou youtu.be/…)"
+            aria-label="Link do vídeo no YouTube"
+            className="w-full rounded-pill border border-black/15 py-2.5 pl-10 pr-4 text-[13px] outline-none transition-colors focus:border-black"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={enviando || !linkYoutube.trim()}
+          className="rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-opacity disabled:opacity-50"
+        >
+          Salvar link
+        </button>
+      </form>
 
       {erro && (
         <p
@@ -201,13 +260,24 @@ export default function VideoManager({
       )}
 
       {videoUrl ? (
-        <video
-          key={videoUrl}
-          src={videoUrl}
-          controls
-          preload="metadata"
-          className="aspect-video w-full rounded-2xl bg-black"
-        />
+        idDoYoutube(videoUrl) ? (
+          <iframe
+            key={videoUrl}
+            src={urlEmbedYoutube(idDoYoutube(videoUrl)!)}
+            title="Vídeo do imóvel (YouTube)"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="aspect-video w-full rounded-2xl bg-black"
+          />
+        ) : (
+          <video
+            key={videoUrl}
+            src={videoUrl}
+            controls
+            preload="metadata"
+            className="aspect-video w-full rounded-2xl bg-black"
+          />
+        )
       ) : (
         <div className="rounded-2xl bg-mist px-6 py-12 text-center text-sm text-black/50">
           Nenhum vídeo ainda. Um tour em vídeo aumenta muito o interesse —

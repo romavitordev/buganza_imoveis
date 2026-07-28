@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import type { PublicPhotoDTO } from "@/lib/dto";
 import { BLUR_DATA_URL } from "@/lib/blur";
+import { idDoYoutube, urlEmbedYoutube } from "@/lib/youtube";
 
 interface GalleryProps {
   fotos: PublicPhotoDTO[];
@@ -190,6 +191,16 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
               className="object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.03]"
             />
           </button>
+        ) : idDoYoutube(ativa.url) ? (
+          // Vídeo no YouTube: player embutido (nocookie) — banda R$ 0
+          <iframe
+            key={indiceAtivo}
+            src={urlEmbedYoutube(idDoYoutube(ativa.url)!)}
+            title={`${titulo} — vídeo do imóvel`}
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 h-full w-full bg-black"
+          />
         ) : (
           // key força remontar (e parar/reiniciar o player) ao voltar ao vídeo
           <video
@@ -349,6 +360,14 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
                   fill
                   sizes="100vw"
                   className="object-contain"
+                />
+              ) : idDoYoutube(ativa.url) ? (
+                <iframe
+                  src={urlEmbedYoutube(idDoYoutube(ativa.url)!, true)}
+                  title={`${titulo} — vídeo do imóvel`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="h-full w-full"
                 />
               ) : (
                 <video
