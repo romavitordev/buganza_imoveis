@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ipDaRequisicao } from "@/lib/ratelimit";
+import { notificarLeadNovo } from "@/lib/notificar";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -82,12 +83,27 @@ export async function POST(request: Request) {
 
   // Slug → imóvel (só ATIVO; lead sem imóvel também vale)
   let propertyId: string | null = null;
+  let imovelDoLead: { titulo: string; codigo: string; slug: string } | null =
+    null;
   if (typeof slug === "string" && slug) {
     const property = await prisma.property.findUnique({
       where: { slug },
-      select: { id: true, status: true },
+      select: {
+        id: true,
+        status: true,
+        titulo: true,
+        codigo: true,
+        slug: true,
+      },
     });
-    if (property?.status === "ATIVO") propertyId = property.id;
+    if (property?.status === "ATIVO") {
+      propertyId = property.id;
+      imovelDoLead = {
+        titulo: property.titulo,
+        codigo: property.codigo,
+        slug: property.slug,
+      };
+    }
   }
 
   try {
@@ -103,6 +119,18 @@ export async function POST(request: Request) {
             : null,
       },
     });
+
+    // Aviso ao corretor (Resend). Aguardado de propósito: em serverless,
+    // trabalho "solto" após o return pode ser congelado. notificarLeadNovo
+    // nunca lança e tem timeout de 5s — o lead já está salvo de todo jeito.
+    await notificarLeadNovo({
+      nome: nomeLimpo,
+      whatsapp: digitos,
+      mensagem: mensagemLimpa || null,
+      origem: typeof origem === "string" && origem ? origem.slice(0, 60) : null,
+      imovel: imovelDoLead,
+    });
+
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (e) {
     console.error("[leads POST]", e);
