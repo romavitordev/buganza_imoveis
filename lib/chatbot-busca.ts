@@ -19,6 +19,12 @@ export interface IntencaoBusca {
   transacao?: "VENDA" | "LOCACAO";
   /** Nome EXATO como está no banco (veio de /api/chatbot/lugares). */
   bairro?: string;
+  /**
+   * O bairro pedido MAIS suas sub-áreas — em Sorocaba, "Parque Campolim"
+   * é um pedaço do Campolim, então quem procura "Campolim" espera ver os
+   * dois. Pedir a sub-área ("Parque Campolim") continua restrito a ela.
+   */
+  bairros?: string[];
   cidade?: string;
   quartosMin?: number;
   vagasMin?: number;
@@ -102,6 +108,19 @@ function acharLugar(alvo: string, nomes: string[]): string | null {
 }
 
 /**
+ * O bairro pedido + as sub-áreas que o contêm ("Campolim" traz também
+ * "Parque Campolim"). Pedir a sub-área não puxa o bairro maior: quem
+ * escreve "Parque Campolim" está sendo específico de propósito.
+ */
+function familiaDeBairros(nome: string, todos: string[]): string[] {
+  const alvo = tokens(nome);
+  const familia = todos.filter(
+    (outro) => outro === nome || contemSequencia(tokens(outro), alvo)
+  );
+  return familia.length > 0 ? familia : [nome];
+}
+
+/**
  * Tira do texto as palavras do lugar já reconhecido. Sem isso, um bairro
  * como "Chácara Recreio" faria o parser achar que o visitante quer uma
  * chácara.
@@ -163,6 +182,7 @@ function extrairFiltros(texto: string, lugares: Lugares = SEM_LUGARES): Filtros 
   const bairro = acharLugar(alvo, lugares.bairros);
   if (bairro) {
     f.bairro = bairro;
+    f.bairros = familiaDeBairros(bairro, lugares.bairros);
     f.partes.push(`em ${bairro}`);
     alvo = removerLugar(alvo, bairro);
   }
@@ -361,6 +381,7 @@ export function mesclarBusca(
     subtipo: novaTemEspecie ? nova.subtipo : anterior.subtipo,
     transacao: nova.transacao ?? anterior.transacao,
     bairro: nova.bairro ?? anterior.bairro,
+    bairros: nova.bairro ? nova.bairros : anterior.bairros,
     cidade: nova.cidade ?? anterior.cidade,
     quartosMin: nova.quartosMin ?? anterior.quartosMin,
     vagasMin: nova.vagasMin ?? anterior.vagasMin,
@@ -411,6 +432,7 @@ export function semLugarNemPreco(b: IntencaoBusca): IntencaoBusca {
   return {
     ...b,
     bairro: undefined,
+    bairros: undefined,
     precoMin: undefined,
     precoMax: undefined,
   };
@@ -422,7 +444,10 @@ export function queryDaBusca(b: IntencaoBusca, limit = 4): string {
   if (b.tipo) params.set("tipo", b.tipo);
   if (b.subtipo) params.set("subtipo", b.subtipo);
   if (b.transacao) params.set("transacao", b.transacao);
-  if (b.bairro) params.set("bairro", b.bairro);
+  // Lista separada por vírgula: a API filtra por qualquer um dos bairros
+  // da família (ver IntencaoBusca.bairros)
+  if (b.bairros?.length) params.set("bairro", b.bairros.join(","));
+  else if (b.bairro) params.set("bairro", b.bairro);
   if (b.cidade) params.set("cidade", b.cidade);
   if (b.quartosMin) params.set("quartosMin", String(b.quartosMin));
   if (b.vagasMin) params.set("vagasMin", String(b.vagasMin));

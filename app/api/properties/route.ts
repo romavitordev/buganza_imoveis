@@ -47,7 +47,15 @@ export async function GET(request: Request) {
   const subtipoParam = searchParams.get("subtipo");
   const transacaoParam = searchParams.get("transacao");
   const cidadeParam = searchParams.get("cidade");
-  const bairroParam = searchParams.get("bairro")?.trim() || undefined;
+  // Aceita um bairro ou uma lista separada por vírgula — o chatbot manda
+  // a "família" do bairro ("Campolim,Parque Campolim"), já que uma
+  // sub-área faz parte do bairro maior. Um valor só = igualdade simples.
+  const bairros = searchParams
+    .get("bairro")
+    ?.split(",")
+    .map((b) => b.trim())
+    .filter(Boolean)
+    .slice(0, 20);
   const q = searchParams.get("q")?.trim().slice(0, 80) || undefined;
   const quartosMin = inteiro(searchParams.get("quartosMin"), 10);
   const vagasMin = inteiro(searchParams.get("vagasMin"), 10);
@@ -135,7 +143,7 @@ export async function GET(request: Request) {
                 }
               : {}),
             ...(cidadeParam ? { cidade: cidadeParam } : {}),
-            ...(bairroParam ? { bairro: bairroParam } : {}),
+            ...(bairros?.length ? { bairro: { in: bairros } } : {}),
             ...(quartosMin !== undefined ? { quartos: { gte: quartosMin } } : {}),
             ...(vagasMin !== undefined ? { vagas: { gte: vagasMin } } : {}),
             ...(ids ? { id: { in: ids } } : {}),

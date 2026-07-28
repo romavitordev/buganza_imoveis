@@ -235,9 +235,13 @@ describe("filtro por bairro/cidade", () => {
   });
 
   it("bairro entra na query da API e na URL do catálogo", () => {
-    const b = extrairBusca("apartamento no Campolim", LUGARES)!;
-    expect(new URLSearchParams(queryDaBusca(b)).get("bairro")).toBe("Campolim");
-    expect(urlCatalogoDaBusca(b)).toContain("bairro=Campolim");
+    // "Jardim Europa" não tem sub-área — a query leva só ele. O caso com
+    // família ("Campolim") tem teste próprio mais abaixo.
+    const b = extrairBusca("casa no Jardim Europa", LUGARES)!;
+    expect(new URLSearchParams(queryDaBusca(b)).get("bairro")).toBe(
+      "Jardim Europa"
+    );
+    expect(urlCatalogoDaBusca(b)).toContain("bairro=Jardim+Europa");
   });
 });
 
@@ -259,5 +263,36 @@ describe("troca de espécie do imóvel (não herda o tipo antigo)", () => {
     expect(m.subtipo).toBe("CASA");
     expect(m.bairro).toBe("Jardim Europa");
     expect(m.precoMax).toBe(800_000);
+  });
+});
+
+describe("família de bairros (sub-área faz parte do bairro maior)", () => {
+  it("'Campolim' inclui a sub-área 'Parque Campolim'", () => {
+    const b = extrairBusca("casa no Campolim", LUGARES)!;
+    expect(b.bairro).toBe("Campolim");
+    expect(b.bairros).toEqual(
+      expect.arrayContaining(["Campolim", "Parque Campolim"])
+    );
+    // a query manda a lista para a API filtrar por qualquer um deles
+    expect(new URLSearchParams(queryDaBusca(b)).get("bairro")).toBe(
+      "Campolim,Parque Campolim"
+    );
+  });
+
+  it("pedir a sub-área continua restrito a ela", () => {
+    const b = extrairBusca("apartamento no Parque Campolim", LUGARES)!;
+    expect(b.bairros).toEqual(["Parque Campolim"]);
+  });
+
+  it("bairro sem sub-área traz só ele", () => {
+    expect(extrairBusca("casa no Jardim Europa", LUGARES)?.bairros).toEqual([
+      "Jardim Europa",
+    ]);
+  });
+
+  it("a URL do catálogo usa só o bairro pedido (filtro exato de lá)", () => {
+    const b = extrairBusca("casa no Campolim", LUGARES)!;
+    expect(urlCatalogoDaBusca(b)).toContain("bairro=Campolim");
+    expect(urlCatalogoDaBusca(b)).not.toContain("Parque");
   });
 });
