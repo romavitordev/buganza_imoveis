@@ -7,8 +7,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Check, Loader2, MessageCircle, Send, X } from "lucide-react";
+import { Check, Loader2, MessageCircle, Search, Send, X } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 import {
   TOPICOS,
@@ -20,6 +21,14 @@ import {
   topicosPorCategoria,
   type ImovelChat,
 } from "@/lib/chatbot";
+import {
+  extrairBusca,
+  queryDaBusca,
+  urlCatalogoDaBusca,
+  type IntencaoBusca,
+} from "@/lib/chatbot-busca";
+import { capaDoImovel, type PublicPropertyDTO } from "@/lib/dto";
+import { precoPrincipal } from "@/lib/format";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
 
 /**
@@ -210,15 +219,129 @@ export default function ChatWidget() {
     responderTexto(topico.titulo, respostaDoTopico(id));
   }
 
+  /**
+   * Busca por conversa: consulta o catálogo com os filtros extraídos da
+   * frase e responde com mini-cards clicáveis. Erros caem num convite ao
+   * catálogo — a conversa nunca "quebra".
+   */
+  async function buscarImoveis(texto: string, intencao: IntencaoBusca) {
+    empurrar({ de: "user", texto });
+    empurrar({
+      de: "bot",
+      texto: (
+        <span className="inline-flex items-center gap-2">
+          <Search size={13} aria-hidden="true" />
+          Procurando {intencao.resumo} no nosso catálogo…
+        </span>
+      ),
+    });
+    let resultados: PublicPropertyDTO[] = [];
+    try {
+      const res = await fetch(`/api/properties?${queryDaBusca(intencao)}`);
+      const body = (await res.json().catch(() => null)) as {
+        properties?: PublicPropertyDTO[];
+      } | null;
+      resultados = body?.properties ?? [];
+    } catch {
+      // Falha de rede: trata como "nenhum resultado" e oferece o catálogo
+    }
+
+    const urlCatalogo = urlCatalogoDaBusca(intencao);
+    empurrar({
+      de: "bot",
+      texto:
+        resultados.length === 0 ? (
+          <>
+            Não encontrei nada com esse perfil agora — mas imóveis novos
+            entram toda semana.{" "}
+            <a
+              href={urlCatalogo}
+              className="font-medium underline underline-offset-2"
+            >
+              Veja o catálogo completo
+            </a>{" "}
+            ou deixe seu contato que avisamos quando chegar algo assim.
+            {acoesBot()}
+          </>
+        ) : (
+          <>
+            Encontrei {resultados.length === 1 ? "este imóvel" : "estes imóveis"}{" "}
+            para você: 👇
+            <span className="mt-2.5 flex flex-col gap-2">
+              {resultados.map((p) => {
+                const capa = capaDoImovel(p);
+                const preco = precoPrincipal(p) ?? "Sob consulta";
+                return (
+                  <a
+                    key={p.slug}
+                    href={`/imoveis/${p.slug}`}
+                    className="flex items-center gap-2.5 rounded-xl border border-black/10 bg-white p-2 transition-colors hover:border-black"
+                  >
+                    <span className="relative h-12 w-16 flex-none overflow-hidden rounded-lg bg-mist">
+                      {capa && (
+                        <Image
+                          src={capa.url}
+                          alt=""
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                        />
+                      )}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate text-[12px] font-medium text-black">
+                        {p.titulo}
+                      </span>
+                      <span className="block text-[11px] text-black/50">
+                        {p.bairro} · <strong>{preco}</strong>
+                      </span>
+                    </span>
+                  </a>
+                );
+              })}
+            </span>
+            <a
+              href={urlCatalogo}
+              className="mt-2 inline-block text-[12px] font-medium underline underline-offset-2"
+            >
+              Ver todos no catálogo →
+            </a>
+          </>
+        ),
+    });
+  }
+
   function onEnviarTexto(e: FormEvent) {
     e.preventDefault();
     const texto = entrada.trim();
     if (!texto) return;
     setEntrada("");
-    // Na página de um anúncio, tenta primeiro responder com os dados
-    // REAIS daquele imóvel; só depois cai nas regras gerais.
+    // Ordem de prioridade: busca INEQUÍVOCA (tipo + outro atributo, ex.
+    // "casa 3 quartos até 500 mil") → dados do imóvel em tela → busca
+    // simples → regras gerais. Assim "quanto custa?" no anúncio responde
+    // o preço real, mas quem descreve outro imóvel cai na busca.
+    const busca = extrairBusca(texto);
+    const buscaForte =
+      busca !== null &&
+      (busca.tipo !== undefined || busca.subtipo !== undefined) &&
+      (busca.quartosMin !== undefined ||
+        busca.vagasMin !== undefined ||
+        busca.precoMax !== undefined ||
+        busca.transacao !== undefined);
+    if (busca && buscaForte) {
+      void buscarImoveis(texto, busca);
+      return;
+    }
     const contextual = imovel ? responderSobreImovel(texto, imovel) : null;
-    responderTexto(texto, contextual ?? responder(texto));
+    if (contextual) {
+      responderTexto(texto, contextual);
+      return;
+    }
+    if (busca) {
+      void buscarImoveis(texto, busca);
+      return;
+    }
+    responderTexto(texto, responder(texto));
   }
 
   function iniciarContato() {
