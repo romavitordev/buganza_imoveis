@@ -26,6 +26,30 @@ brecha.
 > Sem Supabase, o upload cai em `public/uploads`, que **não funciona na
 > Vercel** (disco efêmero). Configure antes de subir fotos em produção.
 
+## 2.5 Aviso de lead por e-mail (Resend)
+
+Quando um visitante envia o "Tenho interesse", o corretor recebe um
+e-mail com nome, WhatsApp clicável, imóvel e mensagem. Para ligar:
+
+1. Crie uma conta gratuita em [resend.com](https://resend.com)
+   (3.000 e-mails/mês — sobra para o volume de leads).
+2. Em **API Keys**, crie uma chave e copie o valor (`re_...`).
+3. Cadastre na Vercel (§3): `RESEND_API_KEY` com a chave e
+   `LEAD_NOTIFY_EMAIL` com o e-mail do corretor que recebe os avisos.
+
+Pronto — não precisa de mais nada para funcionar: sem domínio próprio
+verificado, os avisos saem do remetente `onboarding@resend.dev`.
+
+**Opcional (recomendado depois que o domínio estiver no ar):** em
+**Resend → Domains**, verifique `buganzaimoveis.com.br` (2 registros
+DNS) e defina `LEAD_NOTIFY_FROM="Buganza Imóveis
+<avisos@buganzaimoveis.com.br>"` — os avisos passam a sair do próprio
+domínio, com menos chance de cair em spam.
+
+> As variáveis são opcionais: sem elas o site funciona normalmente e o
+> lead continua caindo na caixa do painel (/admin/leads) — só não chega
+> aviso por e-mail. Falha no envio nunca perde o lead.
+
 ---
 
 ## 3. 🔒 Variáveis de ambiente na Vercel
@@ -41,6 +65,9 @@ valores):
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | 🔒 Senha forte (ver §4). Só usados no seed. |
 | `WHATSAPP_NUMBER` | Só dígitos (55 + DDD + número). Server-only. |
 | `NEXT_PUBLIC_SITE_URL` | URL pública final (sitemap, OG, robots). |
+| `RESEND_API_KEY` | Opcional — liga o aviso de lead por e-mail (§2.5). Secreta, só server-side. |
+| `LEAD_NOTIFY_EMAIL` | Opcional — e-mail do corretor que recebe os avisos de lead. |
+| `LEAD_NOTIFY_FROM` | Opcional — remetente com domínio verificado no Resend (§2.5). |
 
 ### Gerar o `AUTH_SECRET`
 
