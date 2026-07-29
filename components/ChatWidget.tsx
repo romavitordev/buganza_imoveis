@@ -21,6 +21,7 @@ import {
   respostaDoTopicoImovel,
   type Categoria,
   type ImovelChat,
+  type TopicoAprendido,
 } from "@/lib/chatbot";
 import {
   extrairBusca,
@@ -133,6 +134,9 @@ export default function ChatWidget() {
     bairros: [],
     cidades: [],
   });
+  // Respostas que os corretores escreveram em /admin/suporte — entram na
+  // mesma disputa dos tópicos fixos, então a base cresce sem deploy.
+  const [aprendidos, setAprendidos] = useState<TopicoAprendido[]>([]);
   const lugaresPedidosRef = useRef(false);
   useEffect(() => {
     if (!aberto || lugaresPedidosRef.current) return;
@@ -143,6 +147,14 @@ export default function ChatWidget() {
         if (body?.bairros) setLugares(body);
       })
       .catch(() => {});
+    fetch("/api/chatbot/conhecimento")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((body: { topicos?: TopicoAprendido[] } | null) => {
+        if (body?.topicos?.length) setAprendidos(body.topicos);
+      })
+      .catch(() => {
+        // Sem a base aprendida o bot volta aos tópicos fixos — degrada bem
+      });
   }, [aberto]);
 
   // Rola para a última mensagem a cada atualização
@@ -543,7 +555,7 @@ export default function ChatWidget() {
       void buscarImoveis(texto, alvo);
       return;
     }
-    const resposta = responder(texto);
+    const resposta = responder(texto, aprendidos);
     if (resposta.encontrou) {
       responderTexto(texto, resposta);
       return;

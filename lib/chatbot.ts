@@ -181,19 +181,66 @@ function toleranciaDe(palavra: string): number {
 }
 
 /**
+ * Resposta escrita pelos corretores em /admin/suporte. Entra na mesma
+ * disputa dos tópicos fixos — assim a base cresce sem deploy.
+ */
+export interface TopicoAprendido {
+  id: string;
+  titulo: string;
+  chaves: string[];
+  resposta: string;
+}
+
+/** Cumprimentos: têm resposta própria para não virarem "não sei". */
+const SAUDACOES = [
+  "ola", "ole", "oi", "oii", "opa", "eai", "e ai", "hey", "hello",
+  "bom dia", "boa tarde", "boa noite", "tudo bem", "tudo bom",
+];
+
+const RESPOSTA_SAUDACAO =
+  "Olá! 👋 Como posso ajudar? Você pode me perguntar sobre visitas, financiamento, documentos — ou dizer o que procura, tipo “casa 3 quartos até 600 mil”.";
+
+/**
+ * O texto é só um cumprimento? Evita que "oi"/"olá" caia no fallback e
+ * ainda polua a lista de perguntas sem resposta do painel.
+ */
+function ehSaudacao(alvo: string): boolean {
+  const limpo = alvo.replace(/[^a-z\s]/g, "").trim();
+  if (limpo.length > 14) return false; // "ola, quanto custa?" não é só saudação
+  return SAUDACOES.some((s) => {
+    if (limpo === s) return true;
+    // Tolerância própria: o conjunto de saudações é pequeno e fechado,
+    // então 1 letra errada em palavras de 3+ é seguro aqui ("ols" → "ola").
+    // Abaixo disso exige exato, senão "oi" casaria com "ai", "ui"…
+    const limite = s.length >= 3 ? 1 : 0;
+    return limite > 0 && distancia(limpo, s, limite) <= limite;
+  });
+}
+
+/**
  * Encontra o tópico mais relevante para o texto do usuário. Pontua por
  * chave presente (2 pontos) ou parecida — erro de digitação — (1 ponto);
  * empate fica com o primeiro do catálogo.
+ *
+ * `aprendidos` são as respostas cadastradas no painel; elas participam da
+ * mesma pontuação e, no empate, vencem — quem escreveu conhece o caso
+ * melhor que a regra genérica.
  */
-export function responder(texto: string): RespostaChat {
+export function responder(
+  texto: string,
+  aprendidos: TopicoAprendido[] = []
+): RespostaChat {
   const alvo = normalizar(texto);
   if (!alvo.trim()) return { encontrou: false, texto: FALLBACK };
+  if (ehSaudacao(alvo)) {
+    return { encontrou: true, texto: RESPOSTA_SAUDACAO, topicoId: "saudacao" };
+  }
   const tokens = alvo.split(/[^a-z0-9$]+/).filter(Boolean);
 
-  let melhor: TopicoChat | null = null;
+  let melhor: TopicoChat | TopicoAprendido | null = null;
   let melhorPontos = 0;
 
-  for (const topico of TOPICOS) {
+  for (const topico of [...aprendidos, ...TOPICOS]) {
     let pontos = 0;
     for (const chave of topico.chaves) {
       const chaveNorm = normalizar(chave);

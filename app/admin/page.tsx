@@ -61,12 +61,13 @@ export default async function AdminDashboardPage() {
     .count({ where: { status: "NOVO" } })
     .catch(() => 0);
 
-  // Perguntas do chat sem resposta (30d) — insumo para evoluir o bot
+  // Perguntas ainda na fila (as respondidas/ignoradas somem daqui) —
+  // o card leva para /admin/suporte, onde viram resposta do bot
   const perguntasChat = await prisma.chatPergunta
     .findMany({
-      where: { criadoEm: { gte: trintaDiasAtras } },
+      where: { status: "NOVA" },
       orderBy: { criadoEm: "desc" },
-      take: 8,
+      take: 5,
       select: { id: true, texto: true, criadoEm: true },
     })
     .catch(() => []);

@@ -194,10 +194,34 @@ model PropertyPhoto {
 
 // Perguntas do chat que caíram no fallback ("não sei responder") — a
 // matéria-prima para evoluir a base do Buganza Suporte com o tempo.
-model ChatPergunta {
-  id       String   @id @default(cuid())
-  texto    String   @db.VarChar(200)
-  criadoEm DateTime @default(now())
+enum StatusPergunta {
+  NOVA
+  RESPONDIDA
+  IGNORADA
+}
 
-  @@index([criadoEm])
+model ChatPergunta {
+  id       String         @id @default(cuid())
+  texto    String         @db.VarChar(200)
+  status   StatusPergunta @default(NOVA)
+  criadoEm DateTime       @default(now())
+
+  @@index([status, criadoEm])
+}
+
+/// Respostas escritas pelos corretores no painel (/admin/suporte). O bot
+/// usa estas JUNTO com os topicos fixos de lib/chatbot.ts — e assim a base
+/// cresce sem precisar de deploy.
+model ChatConhecimento {
+  id       String   @id @default(cuid())
+  /// Titulo curto do assunto — vira o rotulo do chip no chat.
+  titulo   String   @db.VarChar(80)
+  /// Palavras que ativam a resposta quando o visitante digita.
+  palavras String[] @default([])
+  resposta String   @db.Text
+  ativo    Boolean  @default(true)
+  criadoEm DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@index([ativo])
 }

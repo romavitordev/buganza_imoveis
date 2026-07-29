@@ -446,13 +446,22 @@ export default function DashboardTable({
 
       {perguntasChat.length > 0 && (
         <div className="mb-8 rounded-2xl border border-black/10 p-5">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-black/60">
-            Perguntas que o chat não soube responder (30 dias)
-          </p>
-          <p className="mt-1 text-[12px] text-black/60">
-            O que os visitantes andam perguntando — bom termômetro do que
-            adicionar à base do Buganza Suporte.
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wide text-black/60">
+                Perguntas que o chat não soube responder
+              </p>
+              <p className="mt-1 text-[12px] text-black/60">
+                Responda uma vez e o bot passa a responder sozinho.
+              </p>
+            </div>
+            <Link
+              href="/admin/suporte"
+              className="flex-none rounded-pill bg-black px-4 py-2 text-[12px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
+            >
+              Ensinar o bot
+            </Link>
+          </div>
           <ul className="mt-3 flex flex-col gap-1.5">
             {perguntasChat.map((p) => (
               <li
