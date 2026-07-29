@@ -26,7 +26,7 @@ export default function PrivacidadePage() {
           <h1 className="text-4xl tracking-tight md:text-5xl">
             Política de Privacidade
           </h1>
-          <p className="mt-3 text-[13px] text-black/45">
+          <p className="mt-3 text-[13px] text-black/60">
             Última atualização: {ATUALIZADO_EM}
           </p>
         </header>

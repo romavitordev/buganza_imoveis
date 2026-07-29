@@ -74,7 +74,7 @@ export default function QuemSomos() {
               />
               Conversar com a gente
             </a>
-            <span className="text-[11px] text-black/45">CRECI 118400</span>
+            <span className="text-[11px] text-black/60">CRECI 118400</span>
           </div>
 
           {/* Números — informações fictícias por enquanto */}
@@ -89,7 +89,7 @@ export default function QuemSomos() {
                 <dd className="text-2xl font-semibold tracking-tight md:text-3xl">
                   {numero}
                 </dd>
-                <dd className="mt-0.5 text-[11px] leading-snug text-black/50">
+                <dd className="mt-0.5 text-[11px] leading-snug text-black/60">
                   {rotulo}
                 </dd>
               </div>

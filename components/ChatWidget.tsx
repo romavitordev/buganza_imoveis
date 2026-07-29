@@ -236,7 +236,7 @@ export default function ChatWidget() {
 
         {chipsImovel.length > 0 && (
           <div className="mt-1 border-t border-black/8 pt-2.5">
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/35">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/60">
               Sobre este imóvel
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -256,7 +256,7 @@ export default function ChatWidget() {
 
         {opcoes.length > 0 && (
           <div className="mt-1 border-t border-black/8 pt-2.5">
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/35">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/60">
               {dentroDeCategoria
                 ? "Escolha o assunto"
                 : "Posso ajudar em mais algo?"}
@@ -276,7 +276,7 @@ export default function ChatWidget() {
                 <button
                   type="button"
                   onClick={voltarAosAssuntos}
-                  className="rounded-pill px-2.5 py-1 text-[11px] font-medium text-black/45 underline underline-offset-2 transition-colors hover:text-black"
+                  className="rounded-pill px-2.5 py-1 text-[11px] font-medium text-black/60 underline underline-offset-2 transition-colors hover:text-black"
                 >
                   ← Outros assuntos
                 </button>
@@ -382,7 +382,7 @@ export default function ChatWidget() {
                 <span className="block truncate text-[12px] font-medium text-black">
                   {p.titulo}
                 </span>
-                <span className="block text-[11px] text-black/50">
+                <span className="block text-[11px] text-black/60">
                   {p.bairro} · <strong>{preco}</strong>
                 </span>
               </span>
@@ -617,7 +617,7 @@ export default function ChatWidget() {
                 <p className="text-sm font-semibold tracking-tight">
                   Buganza Suporte
                 </p>
-                <p className="flex items-center gap-1.5 text-[11px] text-black/50">
+                <p className="flex items-center gap-1.5 text-[11px] text-black/60">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#25D366]" />
                   Online agora
                 </p>
@@ -627,7 +627,7 @@ export default function ChatWidget() {
               type="button"
               onClick={() => setAberto(false)}
               aria-label="Fechar atendimento"
-              className="rounded-full p-1.5 text-black/50 transition-colors hover:bg-mist hover:text-black"
+              className="rounded-full p-1.5 text-black/60 transition-colors hover:bg-mist hover:text-black"
             >
               <X size={18} aria-hidden="true" />
             </button>
@@ -684,7 +684,7 @@ export default function ChatWidget() {
                       ),
                     })
                   }
-                  className="w-fit text-[12px] font-medium text-black/50 underline underline-offset-2 transition-colors hover:text-black"
+                  className="w-fit text-[12px] font-medium text-black/60 underline underline-offset-2 transition-colors hover:text-black"
                 >
                   Ver assuntos frequentes
                 </button>
@@ -835,7 +835,7 @@ function ContatoForm({
         )}
         {enviando ? "Enviando…" : "Enviar contato"}
       </button>
-      <p className="text-[10px] leading-relaxed text-black/40">
+      <p className="text-[10px] leading-relaxed text-black/60">
         Ao enviar, você concorda com nossa{" "}
         <a href="/privacidade" className="underline underline-offset-2">
           política de privacidade

@@ -246,7 +246,7 @@ export default async function ImovelPage({ params }: PageProps) {
             <span className="rounded-pill border border-black/15 px-3 py-1 text-[11px] font-medium text-black/70">
               {TRANSACAO_LABEL[imovel.transacao]}
             </span>
-            <span className="text-[11px] font-medium uppercase tracking-wide text-black/40">
+            <span className="text-[11px] font-medium uppercase tracking-wide text-black/60">
               Cód. {imovel.codigo}
             </span>
           </div>
@@ -279,7 +279,7 @@ export default async function ImovelPage({ params }: PageProps) {
             <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
               {precoVenda && (
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/60">
                     Venda
                   </p>
                   <p className="bz-num text-3xl font-semibold tracking-tight">
@@ -289,7 +289,7 @@ export default async function ImovelPage({ params }: PageProps) {
               )}
               {precoLocacao && (
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/60">
                     Locação
                   </p>
                   <p className="bz-num text-3xl font-semibold tracking-tight">
@@ -302,7 +302,7 @@ export default async function ImovelPage({ params }: PageProps) {
                   <p className="bz-num text-3xl font-semibold tracking-tight">
                     Sob consulta
                   </p>
-                  <p className="mt-1 text-[12px] text-black/50">
+                  <p className="mt-1 text-[12px] text-black/60">
                     Chame no WhatsApp — respondemos rápido
                   </p>
                 </div>
@@ -327,7 +327,7 @@ export default async function ImovelPage({ params }: PageProps) {
               />
               {rotuloCta}
             </WhatsAppLink>
-            <p className="mt-2 text-center text-[11px] text-black/40">
+            <p className="mt-2 text-center text-[11px] text-black/60">
               Resposta rápida · atendimento direto com os corretores
             </p>
 
@@ -335,7 +335,7 @@ export default async function ImovelPage({ params }: PageProps) {
                 ao lado da galeria e resume os números do imóvel */}
             {caracteristicas.length > 0 && (
               <div className="mt-6 border-t border-black/10 pt-5">
-                <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-black/45">
+                <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-black/60">
                   Características
                 </p>
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-4">
@@ -348,7 +348,7 @@ export default async function ImovelPage({ params }: PageProps) {
                         <span className="block text-sm font-semibold leading-tight tracking-tight">
                           {valor}
                         </span>
-                        <span className="block truncate text-[10px] font-medium uppercase tracking-wide text-black/45">
+                        <span className="block truncate text-[10px] font-medium uppercase tracking-wide text-black/60">
                           {rotulo}
                         </span>
                       </span>
@@ -399,7 +399,7 @@ export default async function ImovelPage({ params }: PageProps) {
                 allowFullScreen
                 className="aspect-video w-full rounded-2xl border border-black/10 grayscale transition-[filter] duration-500 ease-premium hover:grayscale-0"
               />
-              <p className="mt-2 text-[12px] text-black/45">
+              <p className="mt-2 text-[12px] text-black/60">
                 {imovel.enderecoMapa
                   ? `${imovel.enderecoMapa} · ${imovel.bairro}, ${imovel.cidade}`
                   : `Localização aproximada (${imovel.bairro}) — passamos o endereço completo no atendimento pelo WhatsApp.`}

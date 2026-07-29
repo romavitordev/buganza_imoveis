@@ -54,7 +54,7 @@ const selectCls =
   "w-full rounded-xl border border-black/15 bg-white px-3 py-2.5 text-[13px] outline-none transition-colors focus:border-black md:w-auto";
 const campoCls = "flex flex-col gap-1";
 const rotuloCls =
-  "text-[11px] font-medium uppercase tracking-wide text-black/40";
+  "text-[11px] font-medium uppercase tracking-wide text-black/60";
 
 /**
  * Barra de filtros do catálogo — tudo via URL (filtros compartilháveis).
@@ -165,7 +165,7 @@ export default function CatalogoFiltros({
           <div className="relative flex-1 md:max-w-md" role="search">
             <Search
               size={15}
-              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-black/60"
               aria-hidden="true"
             />
             <input
@@ -332,7 +332,7 @@ export default function CatalogoFiltros({
           ))}
           <Link
             href="/imoveis"
-            className="text-[12px] font-medium text-black/50 underline-offset-2 hover:underline"
+            className="text-[12px] font-medium text-black/60 underline-offset-2 hover:underline"
           >
             Limpar tudo
           </Link>
@@ -341,11 +341,11 @@ export default function CatalogoFiltros({
 
       {/* Contagem + ordenação */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-[13px] text-black/45">
+        <p className="text-[13px] text-black/60">
           {total} imóve{total === 1 ? "l" : "is"} encontrado
           {total === 1 ? "" : "s"}
         </p>
-        <label className="flex items-center gap-2 text-[12px] text-black/50">
+        <label className="flex items-center gap-2 text-[12px] text-black/60">
           <ArrowUpDown size={13} aria-hidden="true" />
           Ordenar
           <select

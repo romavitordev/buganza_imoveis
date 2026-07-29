@@ -29,12 +29,12 @@ export default function SiteFooter() {
             Compra, venda e locação de imóveis residenciais e comerciais em
             Sorocaba e região — sem complicação.
           </p>
-          <p className="text-[11px] text-black/40">CRECI 118400</p>
+          <p className="text-[11px] text-black/60">CRECI 118400</p>
         </div>
 
         {/* Navegação */}
         <nav aria-label="Navegação do rodapé" className="flex flex-col gap-2">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/40">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/60">
             Navegação
           </p>
           {NAVEGACAO.map(({ href, rotulo }) => (
@@ -50,7 +50,7 @@ export default function SiteFooter() {
 
         {/* Atendimento */}
         <div className="flex flex-col gap-2">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/40">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/60">
             Atendimento
           </p>
           <a
@@ -83,7 +83,7 @@ export default function SiteFooter() {
             <Mail size={14} strokeWidth={2} aria-hidden="true" />
             imoveisbuganza@gmail.com
           </a>
-          <p className="mt-1 text-[12px] leading-relaxed text-black/45">
+          <p className="mt-1 text-[12px] leading-relaxed text-black/60">
             Seg. a sáb., 9h às 19h
             <br />
             Sorocaba/SP e região
@@ -92,7 +92,7 @@ export default function SiteFooter() {
 
         {/* Proprietários */}
         <div className="flex flex-col gap-3">
-          <p className="mb-0 text-[11px] font-medium uppercase tracking-[0.08em] text-black/40">
+          <p className="mb-0 text-[11px] font-medium uppercase tracking-[0.08em] text-black/60">
             É proprietário?
           </p>
           <p className="text-[13px] leading-relaxed text-black/55">
@@ -118,7 +118,7 @@ export default function SiteFooter() {
 
       {/* Linha final */}
       <div className="border-t border-black/8">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 pb-28 pt-5 text-[11px] text-black/40 md:flex-row md:items-center md:px-8 md:pb-5">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 pb-28 pt-5 text-[11px] text-black/60 md:flex-row md:items-center md:px-8 md:pb-5">
           <p>
             © {new Date().getFullYear()} Imóveis Buganza · CRECI 118400 ·
             Sorocaba/SP

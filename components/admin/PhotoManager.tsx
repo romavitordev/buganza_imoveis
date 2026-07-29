@@ -290,7 +290,7 @@ export default function PhotoManager({
         />
       </div>
 
-      <p className="text-[12px] text-black/45">
+      <p className="text-[12px] text-black/60">
         Pode mandar a foto direto do celular (até 25 MB) — otimizamos
         automaticamente antes do envio. A foto marcada com ★ é a capa do
         anúncio. Arraste as fotos para reordenar.
@@ -306,7 +306,7 @@ export default function PhotoManager({
       )}
 
       {ordenadas.length === 0 ? (
-        <div className="rounded-2xl bg-mist px-6 py-12 text-center text-sm text-black/50">
+        <div className="rounded-2xl bg-mist px-6 py-12 text-center text-sm text-black/60">
           Nenhuma foto ainda. Anúncios com fotos convertem muito mais —
           adicione pelo menos 3.
         </div>

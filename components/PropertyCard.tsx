@@ -88,7 +88,7 @@ export default function PropertyCard({
             {preco ?? "Sob consulta"}
           </p>
           {precoExtra && (
-            <p className="bz-num text-[12px] font-medium text-black/50">
+            <p className="bz-num text-[12px] font-medium text-black/60">
               ou {precoExtra}
             </p>
           )}

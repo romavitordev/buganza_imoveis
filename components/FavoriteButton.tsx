@@ -49,7 +49,7 @@ export default function FavoriteButton({ id, titulo }: FavoriteButtonProps) {
         strokeWidth={2}
         aria-hidden="true"
         className={`transition-colors duration-200 ${
-          favorito ? "fill-black text-black" : "text-black/45"
+          favorito ? "fill-black text-black" : "text-black/60"
         }`}
       />
     </button>

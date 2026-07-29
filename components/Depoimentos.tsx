@@ -47,7 +47,7 @@ function CartaoDepoimento({
         <p className="text-sm font-semibold tracking-tight">
           {depoimento.nome}
         </p>
-        <p className="mt-0.5 text-[12px] text-black/45">
+        <p className="mt-0.5 text-[12px] text-black/60">
           {depoimento.contexto}
         </p>
       </div>

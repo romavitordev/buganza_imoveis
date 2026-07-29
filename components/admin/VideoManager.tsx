@@ -217,7 +217,7 @@ export default function VideoManager({
         />
       </div>
 
-      <p className="text-[12px] text-black/45">
+      <p className="text-[12px] text-black/60">
         O vídeo aparece na galeria do anúncio — a capa continua sendo uma
         foto. <b>Recomendado:</b> suba o vídeo no YouTube como{" "}
         <b>não listado</b> e cole o link abaixo (não gasta armazenamento e
@@ -229,7 +229,7 @@ export default function VideoManager({
         <div className="relative flex-1">
           <Link2
             size={14}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-black/60"
             aria-hidden="true"
           />
           <input
@@ -279,7 +279,7 @@ export default function VideoManager({
           />
         )
       ) : (
-        <div className="rounded-2xl bg-mist px-6 py-12 text-center text-sm text-black/50">
+        <div className="rounded-2xl bg-mist px-6 py-12 text-center text-sm text-black/60">
           Nenhum vídeo ainda. Um tour em vídeo aumenta muito o interesse —
           grave na horizontal, com o celular estabilizado.
         </div>

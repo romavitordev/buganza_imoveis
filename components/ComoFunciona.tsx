@@ -75,7 +75,7 @@ export default function ComoFunciona() {
                 </span>
                 <span
                   aria-hidden="true"
-                  className="text-3xl font-light tracking-tight text-black/15 transition-colors duration-300 group-hover:text-black/35"
+                  className="text-3xl font-light tracking-tight text-black/15 transition-colors duration-300 group-hover:text-black/60"
                 >
                   {numero}
                 </span>

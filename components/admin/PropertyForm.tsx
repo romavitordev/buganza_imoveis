@@ -52,7 +52,7 @@ function Secao({
     <section className="rounded-2xl border border-black/10 p-5 md:p-6">
       <h2 className="text-lg tracking-tight">{titulo}</h2>
       {descricao && (
-        <p className="mt-1 text-[12px] leading-relaxed text-black/45">
+        <p className="mt-1 text-[12px] leading-relaxed text-black/60">
           {descricao}
         </p>
       )}
@@ -99,7 +99,7 @@ function CampoPreco({
       />
       <span
         className={`min-h-[16px] text-[11px] ${
-          invalido ? "font-medium text-black" : "text-black/45"
+          invalido ? "font-medium text-black" : "text-black/60"
         }`}
         aria-live="polite"
       >
@@ -367,7 +367,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             className={inputCls}
             placeholder="casa-terrea-3-quartos-jardim-europa"
           />
-          <span className="text-[11px] text-black/40">
+          <span className="text-[11px] text-black/60">
             buganza.com.br/imoveis/{slug || "…"}
           </span>
         </label>
@@ -567,7 +567,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           />
           <span
             className={`text-[11px] ${
-              descricao.length >= 300 ? "text-black/45" : "text-black/60"
+              descricao.length >= 300 ? "text-black/60" : "text-black/60"
             }`}
           >
             {descricao.length} caracteres
@@ -644,7 +644,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           </span>
         )}
         {!editando && (
-          <span className="text-[12px] text-black/45">
+          <span className="text-[12px] text-black/60">
             As fotos entram no próximo passo.
           </span>
         )}

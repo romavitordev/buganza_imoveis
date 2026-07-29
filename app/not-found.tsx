@@ -42,7 +42,7 @@ export default function NotFound() {
           <rect x="0" y="128" width="320" height="2" fill="rgba(0,0,0,0.25)" />
         </svg>
 
-        <p className="text-[13px] font-medium uppercase tracking-wide text-black/40">
+        <p className="text-[13px] font-medium uppercase tracking-wide text-black/60">
           Erro 404
         </p>
         <h1 className="max-w-xl text-4xl tracking-tight md:text-5xl">

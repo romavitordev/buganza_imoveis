@@ -23,7 +23,7 @@ export default function Error({
 
   return (
     <main className="flex min-h-[100svh] flex-col items-center justify-center gap-6 px-4 text-center">
-      <p className="text-[13px] font-medium uppercase tracking-wide text-black/40">
+      <p className="text-[13px] font-medium uppercase tracking-wide text-black/60">
         Ops — algo saiu do lugar
       </p>
       <h1 className="max-w-xl text-3xl tracking-tight md:text-4xl">
@@ -54,7 +54,7 @@ export default function Error({
       </div>
       <Link
         href="/"
-        className="text-[12px] text-black/45 underline underline-offset-4 transition-colors hover:text-black"
+        className="text-[12px] text-black/60 underline underline-offset-4 transition-colors hover:text-black"
       >
         Voltar para o início
       </Link>

@@ -312,7 +312,7 @@ export default async function ImoveisPage({
           </>
         ) : (
           <div className="bz-fade-up flex flex-col items-center gap-5 rounded-2xl bg-mist px-6 py-20 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black/40">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black/60">
               <SearchX size={24} strokeWidth={1.5} aria-hidden="true" />
             </span>
             <div>

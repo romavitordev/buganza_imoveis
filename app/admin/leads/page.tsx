@@ -44,7 +44,7 @@ export default async function LeadsPage() {
 
       <div>
         <h1 className="text-3xl tracking-tight">Leads</h1>
-        <p className="mt-1 text-[13px] text-black/50">
+        <p className="mt-1 text-[13px] text-black/60">
           Visitantes que deixaram contato no site — retorne pelo WhatsApp e
           marque como contatado.
         </p>

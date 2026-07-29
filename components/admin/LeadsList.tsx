@@ -26,7 +26,7 @@ const STATUS_LEAD_LABEL: Record<StatusLead, string> = {
 const STATUS_LEAD_ESTILO: Record<StatusLead, string> = {
   NOVO: "bg-black text-white",
   CONTATADO: "bg-mist text-black/70",
-  DESCARTADO: "border border-black/20 text-black/50",
+  DESCARTADO: "border border-black/20 text-black/60",
 };
 
 export default function LeadsList({
@@ -128,7 +128,7 @@ export default function LeadsList({
                 }`}
               >
                 {valor === "TODOS" ? "Todos" : STATUS_LEAD_LABEL[valor]}{" "}
-                <span className={ativo ? "opacity-70" : "text-black/35"}>
+                <span className={ativo ? "opacity-70" : "text-black/60"}>
                   {quantidade}
                 </span>
               </button>
@@ -168,7 +168,7 @@ export default function LeadsList({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium">{lead.nome}</p>
-                    <p className="mt-0.5 text-[12px] text-black/50">
+                    <p className="mt-0.5 text-[12px] text-black/60">
                       {dataHora(lead.criadoEm)}
                       {lead.origem && ` · via ${lead.origem}`}
                       {lead.imovel && (
@@ -228,7 +228,7 @@ export default function LeadsList({
                       disabled={ocupado}
                       onClick={() => setParaExcluir(lead)}
                       aria-label={`Excluir lead de ${lead.nome}`}
-                      className="rounded-full p-2 text-black/50 transition-colors hover:bg-mist hover:text-black"
+                      className="rounded-full p-2 text-black/60 transition-colors hover:bg-mist hover:text-black"
                     >
                       <Trash2 size={14} aria-hidden="true" />
                     </button>

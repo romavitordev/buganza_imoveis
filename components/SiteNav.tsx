@@ -262,7 +262,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
                 onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
                 className={`relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors duration-300 ${
-                  ativo ? "text-black" : "text-black/45"
+                  ativo ? "text-black" : "text-black/60"
                 }`}
               >
                 <span className="flex h-7 w-12 items-center justify-center">
@@ -282,7 +282,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/45"
+            className="relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/60"
           >
             <span className="flex h-7 w-12 items-center justify-center rounded-pill bg-black text-[#25D366]">
               <MessageCircle size={17} strokeWidth={2.25} aria-hidden="true" />

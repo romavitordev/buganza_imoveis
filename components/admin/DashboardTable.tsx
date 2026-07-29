@@ -326,7 +326,7 @@ export default function DashboardTable({
       <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl tracking-tight">Painel de imóveis</h1>
-          <p className="mt-1 text-[13px] text-black/50">
+          <p className="mt-1 text-[13px] text-black/60">
             {properties.length} imóve{properties.length === 1 ? "l" : "is"}{" "}
             cadastrado{properties.length === 1 ? "" : "s"}
           </p>
@@ -373,7 +373,7 @@ export default function DashboardTable({
           Contagem única por dispositivo/dia; nenhum dado pessoal armazenado. */}
       <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
+          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/60">
             <Eye size={13} aria-hidden="true" />
             Visualizações (7 dias)
           </p>
@@ -381,13 +381,13 @@ export default function DashboardTable({
             {resumo7d.visualizacoes}
           </p>
           {resumo7d.percentualMobile !== null && (
-            <p className="mt-0.5 text-[11px] text-black/45">
+            <p className="mt-0.5 text-[11px] text-black/60">
               {resumo7d.percentualMobile}% pelo celular
             </p>
           )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
+          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/60">
             <MessageCircle size={13} aria-hidden="true" />
             Cliques no WhatsApp (7 dias)
           </p>
@@ -395,7 +395,7 @@ export default function DashboardTable({
             {resumo7d.cliquesWhatsApp}
           </p>
           {resumo7d.visualizacoes > 0 && (
-            <p className="mt-0.5 text-[11px] text-black/45">
+            <p className="mt-0.5 text-[11px] text-black/60">
               {Math.round(
                 (resumo7d.cliquesWhatsApp / resumo7d.visualizacoes) * 100
               )}
@@ -404,7 +404,7 @@ export default function DashboardTable({
           )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/45">
+          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/60">
             <Star size={13} aria-hidden="true" />
             Mais visto (total)
           </p>
@@ -417,7 +417,7 @@ export default function DashboardTable({
           </p>
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-black/60">
             Origens do tráfego (7 dias)
           </p>
           {resumo7d.origens.length > 0 ? (
@@ -428,12 +428,12 @@ export default function DashboardTable({
                   className="flex items-center justify-between gap-2 text-[12px]"
                 >
                   <span className="truncate font-medium">{origem}</span>
-                  <span className="tabular-nums text-black/50">{total}</span>
+                  <span className="tabular-nums text-black/60">{total}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-sm font-medium text-black/50">
+            <p className="mt-1 text-sm font-medium text-black/60">
               Acessos diretos por enquanto
             </p>
           )}
@@ -446,10 +446,10 @@ export default function DashboardTable({
 
       {perguntasChat.length > 0 && (
         <div className="mb-8 rounded-2xl border border-black/10 p-5">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-black/45">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-black/60">
             Perguntas que o chat não soube responder (30 dias)
           </p>
-          <p className="mt-1 text-[12px] text-black/45">
+          <p className="mt-1 text-[12px] text-black/60">
             O que os visitantes andam perguntando — bom termômetro do que
             adicionar à base do Buganza Suporte.
           </p>
@@ -460,7 +460,7 @@ export default function DashboardTable({
                 className="flex items-baseline justify-between gap-3 text-sm"
               >
                 <span className="truncate text-black/75">“{p.texto}”</span>
-                <span className="flex-none text-[11px] text-black/40">
+                <span className="flex-none text-[11px] text-black/60">
                   {new Date(p.criadoEm).toLocaleDateString("pt-BR", {
                     day: "2-digit",
                     month: "2-digit",
@@ -476,7 +476,7 @@ export default function DashboardTable({
         <div className="relative max-w-sm flex-1">
           <Search
             size={15}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-black/35"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-black/60"
             aria-hidden="true"
           />
           <input
@@ -524,7 +524,7 @@ export default function DashboardTable({
                 }`}
               >
                 {valor === "TODOS" ? "Todos" : STATUS_LABEL[valor]}{" "}
-                <span className={ativo ? "opacity-70" : "text-black/35"}>
+                <span className={ativo ? "opacity-70" : "text-black/60"}>
                   {quantidade}
                 </span>
               </button>
@@ -556,7 +556,7 @@ export default function DashboardTable({
               scroll lateral. Em telas estreitas, colunas secundárias somem. */}
           <table className="w-full text-left text-[13px]">
             <thead>
-              <tr className="border-b border-black/10 bg-mist/60 text-[11px] uppercase tracking-wide text-black/45">
+              <tr className="border-b border-black/10 bg-mist/60 text-[11px] uppercase tracking-wide text-black/60">
                 <ThOrdenavel campo="titulo" ordenacao={ordenacao} onOrdenar={ordenarPor}>
                   Imóvel
                 </ThOrdenavel>
@@ -627,7 +627,7 @@ export default function DashboardTable({
                           <span className="block truncate font-medium">
                             {p.titulo}
                           </span>
-                          <span className="mt-0.5 block truncate text-[11px] text-black/45">
+                          <span className="mt-0.5 block truncate text-[11px] text-black/60">
                             {p.codigo} · {TIPO_LABEL[p.tipo]} ·{" "}
                             {TRANSACAO_LABEL[p.transacao]} — {p.bairro},{" "}
                             {p.cidade}
@@ -742,7 +742,7 @@ export default function DashboardTable({
               aria-label="Paginação da tabela"
               className="flex items-center justify-between border-t border-black/10 px-4 py-3"
             >
-              <p className="text-[12px] text-black/50">
+              <p className="text-[12px] text-black/60">
                 Página {paginaAtual} de {totalPaginas} · {filtradas.length}{" "}
                 imóve{filtradas.length === 1 ? "l" : "is"}
               </p>
