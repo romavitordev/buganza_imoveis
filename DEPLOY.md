@@ -123,6 +123,23 @@ medida desta lista.
 
 ---
 
+## 5.1 Build local (Windows + Node 24)
+
+`next build` roda em workers paralelos e, **no Windows com Node 24+**,
+eles derrubam o processo com `STATUS_STACK_BUFFER_OVERRUN`
+(código `3221226505`). O `next.config.mjs` detecta esse caso e roda o
+build em processo único — não é preciso fazer nada.
+
+Na Vercel (Linux + Node LTS) a condição não se aplica e o build segue
+paralelo, que é mais rápido. Se um dia o build local falhar com aquele
+código, confira se a detecção ainda cobre a sua versão de Node.
+
+> O Postgres local (`npm run db:local`) precisa estar no ar para o
+> build: ele gera as páginas dos imóveis. Se o build cair com
+> `ConnectionReset`, o banco caiu — rode `npm run db:local` de novo.
+
+---
+
 ## 6. ✅ Verificação pós-deploy (5 minutos no navegador)
 
 Depois que o site estiver no ar, confirme (numa aba anônima, deslogado):

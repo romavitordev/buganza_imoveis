@@ -53,7 +53,20 @@ const securityHeaders = [
   },
 ];
 
+/**
+ * No Windows com Node 24+, os workers paralelos do build do Next 14
+ * derrubam o processo com STATUS_STACK_BUFFER_OVERRUN (0xC0000409) —
+ * `next build` falha antes de gerar as páginas. Rodar em processo único
+ * resolve. A condição existe para NÃO penalizar o build da Vercel
+ * (Linux + Node LTS), onde o paralelismo funciona e é mais rápido.
+ */
+const nodeMajor = Number(process.versions.node.split(".")[0]);
+const workersInstaveis = process.platform === "win32" && nodeMajor >= 23;
+
 const nextConfig = {
+  ...(workersInstaveis
+    ? { experimental: { workerThreads: false, cpus: 1 } }
+    : {}),
   images: {
     remotePatterns: [
       {
