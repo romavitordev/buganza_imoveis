@@ -114,6 +114,15 @@ export default function ChatWidget() {
     if (slugCarregadoRef.current && slugCarregadoRef.current !== slugImovel) {
       slugCarregadoRef.current = null;
       setImovel(null);
+      // A saudação que cita o anúncio não vale mais fora dele: volta à
+      // padrão ENQUANTO a conversa não começou. Se o visitante já
+      // perguntou algo, o histórico é preservado (jogar fora a conversa
+      // dele numa troca de página seria pior que a saudação errada).
+      setMensagens((atual) =>
+        atual.length === 1 && atual[0].de === "bot"
+          ? [{ de: "bot", texto: SAUDACAO }]
+          : atual
+      );
     }
   }, [slugImovel]);
 
@@ -328,7 +337,10 @@ export default function ChatWidget() {
       });
       return;
     }
-    // Chips do imóvel em tela têm prioridade sobre os assuntos gerais
+    // Chips do imóvel em tela têm prioridade sobre os assuntos gerais.
+    // Nas mensagens antigas o onClick guarda o imóvel daquele momento
+    // (closure), então o atalho segue respondendo sobre o anúncio certo
+    // mesmo que o visitante já tenha mudado de página.
     const topicoImovel = TOPICOS_IMOVEL.find((t) => t.id === id);
     if (topicoImovel && imovel) {
       responderTexto(topicoImovel.titulo, respostaDoTopicoImovel(id, imovel));
