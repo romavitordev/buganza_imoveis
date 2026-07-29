@@ -7,7 +7,7 @@ import {
   SESSION_COOKIE,
 } from "@/lib/session";
 import { limitar, liberar, ipDaRequisicao } from "@/lib/ratelimit";
-import { verificarCodigoTotp } from "@/lib/totp";
+import { decifrarSegredo, verificarCodigoTotp } from "@/lib/totp";
 
 export const runtime = "nodejs";
 
@@ -80,7 +80,9 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-    if (!verificarCodigoTotp(codigo, user.totpSecret)) {
+    // Segredo cifrado em repouso: falha ao decifrar NUNCA libera o login
+    const segredo = decifrarSegredo(user.totpSecret);
+    if (!segredo || !verificarCodigoTotp(codigo, segredo)) {
       return NextResponse.json(
         { requer2fa: true, erro: "Código inválido ou expirado. Tente o atual." },
         { status: 401 }

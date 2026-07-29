@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentSession } from "@/lib/session";
-import { gerarSegredoTotp, qrCodeTotp, verificarCodigoTotp } from "@/lib/totp";
+import {
+  cifrarSegredo,
+  decifrarSegredo,
+  gerarSegredoTotp,
+  qrCodeTotp,
+  verificarCodigoTotp,
+} from "@/lib/totp";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -51,7 +57,9 @@ export async function POST(request: Request) {
     const segredo = gerarSegredoTotp();
     await prisma.adminUser.update({
       where: { id: user.id },
-      data: { totpSecret: segredo, totpAtivadoEm: null },
+      // Vai cifrado para o banco; o claro só existe nesta resposta, para
+      // o QR e para o usuário digitar no app
+      data: { totpSecret: cifrarSegredo(segredo), totpAtivadoEm: null },
     });
     const qr = await qrCodeTotp(user.email, segredo);
     return NextResponse.json({ qr, segredo });
@@ -66,7 +74,7 @@ export async function POST(request: Request) {
     }
     if (
       typeof codigo !== "string" ||
-      !verificarCodigoTotp(codigo, user.totpSecret)
+      !verificarCodigoTotp(codigo, decifrarSegredo(user.totpSecret) ?? "")
     ) {
       return NextResponse.json(
         { erro: "Código inválido. Confira o app e tente o código atual." },
@@ -89,7 +97,7 @@ export async function POST(request: Request) {
     }
     if (
       typeof codigo !== "string" ||
-      !verificarCodigoTotp(codigo, user.totpSecret)
+      !verificarCodigoTotp(codigo, decifrarSegredo(user.totpSecret) ?? "")
     ) {
       return NextResponse.json(
         { erro: "Código inválido. Para desativar, confirme o código atual." },

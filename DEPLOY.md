@@ -118,6 +118,18 @@ medida desta lista.
 - **2FA opcional (TOTP)**: ative em **/admin → Minha conta** escaneando
   o QR com Google Authenticator/Authy. Com ela ativa, o login exige
   senha + código de 6 dígitos. **Recomendado ativar após o deploy.**
+- **Segredo da 2FA cifrado em repouso** (AES-256-GCM). A senha usa
+  bcrypt e é irreversível, mas o segredo do TOTP precisa existir em
+  claro para validar o código — então ele é cifrado com uma chave
+  derivada do `AUTH_SECRET`, que fica nas variáveis de ambiente, **fora
+  do banco**. Uma cópia do banco sozinha não permite gerar códigos.
+
+  > ⚠️ **Se você trocar o `AUTH_SECRET`**, os segredos de 2FA gravados
+  > antes deixam de ser decifráveis e o login com código vai falhar. Para
+  > recuperar, limpe a 2FA no banco e ative de novo pelo painel:
+  > ```sql
+  > UPDATE "AdminUser" SET "totpSecret" = NULL, "totpAtivadoEm" = NULL;
+  > ```
 - **Erros genéricos**: em produção o Next não expõe stack trace ao
   cliente; as rotas de API respondem `{ erro: "mensagem curta" }`.
 
