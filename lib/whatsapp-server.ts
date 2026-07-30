@@ -8,16 +8,17 @@ import "server-only";
  * URL do WhatsApp no servidor e redireciona. Assim o número não aparece no
  * "inspecionar" e não é colhido por bots.
  *
- * Usa WHATSAPP_NUMBER (server-only). Cai para NEXT_PUBLIC_WHATSAPP_NUMBER
- * apenas como conveniência em ambientes que ainda não migraram.
+ * Usa SOMENTE `WHATSAPP_NUMBER`. Existia um fallback para
+ * `NEXT_PUBLIC_WHATSAPP_NUMBER`, removido de propósito: o prefixo
+ * NEXT_PUBLIC_ marca uma variável como "pode ir para o navegador", e
+ * bastava alguém referenciá-la em qualquer componente de cliente para o
+ * número voltar ao "inspecionar" — anulando justamente o motivo de
+ * existir o /api/contato. Sem fallback, o erro aparece no deploy (link
+ * quebrado) em vez de virar um vazamento silencioso.
  */
 
 export function whatsappNumber(): string {
-  return (
-    process.env.WHATSAPP_NUMBER ??
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ??
-    ""
-  );
+  return process.env.WHATSAPP_NUMBER ?? "";
 }
 
 export const MENSAGEM_GERAL =

@@ -7,6 +7,12 @@ import type { Property, PropertyPhoto } from "@prisma/client";
  * pública. Por isso este módulo NUNCA usa spread do objeto Prisma —
  * cada campo é copiado individualmente. Se um campo novo for adicionado
  * ao schema, ele NÃO vaza automaticamente para o site.
+ *
+ * `enderecoMapa` também fica DE FORA: o endereço completo é dado do
+ * morador, não do anúncio. Ele é lido só no servidor, para montar o pino
+ * do mapa na página do imóvel (ver enderecoDoMapa em
+ * app/imoveis/[slug]/page.tsx). Se entrasse aqui, `/api/properties`
+ * devolveria o endereço de TODOS os imóveis numa única requisição.
  */
 
 export interface PublicPhotoDTO {
@@ -27,8 +33,6 @@ export interface PublicPropertyDTO {
   transacao: Property["transacao"];
   cidade: string;
   bairro: string;
-  /** Endereço opcional para o pino do mapa (o casal decide por imóvel). */
-  enderecoMapa: string | null;
   quartos: number | null;
   /** Suítes contam dentro de quartos (3 quartos, sendo 1 suíte). */
   suites: number | null;
@@ -66,7 +70,6 @@ export function toPublicPropertyDTO(
     transacao: property.transacao,
     cidade: property.cidade,
     bairro: property.bairro,
-    enderecoMapa: property.enderecoMapa,
     quartos: property.quartos,
     suites: property.suites,
     banheiros: property.banheiros,

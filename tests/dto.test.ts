@@ -22,7 +22,8 @@ function propriedadeFake() {
     destaque: true,
     cidade: "Sorocaba",
     bairro: "Centro",
-    enderecoMapa: null,
+    // preenchido de proposito: o DTO tem que DESCARTAR este valor
+    enderecoMapa: "Rua das Palmeiras, 123",
     quartos: 3,
     banheiros: 2,
     vagas: 2,
@@ -98,5 +99,26 @@ describe("DTO público (regra inviolável do negócio)", () => {
     ]);
     expect(lista).toHaveLength(2);
     expect(JSON.stringify(lista)).not.toContain("precoInterno");
+  });
+
+  // Guarda de regressao: estes campos NUNCA podem sair em resposta
+  // publica. Se alguem adicionar um deles ao DTO, o teste quebra antes
+  // de virar vazamento em producao.
+  it("nao expoe dados internos nem o endereco do morador", () => {
+    const dto = toPublicPropertyDTO(propriedadeFake());
+    const serializado = JSON.stringify(dto);
+
+    // preco de negociacao interna
+    expect(dto).not.toHaveProperty("precoInterno");
+    expect(serializado).not.toContain("precoInterno");
+
+    // endereco completo: usado so no servidor, para o pino do mapa
+    expect(dto).not.toHaveProperty("enderecoMapa");
+    expect(serializado).not.toContain("enderecoMapa");
+    expect(serializado).not.toContain("Rua das Palmeiras");
+
+    // chaves de storage e status interno tambem ficam fora
+    expect(serializado).not.toContain("storageKey");
+    expect(serializado).not.toContain("videoStorageKey");
   });
 });

@@ -80,6 +80,36 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 Cole o resultado no `AUTH_SECRET` da Vercel. **Um segredo diferente por
 ambiente**; nunca reaproveite o de exemplo do `.env`.
 
+### 🔄 Trocar o `AUTH_SECRET` depois (leia antes de trocar)
+
+O `AUTH_SECRET` faz **duas** coisas: assina o cookie de sessão e deriva a
+chave que cifra o segredo da 2FA. Trocá-lo tem dois efeitos:
+
+| O que acontece | Gravidade |
+|---|---|
+| Todo mundo é deslogado (os cookies antigos deixam de valer) | Normal, esperado |
+| **A 2FA para de funcionar** — o segredo gravado não é mais decifrável e o login rejeita qualquer código | ⚠️ **Trava o acesso ao painel** |
+
+**Faça nesta ordem para não se trancar do lado de fora:**
+
+1. **Antes** de trocar, desative a 2FA em **/admin → Minha conta**
+   (enquanto você ainda consegue entrar).
+2. Troque o `AUTH_SECRET` na Vercel e refaça o deploy.
+3. Entre com e-mail e senha e **ative a 2FA de novo**, escaneando o QR
+   novo. O segredo antigo não serve mais.
+
+**Se já trocou e ficou trancado**, limpe a 2FA direto no banco (Neon →
+SQL Editor) e ative de novo pelo painel:
+
+```sql
+UPDATE "AdminUser" SET "totpSecret" = NULL, "totpAtivadoEm" = NULL;
+```
+
+> Por que não dá para "recuperar" o segredo? Porque é exatamente essa a
+> proteção: sem o `AUTH_SECRET` que o cifrou, nem o servidor consegue
+> lê-lo — e é por isso que um vazamento do banco sozinho não permite
+> gerar códigos.
+
 ---
 
 ## 4. 🔒 Senha do admin

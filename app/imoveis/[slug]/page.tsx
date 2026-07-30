@@ -64,6 +64,20 @@ const buscarImovelAtivo = cache(async (slug: string) => {
   return toPublicPropertyDTO(property);
 });
 
+/**
+ * Endereço completo, lido SÓ no servidor e usado apenas para posicionar
+ * o pino do mapa. Fica fora do DTO público de propósito: assim ele não
+ * sai em `/api/properties` (onde daria para colher o endereço de todos
+ * os imóveis de uma vez) nem vai parar em nenhum componente de cliente.
+ */
+const enderecoDoMapa = cache(async (slug: string) => {
+  const p = await prisma.property.findUnique({
+    where: { slug },
+    select: { enderecoMapa: true, status: true },
+  });
+  return p?.status === "ATIVO" ? p.enderecoMapa : null;
+});
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -93,6 +107,9 @@ export async function generateMetadata({
 export default async function ImovelPage({ params }: PageProps) {
   const imovel = await buscarImovelAtivo(params.slug);
   if (!imovel) notFound();
+
+  // Só para o pino do mapa — não entra no DTO nem em componente cliente
+  const endereco = await enderecoDoMapa(params.slug);
 
   // Imóveis parecidos: puxa candidatos ATIVOS da mesma cidade e ranqueia
   // por afinidade (lib/semelhantes.ts). Banco fora do ar → seção some.
@@ -389,19 +406,24 @@ export default async function ImovelPage({ params }: PageProps) {
               </h2>
               <iframe
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                  imovel.enderecoMapa
-                    ? `${imovel.enderecoMapa}, ${imovel.cidade}, SP`
+                  endereco
+                    ? `${endereco}, ${imovel.cidade}, SP`
                     : `${imovel.bairro}, ${imovel.cidade}, SP`
-                )}&z=${imovel.enderecoMapa ? 16 : 14}&output=embed`}
+                )}&z=${endereco ? 16 : 14}&output=embed`}
                 title={`Mapa de ${imovel.bairro}, ${imovel.cidade}`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
                 className="aspect-video w-full rounded-2xl border border-black/10 grayscale transition-[filter] duration-500 ease-premium hover:grayscale-0"
               />
+              {/* O endereço completo NÃO é impresso aqui. O cadastro
+                  promete ao corretor que "o site nunca exibe o número",
+                  e é dado do morador: serve para posicionar o pino, não
+                  para publicar. Quem quiser o endereço fala com o
+                  corretor. */}
               <p className="mt-2 text-[12px] text-black/60">
-                {imovel.enderecoMapa
-                  ? `${imovel.enderecoMapa} · ${imovel.bairro}, ${imovel.cidade}`
+                {endereco
+                  ? `${imovel.bairro}, ${imovel.cidade} — o endereço completo é passado no atendimento pelo WhatsApp.`
                   : `Localização aproximada (${imovel.bairro}) — passamos o endereço completo no atendimento pelo WhatsApp.`}
               </p>
             </section>
