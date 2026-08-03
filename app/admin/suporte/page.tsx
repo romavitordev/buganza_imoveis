@@ -3,11 +3,12 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { exigirSessao } from "@/lib/session";
 import SuporteManager from "@/components/admin/SuporteManager";
+import { MARCA } from "@/lib/marca";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Buganza Suporte · Painel Buganza",
+  title: `${MARCA.assistente} · ${MARCA.painel}`,
   robots: { index: false, follow: false },
 };
 
@@ -49,7 +50,7 @@ export default async function SuportePage() {
       </Link>
 
       <div>
-        <h1 className="text-3xl tracking-tight">Buganza Suporte</h1>
+        <h1 className="text-3xl tracking-tight">{MARCA.assistente}</h1>
         <p className="mt-1 max-w-2xl text-[13px] text-black/60">
           Aqui você ensina o assistente do site. Responda o que os visitantes
           perguntaram e o bot passa a responder sozinho da próxima vez.

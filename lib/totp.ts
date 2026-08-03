@@ -2,6 +2,7 @@ import "server-only";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { generateSecret, generateURI, verifySync } from "otplib";
 import { toDataURL } from "qrcode";
+import { MARCA } from "@/lib/marca";
 
 /**
  * 2FA por TOTP (Google Authenticator, Authy, 1Password…) para o painel.
@@ -12,7 +13,7 @@ import { toDataURL } from "qrcode";
  * configuração — o cliente só vê o QR na hora de ativar.
  */
 
-const EMISSOR = "Buganza Imóveis";
+const EMISSOR = MARCA.nome;
 
 /* ---------------- segredo cifrado em repouso ----------------------- */
 

@@ -17,6 +17,7 @@ import { prisma } from "@/lib/prisma";
 import { toPublicPropertyDTOList } from "@/lib/dto";
 import { linkWhatsAppGeral } from "@/lib/whatsapp";
 import { normalizarPreco } from "@/lib/preco";
+import { MARCA } from "@/lib/marca";
 
 // A página lê searchParams (filtros/busca/ordenação) — renderização dinâmica
 export const dynamic = "force-dynamic";
@@ -24,7 +25,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Imóveis disponíveis",
   description:
-    "Catálogo de imóveis residenciais e comerciais da Imóveis Buganza. Compra, venda e locação em Sorocaba e região.",
+    `Catálogo de imóveis residenciais e comerciais da ${MARCA.nome}. Compra, venda e locação em ${MARCA.regiao}.`,
   // Combinações de filtros geram URLs infinitas — o Google indexa só /imoveis
   alternates: { canonical: "/imoveis" },
 };

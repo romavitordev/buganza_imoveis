@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { siteUrl } from "@/lib/site-url";
 import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
+import { MARCA } from "@/lib/marca";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,11 +15,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
     default:
-      "Imóveis Buganza — Especialistas em Imóveis Residenciais e Comerciais",
-    template: "%s · Imóveis Buganza",
+      `${MARCA.nome} — Especialistas em Imóveis Residenciais e Comerciais`,
+    template: `%s · ${MARCA.nome}`,
   },
   description:
-    "Imóveis Buganza: compra, venda e locação de imóveis residenciais e comerciais em Sorocaba e região. CRECI 118400. Fale conosco pelo WhatsApp.",
+    `${MARCA.nome}: compra, venda e locação de imóveis residenciais e comerciais em ${MARCA.regiao}. CRECI ${MARCA.creci}. Fale conosco pelo WhatsApp.`,
 };
 
 // Dados estruturados do negócio (Google) — telefone fica de fora de
@@ -26,16 +27,16 @@ export const metadata: Metadata = {
 const negocioJsonLd = {
   "@context": "https://schema.org",
   "@type": "RealEstateAgent",
-  name: "Imóveis Buganza",
+  name: MARCA.nome,
   description:
     "Compra, venda e locação de imóveis residenciais e comerciais em Sorocaba e região.",
   url: siteUrl(),
-  identifier: "CRECI 118400",
-  areaServed: "Sorocaba e região, SP",
+  identifier: `CRECI ${MARCA.creci}`,
+  areaServed: `${MARCA.regiao}, ${MARCA.uf}`,
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Sorocaba",
-    addressRegion: "SP",
+    addressLocality: MARCA.cidade,
+    addressRegion: MARCA.uf,
     addressCountry: "BR",
   },
 };

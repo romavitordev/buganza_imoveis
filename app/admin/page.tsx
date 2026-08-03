@@ -2,11 +2,12 @@ import { prisma } from "@/lib/prisma";
 import { exigirSessao } from "@/lib/session";
 import type { AdminProperty } from "@/lib/admin-types";
 import DashboardTable from "@/components/admin/DashboardTable";
+import { MARCA } from "@/lib/marca";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Dashboard · Painel Buganza",
+  title: `Dashboard · ${MARCA.painel}`,
   robots: { index: false, follow: false },
 };
 

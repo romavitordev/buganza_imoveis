@@ -31,6 +31,7 @@ import {
   formatarPreco,
   precoLocacaoFormatado,
 } from "@/lib/format";
+import { MARCA } from "@/lib/marca";
 
 // ISR por slug: gerada sob demanda e servida do cache; mutações no admin
 // invalidam via revalidatePath (lib/revalidate.ts)
@@ -84,7 +85,7 @@ export async function generateMetadata({
     title: imovel.titulo,
     description: descricao,
     openGraph: {
-      title: `${imovel.titulo} · Imóveis Buganza`,
+      title: `${imovel.titulo} · ${MARCA.nome}`,
       description: descricao,
       ...(capa ? { images: [{ url: capa.url }] } : {}),
     },

@@ -1,5 +1,6 @@
 import { Handshake, KeyRound, MapPin, MessageCircle } from "lucide-react";
 import { linkWhatsAppGeral } from "@/lib/whatsapp";
+import { MARCA } from "@/lib/marca";
 
 /**
  * Seção "Quem Somos" — informações fictícias por enquanto.
@@ -50,7 +51,7 @@ export default function QuemSomos() {
             Um jeito mais humano de negociar imóveis.
           </h2>
           <p className="text-[15px] leading-relaxed text-black/60">
-            A Imóveis Buganza nasceu em Sorocaba da parceria de um casal que
+            A {MARCA.nome} nasceu em {MARCA.cidade} da parceria de um casal que
             resolveu fazer diferente: menos vitrine, mais conversa. A gente
             acompanha cada cliente pessoalmente — do primeiro “oi” no WhatsApp
             até a entrega das chaves.

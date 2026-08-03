@@ -1,4 +1,5 @@
 import "server-only";
+import { MARCA } from "@/lib/marca";
 
 /**
  * Contato via WhatsApp — lado SERVIDOR.
@@ -25,7 +26,7 @@ export const MENSAGEM_GERAL =
   "Olá! Vim pelo site e gostaria de saber mais sobre os imóveis disponíveis.";
 
 export const MENSAGEM_ANUNCIAR =
-  "Olá! Tenho um imóvel e gostaria de anunciá-lo com a Imóveis Buganza. Podemos conversar?";
+  `Olá! Tenho um imóvel e gostaria de anunciá-lo com a ${MARCA.nome}. Podemos conversar?`;
 
 export function mensagemImovel(titulo: string, codigo: string): string {
   return `Olá! Tenho interesse no imóvel "${titulo}" (cód. ${codigo}). Poderia me passar mais informações e valores?`;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Loader2, Lock } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
+import { MARCA } from "@/lib/marca";
 
 function LoginForm() {
   const router = useRouter();
@@ -67,7 +68,7 @@ function LoginForm() {
           <BrandMark />
           <div>
             <h1 className="text-xl font-semibold tracking-tight">
-              Painel Buganza
+              {MARCA.painel}
             </h1>
             <p className="mt-1 text-[13px] text-black/60">
               Acesso restrito aos corretores

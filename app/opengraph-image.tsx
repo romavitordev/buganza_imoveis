@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { MARCA, CIDADE_UF } from "@/lib/marca";
 
 /**
  * OG image da marca — aparece quando o site é compartilhado no WhatsApp,
@@ -8,7 +9,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 export const alt =
-  "Imóveis Buganza — Seu Imóvel, Sem Complicação. Sorocaba/SP · CRECI 118400";
+  `${MARCA.nome} — Seu Imóvel, Sem Complicação. ${CIDADE_UF} · CRECI ${MARCA.creci}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

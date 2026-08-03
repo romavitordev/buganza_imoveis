@@ -3,11 +3,12 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { exigirSessao } from "@/lib/session";
 import LeadsList, { type AdminLead } from "@/components/admin/LeadsList";
+import { MARCA } from "@/lib/marca";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Leads · Painel Buganza",
+  title: `Leads · ${MARCA.painel}`,
   robots: { index: false, follow: false },
 };
 

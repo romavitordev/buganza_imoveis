@@ -3,11 +3,12 @@ import Link from "next/link";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
 import { linkWhatsAppGeral } from "@/lib/whatsapp";
+import { MARCA, CIDADE_UF } from "@/lib/marca";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade",
   description:
-    "Como a Imóveis Buganza trata os dados de quem navega no site: analytics anônimo, sem venda de dados, em conformidade com a LGPD.",
+    `Como a ${MARCA.nome} trata os dados de quem navega no site: analytics anônimo, sem venda de dados, em conformidade com a LGPD.`,
 };
 
 const ATUALIZADO_EM = "4 de julho de 2026";
@@ -103,10 +104,10 @@ export default function PrivacidadePage() {
               os compartilhamos com terceiros. Para pedir a exclusão dos seus
               dados, é só chamar no WhatsApp ou escrever para{" "}
               <a
-                href="mailto:imoveisbuganza@gmail.com"
+                href={`mailto:${MARCA.email}`}
                 className="underline underline-offset-2"
               >
-                imoveisbuganza@gmail.com
+                {MARCA.email}
               </a>
               .
             </p>
@@ -202,12 +203,12 @@ export default function PrivacidadePage() {
             <p>
               Dúvidas sobre esta política: {" "}
               <a
-                href="mailto:imoveisbuganza@gmail.com"
+                href={`mailto:${MARCA.email}`}
                 className="underline decoration-black/30 underline-offset-2 hover:decoration-black"
               >
-                imoveisbuganza@gmail.com
+                {MARCA.email}
               </a>{" "}
-              · Imóveis Buganza · CRECI 118400 · Sorocaba/SP.
+              · {MARCA.nome} · CRECI {MARCA.creci} · {CIDADE_UF}.
             </p>
           </section>
 

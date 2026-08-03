@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Instagram, Mail, MessageCircle } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 import { linkWhatsAppGeral, linkWhatsAppAnunciar } from "@/lib/whatsapp";
+import { MARCA } from "@/lib/marca";
 
 const NAVEGACAO = [
   { href: "/", rotulo: "Início" },
@@ -22,7 +23,7 @@ export default function SiteFooter() {
           <div className="flex items-center gap-2.5">
             <BrandMark />
             <p className="text-sm font-semibold tracking-tight">
-              Imóveis Buganza
+              {MARCA.nome}
             </p>
           </div>
           <p className="max-w-[26ch] text-[13px] leading-relaxed text-black/55">
@@ -77,11 +78,11 @@ export default function SiteFooter() {
             @imoveis_buganza
           </a>
           <a
-            href="mailto:imoveisbuganza@gmail.com"
+            href={`mailto:${MARCA.email}`}
             className="inline-flex w-fit items-center gap-2 text-[13px] text-black/65 transition-colors hover:text-black"
           >
             <Mail size={14} strokeWidth={2} aria-hidden="true" />
-            imoveisbuganza@gmail.com
+            {MARCA.email}
           </a>
           <p className="mt-1 text-[12px] leading-relaxed text-black/60">
             Seg. a sáb., 9h às 19h
@@ -120,7 +121,7 @@ export default function SiteFooter() {
       <div className="border-t border-black/8">
         <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 pb-28 pt-5 text-[11px] text-black/60 md:flex-row md:items-center md:px-8 md:pb-5">
           <p>
-            © {new Date().getFullYear()} Imóveis Buganza · CRECI 118400 ·
+            © {new Date().getFullYear()} {MARCA.nome} · CRECI {MARCA.creci} ·
             Sorocaba/SP
           </p>
           <Link

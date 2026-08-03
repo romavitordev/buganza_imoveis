@@ -1,10 +1,11 @@
 import PropertyForm from "@/components/admin/PropertyForm";
 import { exigirSessao } from "@/lib/session";
+import { MARCA } from "@/lib/marca";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Novo imóvel · Painel Buganza",
+  title: `Novo imóvel · ${MARCA.painel}`,
   robots: { index: false, follow: false },
 };
 

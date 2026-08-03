@@ -1,11 +1,12 @@
 import { Plus } from "lucide-react";
 import { linkWhatsAppGeral } from "@/lib/whatsapp";
+import { MARCA } from "@/lib/marca";
 
 /** Dúvidas mais comuns de quem compra, aluga ou anuncia um imóvel. */
 
 const PERGUNTAS = [
   {
-    pergunta: "Quanto custa anunciar meu imóvel com a Buganza?",
+    pergunta: `Quanto custa anunciar meu imóvel com a ${MARCA.nomeCurto}?`,
     resposta:
       "Nada. Você só paga a comissão de corretagem quando o negócio é concluído — sem taxa de anúncio, sem mensalidade e sem exclusividade forçada.",
   },

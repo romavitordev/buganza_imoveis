@@ -1,5 +1,6 @@
 import "server-only";
 import { siteUrl } from "@/lib/site-url";
+import { MARCA } from "@/lib/marca";
 
 /**
  * Notificação de lead novo por e-mail, via Resend (https://resend.com —
@@ -107,7 +108,7 @@ export async function notificarLeadNovo(
       body: JSON.stringify({
         from:
           process.env.LEAD_NOTIFY_FROM ??
-          "Buganza Imóveis <onboarding@resend.dev>",
+          `${MARCA.nome} <onboarding@resend.dev>`,
         to: [para],
         subject: assunto,
         html: corpoHtml(lead),

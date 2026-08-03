@@ -11,6 +11,7 @@ import {
   type MouseEvent,
 } from "react";
 import { Building2, Heart, Home, MessageCircle, Users } from "lucide-react";
+import { MARCA } from "@/lib/marca";
 
 interface SiteNavProps {
   whatsappHref: string;
@@ -183,11 +184,11 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         <Link
           className="flex items-center gap-2"
           href="/"
-          aria-label="Imóveis Buganza — início"
+          aria-label={`${MARCA.nome} — início`}
         >
           <BrandMark />
           <span className="text-sm font-semibold tracking-tight text-black">
-            Imóveis Buganza
+            {MARCA.nome}
           </span>
         </Link>
 

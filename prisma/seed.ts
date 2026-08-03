@@ -5,6 +5,7 @@ import {
   Transacao,
 } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { MARCA } from "@/lib/marca";
 
 const prisma = new PrismaClient();
 
@@ -25,7 +26,7 @@ async function main() {
     where: { email },
     update: { passwordHash },
     create: {
-      nome: "Buganza Imóveis",
+      nome: MARCA.nome,
       email,
       passwordHash,
     },

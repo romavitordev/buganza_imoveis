@@ -6,11 +6,12 @@ import PropertyForm from "@/components/admin/PropertyForm";
 import PhotoManager from "@/components/admin/PhotoManager";
 import QualidadeAnuncio from "@/components/admin/QualidadeAnuncio";
 import VideoManager from "@/components/admin/VideoManager";
+import { MARCA } from "@/lib/marca";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Editar imóvel · Painel Buganza",
+  title: `Editar imóvel · ${MARCA.painel}`,
   robots: { index: false, follow: false },
 };
 

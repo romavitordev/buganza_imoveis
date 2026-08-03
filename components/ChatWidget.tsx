@@ -39,6 +39,7 @@ import {
 import { capaDoImovel, type PublicPropertyDTO } from "@/lib/dto";
 import { precoPrincipal } from "@/lib/format";
 import { linkWhatsAppGeral, linkWhatsAppImovel } from "@/lib/whatsapp";
+import { MARCA } from "@/lib/marca";
 
 /**
  * "Buganza Suporte" — widget de atendimento flutuante, fechado por padrão
@@ -67,7 +68,7 @@ type Nivel =
 const PREFIXO_CATEGORIA = "cat:";
 
 const SAUDACAO =
-  "Olá! Sou o assistente da Imóveis Buganza 👋 Escreva sua dúvida — ou diga o que procura, como “apartamento de 2 quartos até 500 mil”.";
+  `Olá! Sou o assistente da ${MARCA.nome} 👋 Escreva sua dúvida — ou diga o que procura, como “apartamento de 2 quartos até 500 mil”.`;
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -603,7 +604,7 @@ export default function ChatWidget() {
         <button
           type="button"
           onClick={() => setAberto(true)}
-          aria-label="Abrir atendimento Buganza Suporte"
+          aria-label={`Abrir atendimento ${MARCA.assistente}`}
           className="fixed right-4 bottom-[5.5rem] z-[70] inline-flex items-center gap-2.5 rounded-pill bg-black px-6 py-4 text-[15px] font-medium text-white shadow-[0_10px_36px_rgba(0,0,0,0.28)] transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:bottom-5 md:right-5"
         >
           <MessageCircle size={22} strokeWidth={2} aria-hidden="true" />
@@ -616,7 +617,7 @@ export default function ChatWidget() {
         <div
           ref={painelRef}
           role="dialog"
-          aria-label="Buganza Suporte"
+          aria-label={MARCA.assistente}
           className="fixed inset-x-4 bottom-4 z-[70] flex max-h-[80vh] flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_16px_56px_rgba(0,0,0,0.24)] md:inset-x-auto md:right-6 md:bottom-6 md:h-[560px] md:max-h-[80vh] md:w-[380px]"
         >
           {/* Cabeçalho */}
@@ -627,7 +628,7 @@ export default function ChatWidget() {
               </span>
               <div>
                 <p className="text-sm font-semibold tracking-tight">
-                  Buganza Suporte
+                  {MARCA.assistente}
                 </p>
                 <p className="flex items-center gap-1.5 text-[11px] text-black/60">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#25D366]" />
@@ -774,7 +775,7 @@ function ContatoForm({
         body: JSON.stringify({
           nome,
           whatsapp,
-          mensagem: "Contato pelo chat do site (Buganza Suporte).",
+          mensagem: `Contato pelo chat do site (${MARCA.assistente}).`,
           slug,
           site,
           origem: "chat",

@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { exigirSessao } from "@/lib/session";
 import PasswordForm from "@/components/admin/PasswordForm";
 import TwoFactorCard from "@/components/admin/TwoFactorCard";
+import { MARCA } from "@/lib/marca";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Minha conta · Painel Buganza",
+  title: `Minha conta · ${MARCA.painel}`,
   robots: { index: false, follow: false },
 };
 
