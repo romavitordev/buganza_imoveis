@@ -64,19 +64,6 @@ const buscarImovelAtivo = cache(async (slug: string) => {
   return toPublicPropertyDTO(property);
 });
 
-/**
- * Endereço completo, lido SÓ no servidor e usado apenas para posicionar
- * o pino do mapa. Fica fora do DTO público de propósito: assim ele não
- * sai em `/api/properties` (onde daria para colher o endereço de todos
- * os imóveis de uma vez) nem vai parar em nenhum componente de cliente.
- */
-const enderecoDoMapa = cache(async (slug: string) => {
-  const p = await prisma.property.findUnique({
-    where: { slug },
-    select: { enderecoMapa: true, status: true },
-  });
-  return p?.status === "ATIVO" ? p.enderecoMapa : null;
-});
 
 export async function generateMetadata({
   params,
@@ -108,8 +95,8 @@ export default async function ImovelPage({ params }: PageProps) {
   const imovel = await buscarImovelAtivo(params.slug);
   if (!imovel) notFound();
 
-  // Só para o pino do mapa — não entra no DTO nem em componente cliente
-  const endereco = await enderecoDoMapa(params.slug);
+  // Preenchido = pino exato + endereço no anúncio; vazio = só o bairro
+  const endereco = imovel.enderecoMapa;
 
   // Imóveis parecidos: puxa candidatos ATIVOS da mesma cidade e ranqueia
   // por afinidade (lib/semelhantes.ts). Banco fora do ar → seção some.
@@ -416,14 +403,12 @@ export default async function ImovelPage({ params }: PageProps) {
                 allowFullScreen
                 className="aspect-video w-full rounded-2xl border border-black/10 grayscale transition-[filter] duration-500 ease-premium hover:grayscale-0"
               />
-              {/* O endereço completo NÃO é impresso aqui. O cadastro
-                  promete ao corretor que "o site nunca exibe o número",
-                  e é dado do morador: serve para posicionar o pino, não
-                  para publicar. Quem quiser o endereço fala com o
-                  corretor. */}
+              {/* Endereço exibido quando o corretor preenche o campo —
+                  o cadastro avisa que ele fica visível, para a decisão
+                  ser combinada com o proprietário imóvel a imóvel. */}
               <p className="mt-2 text-[12px] text-black/60">
                 {endereco
-                  ? `${imovel.bairro}, ${imovel.cidade} — o endereço completo é passado no atendimento pelo WhatsApp.`
+                  ? `${endereco} · ${imovel.bairro}, ${imovel.cidade}`
                   : `Localização aproximada (${imovel.bairro}) — passamos o endereço completo no atendimento pelo WhatsApp.`}
               </p>
             </section>

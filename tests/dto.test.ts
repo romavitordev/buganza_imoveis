@@ -104,21 +104,23 @@ describe("DTO público (regra inviolável do negócio)", () => {
   // Guarda de regressao: estes campos NUNCA podem sair em resposta
   // publica. Se alguem adicionar um deles ao DTO, o teste quebra antes
   // de virar vazamento em producao.
-  it("nao expoe dados internos nem o endereco do morador", () => {
+  it("nao expoe preco interno nem chaves de storage", () => {
     const dto = toPublicPropertyDTO(propriedadeFake());
     const serializado = JSON.stringify(dto);
 
-    // preco de negociacao interna
+    // preco de negociacao interna — jamais publico
     expect(dto).not.toHaveProperty("precoInterno");
     expect(serializado).not.toContain("precoInterno");
 
-    // endereco completo: usado so no servidor, para o pino do mapa
-    expect(dto).not.toHaveProperty("enderecoMapa");
-    expect(serializado).not.toContain("enderecoMapa");
-    expect(serializado).not.toContain("Rua das Palmeiras");
-
-    // chaves de storage e status interno tambem ficam fora
+    // caminhos internos do storage
     expect(serializado).not.toContain("storageKey");
     expect(serializado).not.toContain("videoStorageKey");
+  });
+
+  // O endereco E publico por decisao de negocio (o cadastro avisa o
+  // corretor). O teste fixa esse contrato para a mudanca ser consciente.
+  it("expoe o endereco quando preenchido — decisao de negocio", () => {
+    const dto = toPublicPropertyDTO(propriedadeFake());
+    expect(dto.enderecoMapa).toBe("Rua das Palmeiras, 123");
   });
 });

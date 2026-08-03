@@ -375,7 +375,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
       <Secao
         titulo="Localização"
-        descricao="O endereço completo é opcional e serve só para posicionar o pino do mapa — o site nunca exibe o número."
+        descricao="O endereço completo é opcional. Se preencher, ele APARECE no anúncio e o mapa mostra o pino exato — combine com o proprietário antes. Deixando vazio, o site mostra só a região do bairro."
       >
         <label className={labelCls}>
           <span className={legendaCls}>Cidade *</span>
@@ -404,7 +404,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             onChange={(e) => setEnderecoMapa(e.target.value)}
             maxLength={160}
             className={inputCls}
-            placeholder="Ex.: Rua das Palmeiras, 123 — vazio = mapa mostra só o bairro"
+            placeholder="Ex.: Rua das Palmeiras, 123 — aparece no anúncio; vazio = só o bairro"
           />
         </label>
       </Secao>
