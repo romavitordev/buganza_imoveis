@@ -96,9 +96,6 @@ export default async function ImovelPage({ params }: PageProps) {
   const imovel = await buscarImovelAtivo(params.slug);
   if (!imovel) notFound();
 
-  // Preenchido = pino exato + endereço no anúncio; vazio = só o bairro
-  const endereco = imovel.enderecoMapa;
-
   // Imóveis parecidos: puxa candidatos ATIVOS da mesma cidade e ranqueia
   // por afinidade (lib/semelhantes.ts). Banco fora do ar → seção some.
   const semelhantes = await prisma.property
@@ -393,24 +390,21 @@ export default async function ImovelPage({ params }: PageProps) {
                 Localização
               </h2>
               <iframe
+                /* SEMPRE por bairro, nunca pelo endereço: a URL do
+                   iframe vai no HTML e seria legível no "inspecionar".
+                   Zoom 14 = quadra/região, sem apontar a casa. */
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(
-                  endereco
-                    ? `${endereco}, ${imovel.cidade}, SP`
-                    : `${imovel.bairro}, ${imovel.cidade}, SP`
-                )}&z=${endereco ? 16 : 14}&output=embed`}
+                  `${imovel.bairro}, ${imovel.cidade}, ${MARCA.uf}`
+                )}&z=14&output=embed`}
                 title={`Mapa de ${imovel.bairro}, ${imovel.cidade}`}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 allowFullScreen
                 className="aspect-video w-full rounded-2xl border border-black/10 grayscale transition-[filter] duration-500 ease-premium hover:grayscale-0"
               />
-              {/* Endereço exibido quando o corretor preenche o campo —
-                  o cadastro avisa que ele fica visível, para a decisão
-                  ser combinada com o proprietário imóvel a imóvel. */}
               <p className="mt-2 text-[12px] text-black/60">
-                {endereco
-                  ? `${endereco} · ${imovel.bairro}, ${imovel.cidade}`
-                  : `Localização aproximada (${imovel.bairro}) — passamos o endereço completo no atendimento pelo WhatsApp.`}
+                Localização aproximada ({imovel.bairro}) — o endereço
+                completo é passado no atendimento pelo WhatsApp.
               </p>
             </section>
         </div>

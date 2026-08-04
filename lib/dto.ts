@@ -8,11 +8,15 @@ import type { Property, PropertyPhoto } from "@prisma/client";
  * cada campo é copiado individualmente. Se um campo novo for adicionado
  * ao schema, ele NÃO vaza automaticamente para o site.
  *
- * `enderecoMapa` É público por decisão de negócio: quando preenchido, o
- * anúncio mostra o endereço e o mapa aponta o pino exato. O controle é
- * por imóvel — o campo é opcional no cadastro, e o formulário avisa que
- * o endereço fica visível, para o corretor decidir caso a caso (é dado
- * do morador). Deixando vazio, o site mostra só a região do bairro.
+ * `enderecoMapa` fica DE FORA por decisão dos donos da imobiliária: o
+ * endereço completo é dado do morador e NÃO pode aparecer no site — o
+ * público vê apenas o bairro. O campo continua existindo para uso
+ * INTERNO (o corretor precisa saber onde fica o imóvel) e só é visível
+ * no painel, que exige login.
+ *
+ * Por isso o mapa da página do imóvel também busca por bairro/cidade, e
+ * nunca pelo endereço: a URL do iframe fica no HTML e seria legível no
+ * "inspecionar". Ver app/imoveis/[slug]/page.tsx.
  */
 
 export interface PublicPhotoDTO {
@@ -33,8 +37,6 @@ export interface PublicPropertyDTO {
   transacao: Property["transacao"];
   cidade: string;
   bairro: string;
-  /** Endereço exibido no anúncio; vazio = só a região do bairro. */
-  enderecoMapa: string | null;
   quartos: number | null;
   /** Suítes contam dentro de quartos (3 quartos, sendo 1 suíte). */
   suites: number | null;
@@ -72,7 +74,6 @@ export function toPublicPropertyDTO(
     transacao: property.transacao,
     cidade: property.cidade,
     bairro: property.bairro,
-    enderecoMapa: property.enderecoMapa,
     quartos: property.quartos,
     suites: property.suites,
     banheiros: property.banheiros,

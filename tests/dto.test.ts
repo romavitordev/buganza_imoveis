@@ -117,10 +117,19 @@ describe("DTO público (regra inviolável do negócio)", () => {
     expect(serializado).not.toContain("videoStorageKey");
   });
 
-  // O endereco E publico por decisao de negocio (o cadastro avisa o
-  // corretor). O teste fixa esse contrato para a mudanca ser consciente.
-  it("expoe o endereco quando preenchido — decisao de negocio", () => {
+  // Decisao dos DONOS da imobiliaria: o endereco completo nunca aparece
+  // no site — o publico ve so o bairro. O campo existe para uso interno e
+  // fica visivel apenas no painel (que exige login). Este teste impede
+  // que ele volte ao publico sem alguem decidir de novo.
+  it("NAO expoe o endereco completo, mesmo preenchido", () => {
     const dto = toPublicPropertyDTO(propriedadeFake());
-    expect(dto.enderecoMapa).toBe("Rua das Palmeiras, 123");
+    const serializado = JSON.stringify(dto);
+
+    expect(dto).not.toHaveProperty("enderecoMapa");
+    expect(serializado).not.toContain("enderecoMapa");
+    expect(serializado).not.toContain("Rua das Palmeiras");
+
+    // o bairro continua publico — e o que o visitante precisa saber
+    expect(dto.bairro).toBeTruthy();
   });
 });

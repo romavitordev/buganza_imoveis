@@ -78,7 +78,12 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       `lib/depoimentos.ts` tem depoimentos inventados. **Publicar
       depoimento falso é propaganda enganosa** — troque por reais (com
       autorização de quem falou) ou apague a seção.
-- [ ] **2.4 — Conferir o CRECI**
+- [ ] **2.4 — Conferir os endereços cadastrados**
+      O endereço completo é **uso interno**: o site mostra só o bairro, e
+      o mapa aponta a região (decisão dos donos). Confira que o **bairro**
+      de cada imóvel está certo — é o que o visitante vê.
+
+- [ ] **2.5 — Conferir o CRECI**
       Hoje é `118400`, em `lib/marca.ts`. Confirme que é o número certo.
 
 ---
