@@ -10,8 +10,9 @@ import {
   useState,
   type MouseEvent,
 } from "react";
-import { Building2, Heart, Home, MessageCircle, Users } from "lucide-react";
+import { Building2, Headset, Heart, Home, MessageCircle, Users } from "lucide-react";
 import { CORES, MARCA } from "@/lib/marca";
+import { abrirSuporte } from "@/lib/suporte";
 
 interface SiteNavProps {
   whatsappHref: string;
@@ -337,17 +338,35 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
           })}
         </div>
 
-        <a
-          className="bz-contact-pill"
-          href={whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className="bz-contact-circle">
-            <MessageCircle size={14} strokeWidth={2.5} aria-hidden="true" />
-          </span>
-          <span className="bz-contact-label">Fale Conosco</span>
-        </a>
+        <div className="flex items-center gap-2">
+          {/* Atendimento — só no mobile. No desktop quem abre o chat é o
+              botão flutuante do ChatWidget; aqui ele evita empilhar mais
+              um elemento fixo na base da tela, que já tem a bottom nav.
+              Ícone de headset, e não de balão, para não virar um segundo
+              botão igual ao do WhatsApp ao lado. */}
+          <button
+            type="button"
+            onClick={abrirSuporte}
+            aria-label={`Abrir atendimento ${MARCA.assistente}`}
+            className="bz-contact-pill md:hidden"
+          >
+            <span className="bz-contact-circle">
+              <Headset size={14} strokeWidth={2.5} aria-hidden="true" />
+            </span>
+          </button>
+
+          <a
+            className="bz-contact-pill"
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="bz-contact-circle">
+              <MessageCircle size={14} strokeWidth={2.5} aria-hidden="true" />
+            </span>
+            <span className="bz-contact-label">Fale Conosco</span>
+          </a>
+        </div>
       </nav>
 
       {/* ---------- bottom nav (só mobile) ---------- */}

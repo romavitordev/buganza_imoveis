@@ -187,13 +187,20 @@ h3 {
   -webkit-backdrop-filter: blur(12px);
 }
 
+/* Serve tanto ao link do WhatsApp quanto ao botão de atendimento do
+   mobile — daí zerar borda e herdar a fonte, que o <button> traz do
+   navegador. */
 .bz-contact-pill {
   display: flex;
   align-items: center;
   gap: 8px;
   background: #F4F4F6;
+  border: 0;
   border-radius: 999px;
   padding: 4px;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
   text-decoration: none;
   transition: background 0.25s ease;
 }
@@ -222,10 +229,11 @@ h3 {
 .bz-footer {
   position: relative;
   z-index: 30;
-  /* Reserva embaixo, no mobile, o espaço de DOIS elementos fixos: a
-     bottom nav (~72px) e o botão flutuante "Suporte" logo acima dela.
-     Sem isso o botão cobre o CTA "Ver Imóveis" e a linha do CRECI. */
-  padding: 24px 16px 152px;
+  /* Reserva embaixo, no mobile, o espaço da bottom nav fixa (~72px com
+     a área segura) mais uma folga. Já foram 152px, quando o botão
+     "Suporte" também flutuava aqui; ele virou ícone da navbar e a
+     sobra devolvida some do caminho do CTA "Ver Imóveis". */
+  padding: 24px 16px 104px;
   background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
   display: flex;
   flex-direction: column;

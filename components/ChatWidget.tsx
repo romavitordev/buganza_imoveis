@@ -11,6 +11,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Check, Loader2, MessageCircle, Search, Send, X } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
+import { EVENTO_ABRIR_SUPORTE } from "@/lib/suporte";
 import {
   CATEGORIAS,
   TOPICOS,
@@ -91,6 +92,14 @@ export default function ChatWidget() {
   const hrefWhats = slugImovel
     ? linkWhatsAppImovel(slugImovel)
     : linkWhatsAppGeral();
+
+  // Gatilho externo: no mobile quem abre o chat é o ícone da navbar,
+  // que fica noutro ramo da árvore (ver lib/suporte.ts).
+  useEffect(() => {
+    const abrir = () => setAberto(true);
+    window.addEventListener(EVENTO_ABRIR_SUPORTE, abrir);
+    return () => window.removeEventListener(EVENTO_ABRIR_SUPORTE, abrir);
+  }, []);
 
   // Dados reais do imóvel em tela (modo "ciente do imóvel"). Carregado
   // na primeira abertura do chat; falha silenciosa = segue o modo geral.
@@ -598,13 +607,17 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Botão flutuante — fica acima da bottom nav no mobile */}
+      {/* Botão flutuante — SÓ no desktop.
+          No mobile ele virou ícone fixo na navbar (SiteNav): flutuando,
+          ficava empilhado com a bottom nav e com o CTA fixo da página do
+          imóvel, comendo a parte de baixo da tela justamente onde o
+          polegar trabalha. */}
       {!aberto && (
         <button
           type="button"
           onClick={() => setAberto(true)}
           aria-label={`Abrir atendimento ${MARCA.assistente}`}
-          className="fixed right-4 bottom-[5.5rem] z-[70] inline-flex items-center gap-2.5 rounded-pill bg-black px-6 py-4 text-[15px] font-medium text-white shadow-[0_10px_36px_rgba(0,0,0,0.28)] transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:bottom-5 md:right-5"
+          className="fixed right-5 bottom-5 z-[70] hidden items-center gap-2.5 rounded-pill bg-black px-6 py-4 text-[15px] font-medium text-white shadow-[0_10px_36px_rgba(0,0,0,0.28)] transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:inline-flex"
         >
           <MessageCircle size={22} strokeWidth={2} aria-hidden="true" />
           Suporte
