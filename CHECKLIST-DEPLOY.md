@@ -150,27 +150,38 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 ---
 
-## Fase 5 — Trocar o nome da marca (se decidiu na 0.1)
+## Fase 5 — Marca: nome e logotipo
+
+**Feito:** a marca já é **Marcelo Imóveis**, com a paleta marinho
+(`#14264A`) + dourado (`#C6A052`) do logotipo.
 
 O nome está **centralizado**: edite **`lib/marca.ts`** e o site inteiro
 acompanha — títulos das abas, rodapé, chat, remetente do e-mail, emissor
 do QR da 2FA, dados estruturados do Google.
 
 ```ts
-const nome = "Imóveis Buganza";   // ← novo nome completo
-const nomeCurto = "Buganza";      // ← forma curta, usada em frases
+const nome = "Marcelo Imóveis";      // ← nome completo
+const nomeCurto = "Marcelo Imóveis"; // ← forma curta, usada em frases
 ```
 
-No mesmo arquivo estão também `creci`, `cidade`, `regiao` e `email`.
+No mesmo arquivo estão também `creci`, `cidade`, `regiao`, `email` e
+`instagram`. As cores ficam em `CORES`, no mesmo arquivo, e no
+`tailwind.config.ts` (onde `black` foi trocado pelo marinho — é o que
+recolore o site inteiro de uma vez).
+
+### O arquivo do logotipo
+
+- [ ] Colocar o logotipo oficial em **`public/logo.svg`**
+
+É ele que a navbar e o rodapé usam. Enquanto o arquivo não existe, entra
+um monograma desenhado em SVG como rede de segurança (aproximado, não é a
+marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
+`components/SiteNav.tsx`. Prefira SVG: fica nítido em qualquer tela.
 
 **Ainda precisa mexer à mão em:**
-- [ ] `components/CityScene.tsx` e o favicon (`app/icon.svg`) — se o
-      logotipo mudar
+- [ ] `app/icon.svg` — o favicon (desenho próprio, marinho + dourado)
 - [ ] `components/QuemSomos.tsx` — o texto da história
 - [ ] Nome dos repositórios no GitHub (opcional, é cosmético)
-
-> Já testei: trocando as duas linhas, o typecheck e os 101 testes passam.
-> A troca é segura.
 
 ---
 

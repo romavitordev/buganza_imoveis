@@ -1,5 +1,5 @@
 /**
- * Base de conhecimento do "Buganza Suporte" — atendimento por regras
+ * Base de conhecimento do "Assistente Marcelo" — atendimento por regras
  * (casamento de palavras-chave), sem IA/LLM. Mantém tudo previsível e de
  * custo zero. Quando nenhuma regra casa, o widget oferece o WhatsApp.
  *

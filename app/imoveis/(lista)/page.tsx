@@ -230,9 +230,13 @@ export default async function ImoveisPage({
     <>
       <SiteNav whatsappHref={linkWhatsAppGeral()} />
 
+      {/* Fundo levemente azulado: é o que faz o card branco existir como
+          objeto. Antes era branco sobre branco e a separação dependia só
+          de sombra. O rodapé continua branco e fecha a página. */}
+      <div className="bg-fundo">
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-28 md:px-8 md:pt-36">
         <header className="bz-fade-up mb-10">
-          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/55">
+          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/70">
             <span className="bz-dot" aria-hidden="true" />
             Catálogo completo
           </p>
@@ -312,15 +316,17 @@ export default async function ImoveisPage({
             )}
           </>
         ) : (
-          <div className="bz-fade-up flex flex-col items-center gap-5 rounded-2xl bg-mist px-6 py-20 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-black/60">
+          // Era bg-mist; com a página agora em bg-fundo os dois tons se
+          // anulavam. O bloco vazio virou superfície branca, como o card.
+          <div className="bz-fade-up flex flex-col items-center gap-5 rounded-2xl border border-black/8 bg-white px-6 py-20 text-center">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-fundo text-black/70">
               <SearchX size={24} strokeWidth={1.5} aria-hidden="true" />
             </span>
             <div>
               <h2 className="mb-2 text-2xl tracking-tight">
                 Nenhum imóvel com esses filtros — por enquanto.
               </h2>
-              <p className="mx-auto max-w-md text-sm leading-relaxed text-black/55">
+              <p className="mx-auto max-w-md text-sm leading-relaxed text-black/70">
                 Nosso catálogo muda toda semana e nem tudo chega a ser
                 publicado. Conte pelo WhatsApp o que você procura e vamos
                 atrás do imóvel certo para você.
@@ -335,7 +341,6 @@ export default async function ImoveisPage({
               <MessageCircle
                 size={15}
                 strokeWidth={2.5}
-                className="text-[#25D366]"
                 aria-hidden="true"
               />
               Falar no WhatsApp
@@ -343,6 +348,7 @@ export default async function ImoveisPage({
           </div>
         )}
       </main>
+      </div>
 
       <SiteFooter />
     </>

@@ -69,11 +69,13 @@ function corpoHtml(lead: LeadParaNotificar): string {
     );
   }
   return (
-    `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;color:#111">` +
+    // Cores literais, não tokens do Tailwind: cliente de e-mail não roda CSS
+    // do site — o marinho da marca precisa vir escrito no style inline.
+    `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;color:#14264A">` +
     `<h2 style="margin:0 0 12px">Novo lead no site 🏠</h2>` +
     linhas.join("") +
     `<p style="margin:16px 0 0"><a href="${siteUrl()}/admin/leads" ` +
-    `style="display:inline-block;background:#111;color:#fff;padding:10px 18px;` +
+    `style="display:inline-block;background:#14264A;color:#fff;padding:10px 18px;` +
     `border-radius:999px;text-decoration:none">Abrir caixa de leads</a></p>` +
     `</div>`
   );

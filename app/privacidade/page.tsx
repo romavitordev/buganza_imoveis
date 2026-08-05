@@ -20,14 +20,14 @@ export default function PrivacidadePage() {
 
       <main className="mx-auto max-w-3xl px-4 pb-24 pt-28 md:px-8 md:pt-36">
         <header className="bz-fade-up mb-10">
-          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/55">
+          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/70">
             <span className="bz-dot" aria-hidden="true" />
             Transparência
           </p>
           <h1 className="text-4xl tracking-tight md:text-5xl">
             Política de Privacidade
           </h1>
-          <p className="mt-3 text-[13px] text-black/60">
+          <p className="mt-3 text-[13px] text-black/70">
             Última atualização: {ATUALIZADO_EM}
           </p>
         </header>

@@ -11,7 +11,7 @@ import {
   type MouseEvent,
 } from "react";
 import { Building2, Heart, Home, MessageCircle, Users } from "lucide-react";
-import { MARCA } from "@/lib/marca";
+import { CORES, MARCA } from "@/lib/marca";
 
 interface SiteNavProps {
   whatsappHref: string;
@@ -19,17 +19,127 @@ interface SiteNavProps {
   animated?: boolean;
 }
 
-/** Logo — torre preta minimalista. */
-export function BrandMark() {
+/**
+ * Logotipo oficial. É PNG com fundo transparente e 320px de altura —
+ * ~7x o maior uso na tela (46px no rodapé), então continua nítido em
+ * telas de alta densidade. Se um dia existir a versão vetorial, troque
+ * por "/logo.svg" e o resto continua igual.
+ *
+ * O prefixo existe por causa da vitrine (layout_buganza), que no GitHub
+ * Pages mora em /layout_buganza: um caminho absoluto cru daria 404 lá.
+ * O <img> comum não recebe o basePath automático do Next (só o
+ * next/image recebe), e trocar por next/image exigiria fixar a proporção
+ * do arquivo no código. Aqui a variável fica vazia e nada muda.
+ */
+const ARQUIVO_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`;
+
+/**
+ * Logotipo da marca.
+ *
+ * Usa o arquivo oficial em `public/logo.svg` — é ELE que manda. O
+ * desenho abaixo (MonogramaFallback) só aparece se o arquivo faltar,
+ * para a navbar nunca mostrar ícone quebrado; ele é uma aproximação,
+ * não a marca. Trocar o logotipo = substituir o arquivo, sem tocar em
+ * código.
+ *
+ * Aceita .svg; para PNG, mude ARQUIVO_LOGO. A altura é que manda — a
+ * largura acompanha a proporção do arquivo.
+ */
+export function BrandMark({ size = 30 }: { size?: number }) {
+  const [semArquivo, setSemArquivo] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // O onError sozinho não basta: a imagem vem no HTML do servidor e pode
+  // falhar ANTES da hidratação, quando o handler ainda não existe — daí
+  // ficaria um espaço vazio. Depois de montar, conferimos o resultado
+  // pelo próprio elemento (carregada, mas com largura 0 = quebrada).
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setSemArquivo(true);
+  }, []);
+
+  if (!semArquivo) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        ref={imgRef}
+        src={ARQUIVO_LOGO}
+        alt=""
+        aria-hidden="true"
+        style={{ height: size, width: "auto" }}
+        className="flex-none"
+        onError={() => setSemArquivo(true)}
+      />
+    );
+  }
+  return <MonogramaFallback size={size} />;
+}
+
+/**
+ * Aproximação do monograma, desenhada em SVG. Só entra em cena quando
+ * `public/logo.svg` não existe.
+ */
+function MonogramaFallback({ size }: { size: number }) {
+  // Abaixo de ~34px os detalhes finos (segundo prédio, base curva)
+  // viram borrão e sujam a leitura do M. Nesse tamanho desenhamos só o
+  // essencial — é o mesmo princípio dos ícones de sistema, que têm
+  // desenhos diferentes por tamanho em vez de um só reduzido.
+  const detalhado = size >= 34;
+
   return (
-    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
-      <rect x="4" y="8" width="8" height="16" rx="1" fill="#000" />
-      <rect x="14" y="2" width="8" height="22" rx="1" fill="#000" />
-      <rect x="6.5" y="11" width="3" height="2.4" fill="#fff" opacity="0.85" />
-      <rect x="6.5" y="16" width="3" height="2.4" fill="#fff" opacity="0.85" />
-      <rect x="16.5" y="6" width="3" height="2.4" fill="#fff" opacity="0.85" />
-      <rect x="16.5" y="11" width="3" height="2.4" fill="#fff" opacity="0.85" />
-      <rect x="16.5" y="16" width="3" height="2.4" fill="#fff" opacity="0.85" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 32"
+      aria-hidden="true"
+      className="flex-none"
+    >
+      {/* Prédios subindo atrás do M. Terminam bem acima do vértice (y=20)
+          para não encostarem nas hastes — encostando, o desenho lê como
+          "N" em vez de M. Só na versão detalhada. */}
+      {detalhado && (
+        <>
+          <rect x="13.4" y="2.5" width="3" height="10" fill={CORES.marinho} />
+          <rect x="17" y="5.5" width="2.4" height="7" fill={CORES.dourado} />
+        </>
+      )}
+      {/* O M: esquerda marinho, direita dourada. Vértice alto (V raso),
+          como no logotipo — deixa espaço para a casa embaixo. */}
+      <path
+        d="M6 26 V10 L16 20"
+        stroke={CORES.marinho}
+        strokeWidth={detalhado ? 3.4 : 3.8}
+        fill="none"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 20 L26 10 V26"
+        stroke={CORES.dourado}
+        strokeWidth={detalhado ? 3.4 : 3.8}
+        fill="none"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+      {/* janelinha da casa, sob o vértice */}
+      <rect
+        x="14.3"
+        y="21.6"
+        width="3.4"
+        height="3.4"
+        rx="0.4"
+        fill={CORES.marinho}
+      />
+      {detalhado && (
+        /* base do logotipo — quase reta, só uma leve curva */
+        <path
+          d="M4.5 28.8 Q16 27.4 27.5 28.8"
+          stroke={CORES.marinho}
+          strokeWidth="1.4"
+          fill="none"
+          strokeLinecap="round"
+        />
+      )}
     </svg>
   );
 }
@@ -218,7 +328,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
                 onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
                 className={`relative z-10 rounded-pill px-4 py-2 text-[12px] font-medium transition-colors duration-300 ${
-                  ativo ? "text-white" : "text-black/65 hover:text-black"
+                  ativo ? "text-white" : "text-black/75 hover:text-black"
                 }`}
               >
                 {rotulo}
@@ -263,7 +373,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
                 onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
                 className={`relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors duration-300 ${
-                  ativo ? "text-black" : "text-black/60"
+                  ativo ? "text-black" : "text-black/70"
                 }`}
               >
                 <span className="flex h-7 w-12 items-center justify-center">
@@ -283,9 +393,12 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/60"
+            className="relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/70"
           >
-            <span className="flex h-7 w-12 items-center justify-center rounded-pill bg-black text-[#25D366]">
+            {/* Glifo branco, não verde: aqui ele é um item de navegação
+                ao lado de outros quatro, e o verde o transformava no
+                elemento mais forte da barra. */}
+            <span className="flex h-7 w-12 items-center justify-center rounded-pill bg-black text-white">
               <MessageCircle size={17} strokeWidth={2.25} aria-hidden="true" />
             </span>
             WhatsApp

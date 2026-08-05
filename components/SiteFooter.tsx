@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Instagram, Mail, MessageCircle } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 import { linkWhatsAppGeral, linkWhatsAppAnunciar } from "@/lib/whatsapp";
-import { MARCA } from "@/lib/marca";
+import { CIDADE_UF, MARCA } from "@/lib/marca";
 
 const NAVEGACAO = [
   { href: "/", rotulo: "Início" },
@@ -18,31 +18,44 @@ export default function SiteFooter() {
     <footer className="border-t border-black/10 bg-white">
       {/* pb extra no mobile por causa da bottom nav fixa */}
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 pb-10 pt-12 sm:grid-cols-2 md:grid-cols-4 md:px-8">
-        {/* Marca */}
+        {/* Marca — logotipo completo, com a assinatura */}
         <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-2.5">
-            <BrandMark />
-            <p className="text-sm font-semibold tracking-tight">
-              {MARCA.nome}
-            </p>
+          <div className="flex items-start gap-3">
+            <BrandMark size={46} />
+            <div>
+              <p className="text-[15px] font-semibold tracking-tight text-marinho">
+                {MARCA.nome}
+              </p>
+              {/* Filete dourado do logotipo — decorativo, não é texto */}
+              <span
+                className="mt-1.5 block h-px w-14 bg-dourado"
+                aria-hidden="true"
+              />
+              <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-black/70">
+                {CIDADE_UF}
+              </p>
+            </div>
           </div>
-          <p className="max-w-[26ch] text-[13px] leading-relaxed text-black/55">
-            Compra, venda e locação de imóveis residenciais e comerciais em
-            Sorocaba e região — sem complicação.
+          <p className="max-w-[26ch] text-[13px] italic leading-relaxed text-black/70">
+            {MARCA.tagline}
           </p>
-          <p className="text-[11px] text-black/60">CRECI 118400</p>
+          <p className="max-w-[26ch] text-[13px] leading-relaxed text-black/70">
+            Compra, venda e locação de imóveis residenciais e comerciais em{" "}
+            {MARCA.regiao}.
+          </p>
+          <p className="text-[11px] text-black/70">CRECI {MARCA.creci}</p>
         </div>
 
         {/* Navegação */}
         <nav aria-label="Navegação do rodapé" className="flex flex-col gap-2">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/60">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
             Navegação
           </p>
           {NAVEGACAO.map(({ href, rotulo }) => (
             <Link
               key={href}
               href={href}
-              className="w-fit text-[13px] text-black/65 transition-colors hover:text-black"
+              className="w-fit text-[13px] text-black/75 transition-colors hover:text-black"
             >
               {rotulo}
             </Link>
@@ -51,52 +64,49 @@ export default function SiteFooter() {
 
         {/* Atendimento */}
         <div className="flex flex-col gap-2">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/60">
+          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
             Atendimento
           </p>
           <a
             href={linkWhatsAppGeral()}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex w-fit items-center gap-2 text-[13px] text-black/65 transition-colors hover:text-black"
+            className="inline-flex w-fit items-center gap-2 text-[13px] text-black/75 transition-colors hover:text-black"
           >
-            <MessageCircle
-              size={14}
-              strokeWidth={2.25}
-              className="text-[#25D366]"
-              aria-hidden="true"
-            />
+            {/* Sem verde: é um link de lista, ao lado de Instagram e
+                e-mail, que têm ícone monocromático. */}
+            <MessageCircle size={14} strokeWidth={2.25} aria-hidden="true" />
             WhatsApp
           </a>
           <a
-            href="https://instagram.com/imoveis_buganza"
+            href={`https://instagram.com/${MARCA.instagram}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex w-fit items-center gap-2 text-[13px] text-black/65 transition-colors hover:text-black"
+            className="inline-flex w-fit items-center gap-2 text-[13px] text-black/75 transition-colors hover:text-black"
           >
             <Instagram size={14} strokeWidth={2} aria-hidden="true" />
-            @imoveis_buganza
+            @{MARCA.instagram}
           </a>
           <a
             href={`mailto:${MARCA.email}`}
-            className="inline-flex w-fit items-center gap-2 text-[13px] text-black/65 transition-colors hover:text-black"
+            className="inline-flex w-fit items-center gap-2 text-[13px] text-black/75 transition-colors hover:text-black"
           >
             <Mail size={14} strokeWidth={2} aria-hidden="true" />
             {MARCA.email}
           </a>
-          <p className="mt-1 text-[12px] leading-relaxed text-black/60">
+          <p className="mt-1 text-[12px] leading-relaxed text-black/70">
             Seg. a sáb., 9h às 19h
             <br />
-            Sorocaba/SP e região
+            {CIDADE_UF} e região
           </p>
         </div>
 
         {/* Proprietários */}
         <div className="flex flex-col gap-3">
-          <p className="mb-0 text-[11px] font-medium uppercase tracking-[0.08em] text-black/60">
+          <p className="mb-0 text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
             É proprietário?
           </p>
-          <p className="text-[13px] leading-relaxed text-black/55">
+          <p className="text-[13px] leading-relaxed text-black/70">
             Anuncie seu imóvel com a gente — você só paga na conclusão do
             negócio.
           </p>
@@ -109,7 +119,6 @@ export default function SiteFooter() {
             <MessageCircle
               size={13}
               strokeWidth={2.5}
-              className="text-[#25D366]"
               aria-hidden="true"
             />
             Anunciar imóvel
@@ -119,10 +128,10 @@ export default function SiteFooter() {
 
       {/* Linha final */}
       <div className="border-t border-black/8">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 pb-28 pt-5 text-[11px] text-black/60 md:flex-row md:items-center md:px-8 md:pb-5">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 pb-28 pt-5 text-[11px] text-black/70 md:flex-row md:items-center md:px-8 md:pb-5">
           <p>
-            © {new Date().getFullYear()} {MARCA.nome} · CRECI {MARCA.creci} ·
-            Sorocaba/SP
+            © {new Date().getFullYear()} {MARCA.nome} · CRECI {MARCA.creci} ·{" "}
+            {CIDADE_UF}
           </p>
           <Link
             href="/privacidade"

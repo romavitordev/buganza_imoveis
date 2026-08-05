@@ -37,7 +37,7 @@ export default async function LeadsPage() {
     <main className="mx-auto flex max-w-4xl flex-col gap-8 px-4 py-10 md:px-8">
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-[13px] font-medium text-black/55 transition-colors hover:text-black"
+        className="inline-flex items-center gap-2 text-[13px] font-medium text-black/70 transition-colors hover:text-black"
       >
         <ArrowLeft size={15} aria-hidden="true" />
         Voltar ao painel
@@ -45,7 +45,7 @@ export default async function LeadsPage() {
 
       <div>
         <h1 className="text-3xl tracking-tight">Leads</h1>
-        <p className="mt-1 text-[13px] text-black/60">
+        <p className="mt-1 text-[13px] text-black/70">
           Visitantes que deixaram contato no site — retorne pelo WhatsApp e
           marque como contatado.
         </p>

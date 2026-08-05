@@ -11,17 +11,19 @@
  * (O número de WhatsApp continua server-only, em lib/whatsapp-server.ts.)
  */
 
-const nome = "Imóveis Buganza";
-/** Forma curta, para frases: "Anunciar com a Buganza…". */
-const nomeCurto = "Buganza";
+const nome = "Marcelo Imóveis";
+/** Forma curta, para frases: "Anunciar com a Marcelo…". */
+const nomeCurto = "Marcelo Imóveis";
 
 export const MARCA = {
   nome,
   nomeCurto,
+  /** Assinatura do logotipo — usada no rodapé e na imagem de compartilhamento. */
+  tagline: "Conectando pessoas aos melhores lugares.",
   /** Nome do assistente do chat, no site e nos rótulos de acessibilidade. */
-  assistente: `${nomeCurto} Suporte`,
+  assistente: "Assistente Marcelo",
   /** Como o painel administrativo se identifica nos títulos das abas. */
-  painel: `Painel ${nomeCurto}`,
+  painel: "Painel Marcelo Imóveis",
 
   creci: "118400",
   cidade: "Sorocaba",
@@ -31,10 +33,32 @@ export const MARCA = {
 
   /**
    * E-mail público de contato (rodapé e política de privacidade).
-   * TROQUE junto com a marca — hoje é o endereço provisório.
+   * TROQUE quando o endereço definitivo existir.
    */
-  email: "imoveisbuganza@gmail.com",
+  email: "contato@marceloimoveis.com.br",
+  /** Perfil do Instagram, sem o @ — confira antes de publicar. */
+  instagram: "marceloimoveis.sorocaba",
 } as const;
 
 /** "Sorocaba/SP" — atalho usado em rodapé, OG image e linha do CRECI. */
 export const CIDADE_UF = `${MARCA.cidade}/${MARCA.uf}` as const;
+
+/**
+ * Cores da marca, tiradas do logotipo.
+ *
+ * REGRA DE CONTRASTE (não quebre): o dourado sobre branco dá apenas
+ * 2,4:1 — muito abaixo do mínimo de 4,5:1 da WCAG. Ele é DECORATIVO:
+ * divisores, detalhes de ícone e texto sobre o azul-escuro. Nunca em
+ * texto pequeno sobre fundo claro. O azul-marinho, sim, é a tinta
+ * principal: 13:1 sobre branco, melhor que muitos cinzas.
+ */
+export const CORES = {
+  /** Azul-marinho do logotipo — substitui o preto como tinta principal. */
+  marinho: "#14264A",
+  /** Variação mais clara, para gradientes e estados de hover. */
+  marinhoClaro: "#1E3A6B",
+  /** Dourado do logotipo — SÓ decorativo (ver regra acima). */
+  dourado: "#C6A052",
+  /** Dourado mais claro, para brilhos e gradientes. */
+  douradoClaro: "#E0C27E",
+} as const;

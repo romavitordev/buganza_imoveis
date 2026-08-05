@@ -23,13 +23,13 @@ export default function Error({
 
   return (
     <main className="flex min-h-[100svh] flex-col items-center justify-center gap-6 px-4 text-center">
-      <p className="text-[13px] font-medium uppercase tracking-wide text-black/60">
+      <p className="text-[13px] font-medium uppercase tracking-wide text-black/70">
         Ops — algo saiu do lugar
       </p>
       <h1 className="max-w-xl text-3xl tracking-tight md:text-4xl">
         Tivemos um probleminha ao carregar esta página.
       </h1>
-      <p className="max-w-md text-sm leading-relaxed text-black/55">
+      <p className="max-w-md text-sm leading-relaxed text-black/70">
         Já registramos o ocorrido. Você pode tentar de novo ou falar direto
         com a gente pelo WhatsApp.
       </p>
@@ -54,7 +54,7 @@ export default function Error({
       </div>
       <Link
         href="/"
-        className="text-[12px] text-black/60 underline underline-offset-4 transition-colors hover:text-black"
+        className="text-[12px] text-black/70 underline underline-offset-4 transition-colors hover:text-black"
       >
         Voltar para o início
       </Link>

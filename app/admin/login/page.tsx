@@ -70,7 +70,7 @@ function LoginForm() {
             <h1 className="text-xl font-semibold tracking-tight">
               {MARCA.painel}
             </h1>
-            <p className="mt-1 text-[13px] text-black/60">
+            <p className="mt-1 text-[13px] text-black/70">
               Acesso restrito aos corretores
             </p>
           </div>
@@ -124,7 +124,7 @@ function LoginForm() {
                 className="rounded-xl border border-black/15 px-4 py-3 text-center text-sm tracking-[0.3em] outline-none transition-colors focus:border-black"
                 placeholder="000000"
               />
-              <span className="text-[11px] text-black/60">
+              <span className="text-[11px] text-black/70">
                 Sua conta tem verificação em duas etapas — abra o app e
                 digite o código de 6 dígitos.
               </span>
@@ -156,7 +156,7 @@ function LoginForm() {
 
         <Link
           href="/"
-          className="mt-6 flex items-center justify-center gap-1.5 text-[13px] font-medium text-black/60 transition-colors hover:text-black"
+          className="mt-6 flex items-center justify-center gap-1.5 text-[13px] font-medium text-black/70 transition-colors hover:text-black"
         >
           <ArrowLeft size={14} aria-hidden="true" />
           Voltar para o site

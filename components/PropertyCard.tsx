@@ -52,11 +52,18 @@ export default function PropertyCard({
   return (
     // relative: âncora do coração de favoritar, que fica FORA do <Link>
     // (botão dentro de link é armadilha de acessibilidade)
-    <article className="group relative flex h-full flex-col gap-4">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-black/8 bg-white transition-shadow duration-300 ease-premium hover:shadow-[0_14px_40px_rgba(20,38,74,0.10)]">
+      {/* Filete dourado que corre no topo ao passar o mouse. Vive DENTRO
+          do card (overflow-hidden), acima da foto, e cresce da esquerda —
+          é a mesma linha do logotipo, usada como resposta de hover. */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 z-20 h-[3px] origin-left scale-x-0 bg-dourado transition-transform duration-500 ease-premium group-hover:scale-x-100"
+      />
       <FavoriteButton id={imovel.id} titulo={imovel.titulo} />
       <Link
         href={`/imoveis/${imovel.slug}`}
-        className="relative block aspect-[4/3] overflow-hidden rounded-2xl bg-mist"
+        className="relative block aspect-[4/3] overflow-hidden bg-mist"
         aria-label={`Ver detalhes de ${imovel.titulo}`}
       >
         {capa ? (
@@ -82,13 +89,21 @@ export default function PropertyCard({
         </span>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-2 px-1">
+      <div className="flex flex-1 flex-col gap-2 p-5">
         <div className="flex items-baseline justify-between gap-3">
-          <p className="bz-num text-lg font-semibold tracking-tight">
+          {/* Marca dourada no preço: é o número que mais importa num
+              catálogo de imóvel, e era só mais uma linha de texto. O
+              dourado entra como filete (matéria), não como letra — sobre
+              branco ele não passa no contraste de texto. */}
+          <p className="bz-num flex items-center gap-2.5 text-lg font-semibold tracking-tight">
+            <span
+              aria-hidden="true"
+              className="h-4 w-[3px] flex-none rounded-sm bg-dourado"
+            />
             {preco ?? "Sob consulta"}
           </p>
           {precoExtra && (
-            <p className="bz-num text-[12px] font-medium text-black/60">
+            <p className="bz-num text-[12px] font-medium text-black/70">
               ou {precoExtra}
             </p>
           )}
@@ -102,7 +117,7 @@ export default function PropertyCard({
             {imovel.titulo}
           </Link>
         </h3>
-        <p className="text-sm text-black/55">
+        <p className="text-sm text-black/70">
           {imovel.bairro} · {imovel.cidade}
         </p>
 
@@ -126,12 +141,9 @@ export default function PropertyCard({
             href={linkWhatsAppImovel(imovel.slug)}
             className="inline-flex w-fit items-center gap-2 rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
           >
-            <MessageCircle
-              size={14}
-              strokeWidth={2.5}
-              className="text-[#25D366]"
-              aria-hidden="true"
-            />
+            {/* Glifo herda o branco do botão — sem o verde do WhatsApp,
+                que trazia uma quarta cor para dentro da grade do catálogo. */}
+            <MessageCircle size={14} strokeWidth={2.5} aria-hidden="true" />
             Falar sobre este imóvel
           </WhatsAppLink>
         </div>

@@ -5,7 +5,7 @@ import { MARCA } from "@/lib/marca";
 /**
  * Seção "Quem Somos" — informações fictícias por enquanto.
  * Este site é o ponto-chave do desenvolvimento da identidade visual
- * da Buganza: paleta preto/branco/cinza, headings leves, pills.
+ * da Marcelo Imóveis: paleta preto/branco/cinza, headings leves, pills.
  */
 
 const PILARES = [
@@ -38,7 +38,7 @@ export default function QuemSomos() {
     >
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 py-16 md:grid-cols-[2fr_3fr] md:gap-16 md:px-8 md:py-24">
         <div className="bz-fade-up flex flex-col gap-5">
-          <p className="flex items-center gap-2 text-[13px] text-black/55">
+          <p className="flex items-center gap-2 text-[13px] text-black/70">
             <span className="bz-dot" aria-hidden="true" />
             Quem somos
           </p>
@@ -50,13 +50,13 @@ export default function QuemSomos() {
             <br />
             Um jeito mais humano de negociar imóveis.
           </h2>
-          <p className="text-[15px] leading-relaxed text-black/60">
+          <p className="text-[15px] leading-relaxed text-black/70">
             A {MARCA.nome} nasceu em {MARCA.cidade} da parceria de um casal que
             resolveu fazer diferente: menos vitrine, mais conversa. A gente
             acompanha cada cliente pessoalmente — do primeiro “oi” no WhatsApp
             até a entrega das chaves.
           </p>
-          <p className="text-[15px] leading-relaxed text-black/60">
+          <p className="text-[15px] leading-relaxed text-black/70">
             Trabalhamos com um catálogo enxuto e escolhido a dedo, porque
             preferimos conhecer bem cada imóvel a anunciar qualquer um.
           </p>
@@ -70,12 +70,13 @@ export default function QuemSomos() {
               <MessageCircle
                 size={15}
                 strokeWidth={2.5}
-                className="text-[#25D366]"
                 aria-hidden="true"
               />
               Conversar com a gente
             </a>
-            <span className="text-[11px] text-black/60">CRECI 118400</span>
+            <span className="text-[11px] text-black/70">
+              CRECI {MARCA.creci}
+            </span>
           </div>
 
           {/* Números — informações fictícias por enquanto */}
@@ -90,7 +91,7 @@ export default function QuemSomos() {
                 <dd className="text-2xl font-semibold tracking-tight md:text-3xl">
                   {numero}
                 </dd>
-                <dd className="mt-0.5 text-[11px] leading-snug text-black/60">
+                <dd className="mt-0.5 text-[11px] leading-snug text-black/70">
                   {rotulo}
                 </dd>
               </div>
@@ -117,7 +118,7 @@ export default function QuemSomos() {
                 <h3 className="mb-1 text-base font-medium tracking-tight">
                   {titulo}
                 </h3>
-                <p className="text-[13px] leading-relaxed text-black/55">
+                <p className="text-[13px] leading-relaxed text-black/70">
                   {texto}
                 </p>
               </div>

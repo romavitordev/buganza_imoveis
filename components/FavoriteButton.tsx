@@ -48,8 +48,11 @@ export default function FavoriteButton({ id, titulo }: FavoriteButtonProps) {
         size={15}
         strokeWidth={2}
         aria-hidden="true"
+        // Preenchido em dourado: o estado "salvo" é o único do card que
+        // precisa saltar, e o dourado como preenchimento (não como texto)
+        // é exatamente o uso permitido da cor sobre fundo claro.
         className={`transition-colors duration-200 ${
-          favorito ? "fill-black text-black" : "text-black/60"
+          favorito ? "fill-dourado text-dourado" : "text-black/70"
         }`}
       />
     </button>

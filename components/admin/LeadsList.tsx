@@ -26,7 +26,7 @@ const STATUS_LEAD_LABEL: Record<StatusLead, string> = {
 const STATUS_LEAD_ESTILO: Record<StatusLead, string> = {
   NOVO: "bg-black text-white",
   CONTATADO: "bg-mist text-black/70",
-  DESCARTADO: "border border-black/20 text-black/60",
+  DESCARTADO: "border border-black/20 text-black/70",
 };
 
 export default function LeadsList({
@@ -124,11 +124,11 @@ export default function LeadsList({
                 className={`rounded-pill border px-3.5 py-1.5 text-[12px] font-medium transition-colors ${
                   ativo
                     ? "border-black bg-black text-white"
-                    : "border-black/12 bg-white text-black/60 hover:border-black/40"
+                    : "border-black/12 bg-white text-black/70 hover:border-black/40"
                 }`}
               >
                 {valor === "TODOS" ? "Todos" : STATUS_LEAD_LABEL[valor]}{" "}
-                <span className={ativo ? "opacity-70" : "text-black/60"}>
+                <span className={ativo ? "opacity-70" : "text-black/70"}>
                   {quantidade}
                 </span>
               </button>
@@ -148,7 +148,7 @@ export default function LeadsList({
 
       {visiveis.length === 0 ? (
         <div className="rounded-2xl bg-mist px-6 py-16 text-center">
-          <p className="text-sm text-black/55">
+          <p className="text-sm text-black/70">
             {leads.length === 0
               ? "Nenhum lead ainda. Quando um visitante deixar o contato no site, ele aparece aqui."
               : "Nenhum lead com esse status."}
@@ -168,7 +168,7 @@ export default function LeadsList({
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium">{lead.nome}</p>
-                    <p className="mt-0.5 text-[12px] text-black/60">
+                    <p className="mt-0.5 text-[12px] text-black/70">
                       {dataHora(lead.criadoEm)}
                       {lead.origem && ` · via ${lead.origem}`}
                       {lead.imovel && (
@@ -201,7 +201,6 @@ export default function LeadsList({
                       <MessageCircle
                         size={13}
                         strokeWidth={2.5}
-                        className="text-[#25D366]"
                         aria-hidden="true"
                       />
                       {formatarWhats(lead.whatsapp)}
@@ -228,7 +227,7 @@ export default function LeadsList({
                       disabled={ocupado}
                       onClick={() => setParaExcluir(lead)}
                       aria-label={`Excluir lead de ${lead.nome}`}
-                      className="rounded-full p-2 text-black/60 transition-colors hover:bg-mist hover:text-black"
+                      className="rounded-full p-2 text-black/70 transition-colors hover:bg-mist hover:text-black"
                     >
                       <Trash2 size={14} aria-hidden="true" />
                     </button>

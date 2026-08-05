@@ -1,4 +1,4 @@
-// Schema do banco — Buganza Imóveis
+// Schema do banco — Marcelo Imóveis
 //
 // Para desenvolvimento local SEM Postgres, dá para trocar para SQLite,
 // mas atenção — o Prisma NÃO suporta enums em SQLite, então a troca exige:
@@ -193,7 +193,7 @@ model PropertyPhoto {
 }
 
 // Perguntas do chat que caíram no fallback ("não sei responder") — a
-// matéria-prima para evoluir a base do Buganza Suporte com o tempo.
+// matéria-prima para evoluir a base do Assistente Marcelo com o tempo.
 enum StatusPergunta {
   NOVA
   RESPONDIDA

@@ -50,7 +50,7 @@ export default function ComoFunciona() {
     >
       <div className="mx-auto max-w-6xl px-4 py-16 md:px-8 md:py-24">
         <div className="bz-fade-up mb-12">
-          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/55">
+          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/70">
             <span className="bz-dot" aria-hidden="true" />
             Simples assim
           </p>
@@ -73,9 +73,12 @@ export default function ComoFunciona() {
                 <span className="flex h-11 w-11 items-center justify-center rounded-full border border-transparent bg-black text-white transition-all duration-300 ease-premium group-hover:scale-105 group-hover:border-black group-hover:bg-white group-hover:text-black">
                   <Icone size={18} strokeWidth={1.75} aria-hidden="true" />
                 </span>
+                {/* Numeral decorativo (aria-hidden: a ordem já vem do <ol>).
+                    Por ser decoração, pode acender em dourado no hover —
+                    é uso de cor sem exigência de contraste de texto. */}
                 <span
                   aria-hidden="true"
-                  className="text-3xl font-light tracking-tight text-black/15 transition-colors duration-300 group-hover:text-black/60"
+                  className="text-3xl font-light tracking-tight text-black/15 transition-colors duration-300 group-hover:text-dourado"
                 >
                   {numero}
                 </span>
@@ -84,7 +87,7 @@ export default function ComoFunciona() {
                 <h3 className="mb-1 text-base font-medium tracking-tight">
                   {titulo}
                 </h3>
-                <p className="text-[13px] leading-relaxed text-black/55">
+                <p className="text-[13px] leading-relaxed text-black/70">
                   {texto}
                 </p>
               </div>

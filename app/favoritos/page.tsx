@@ -16,9 +16,11 @@ export default function FavoritosPage() {
     <>
       <SiteNav whatsappHref={linkWhatsAppGeral()} />
 
+      {/* Mesmo fundo do catálogo — são a mesma grade de cards */}
+      <div className="min-h-[60svh] bg-fundo">
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-28 md:px-8 md:pt-36">
         <header className="bz-fade-up mb-10">
-          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/55">
+          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/70">
             <span className="bz-dot" aria-hidden="true" />
             Salvos neste dispositivo
           </p>
@@ -27,6 +29,7 @@ export default function FavoritosPage() {
 
         <FavoritosList />
       </main>
+      </div>
 
       <SiteFooter />
     </>

@@ -14,6 +14,7 @@ import {
 } from "@/lib/labels";
 import { COMODIDADES } from "@/lib/comodidades";
 import { normalizarPreco, previewPreco } from "@/lib/preco";
+import { dominioDoSite } from "@/lib/site-url";
 
 interface PropertyFormProps {
   /** Ausente = criação de um novo imóvel. */
@@ -52,7 +53,7 @@ function Secao({
     <section className="rounded-2xl border border-black/10 p-5 md:p-6">
       <h2 className="text-lg tracking-tight">{titulo}</h2>
       {descricao && (
-        <p className="mt-1 text-[12px] leading-relaxed text-black/60">
+        <p className="mt-1 text-[12px] leading-relaxed text-black/70">
           {descricao}
         </p>
       )}
@@ -99,7 +100,7 @@ function CampoPreco({
       />
       <span
         className={`min-h-[16px] text-[11px] ${
-          invalido ? "font-medium text-black" : "text-black/60"
+          invalido ? "font-medium text-black" : "text-black/70"
         }`}
         aria-live="polite"
       >
@@ -272,13 +273,13 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/admin"
-          className="inline-flex items-center gap-2 text-[13px] font-medium text-black/55 transition-colors hover:text-black"
+          className="inline-flex items-center gap-2 text-[13px] font-medium text-black/70 transition-colors hover:text-black"
         >
           <ArrowLeft size={15} aria-hidden="true" />
           Voltar ao painel
         </Link>
         {editando && property && (
-          <span className="rounded-pill bg-mist px-3 py-1 text-[11px] font-medium text-black/60">
+          <span className="rounded-pill bg-mist px-3 py-1 text-[11px] font-medium text-black/70">
             {property.codigo}
           </span>
         )}
@@ -367,8 +368,8 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             className={inputCls}
             placeholder="casa-terrea-3-quartos-jardim-europa"
           />
-          <span className="text-[11px] text-black/60">
-            buganza.com.br/imoveis/{slug || "…"}
+          <span className="text-[11px] text-black/70">
+            {dominioDoSite()}/imoveis/{slug || "…"}
           </span>
         </label>
       </Secao>
@@ -569,7 +570,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           />
           <span
             className={`text-[11px] ${
-              descricao.length >= 300 ? "text-black/60" : "text-black/60"
+              descricao.length >= 300 ? "text-black/70" : "text-black/70"
             }`}
           >
             {descricao.length} caracteres
@@ -640,13 +641,13 @@ export default function PropertyForm({ property }: PropertyFormProps) {
               : "Criar e adicionar fotos"}
         </button>
         {salvo && (
-          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-black/60">
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-black/70">
             <Check size={15} aria-hidden="true" />
             Alterações salvas
           </span>
         )}
         {!editando && (
-          <span className="text-[12px] text-black/60">
+          <span className="text-[12px] text-black/70">
             As fotos entram no próximo passo.
           </span>
         )}

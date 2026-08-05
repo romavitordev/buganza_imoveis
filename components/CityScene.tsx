@@ -42,7 +42,7 @@ function WindowGrid({ x, y, cols, rows, w, h, gx, gy, lit }: WindowGridProps) {
           y={y + r * (h + gy)}
           width={w}
           height={h}
-          fill={isLit ? "#ffffff" : "rgba(255,255,255,0.14)"}
+          fill={isLit ? "#E0C27E" : "rgba(255,255,255,0.13)"}
           className={isLit ? "bz-lit" : undefined}
           // Delay determinístico (evita mismatch de hidratação) mas
           // visualmente alternado, como o Math.random() da versão original
@@ -107,8 +107,8 @@ export default function CityScene() {
     >
       <defs>
         <linearGradient id="bzTower" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#0c0c0e" />
-          <stop offset="100%" stopColor="#1a1a1d" />
+          <stop offset="0%" stopColor="#14264A" />
+          <stop offset="100%" stopColor="#22406F" />
         </linearGradient>
       </defs>
 
@@ -118,18 +118,29 @@ export default function CityScene() {
       {/* Sol/disco discreto */}
       <g className="bz-layer-sun">
         <circle cx="920" cy="150" r="70" fill="#ffffff" opacity="0.9" />
-        <circle cx="920" cy="150" r="70" fill="none" stroke="rgba(0,0,0,0.06)" />
+        {/* Aro dourado: o sol era branco sobre um céu quase branco e
+            praticamente sumia. O aro dá a borda e leva a cor da marca
+            para o ponto mais alto da cena. */}
+        <circle
+          cx="920"
+          cy="150"
+          r="70"
+          fill="none"
+          stroke="#C6A052"
+          strokeWidth="1.5"
+          opacity="0.7"
+        />
       </g>
 
       {/* Silhuetas de fundo — somem descendo ao scrollar */}
       <g className="bz-layer-bg">
-        <g fill="#d8d8dc">
+        <g fill="#DCE0EA">
           <rect x="60" y="300" width="120" height="400" />
           <rect x="330" y="260" width="90" height="440" />
           <rect x="760" y="320" width="110" height="380" />
           <rect x="1050" y="280" width="100" height="420" />
         </g>
-        <g fill="#9a9aa0">
+        <g fill="#A6AFC4">
           <rect x="150" y="340" width="100" height="360" />
           <rect x="700" y="380" width="80" height="320" />
           <rect x="960" y="360" width="120" height="340" />
@@ -141,8 +152,8 @@ export default function CityScene() {
         {/* Torre principal — preta, centro-direita */}
         <g>
           <rect x="480" y="140" width="180" height="560" fill="url(#bzTower)" />
-          <rect x="480" y="128" width="180" height="12" fill="#000" />
-          <rect x="550" y="96" width="6" height="32" fill="#000" />
+          <rect x="480" y="128" width="180" height="12" fill="#0F1D3A" />
+          <rect x="550" y="96" width="6" height="32" fill="#0F1D3A" />
           <WindowGrid
             x={500}
             y={170}
@@ -158,8 +169,8 @@ export default function CityScene() {
 
         {/* Torre secundária — preta, esquerda */}
         <g>
-          <rect x="230" y="240" width="130" height="460" fill="#101013" />
-          <rect x="230" y="230" width="130" height="10" fill="#000" />
+          <rect x="230" y="240" width="130" height="460" fill="#182C55" />
+          <rect x="230" y="230" width="130" height="10" fill="#0F1D3A" />
           <WindowGrid
             x={246}
             y={264}
@@ -175,7 +186,7 @@ export default function CityScene() {
 
         {/* Torre baixa comercial — direita */}
         <g>
-          <rect x="820" y="440" width="220" height="260" fill="#131316" />
+          <rect x="820" y="440" width="220" height="260" fill="#1B3160" />
           <WindowGrid
             x={838}
             y={464}
@@ -191,7 +202,7 @@ export default function CityScene() {
       </g>
 
       {/* Linha do chão */}
-      <rect x="0" y="698" width="1200" height="2" fill="rgba(0,0,0,0.25)" />
+      <rect x="0" y="698" width="1200" height="2" fill="rgba(20,38,74,0.22)" />
     </svg>
   );
 }

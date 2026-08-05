@@ -1,10 +1,15 @@
 <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="14" fill="#ffffff"/>
-  <rect x="12" y="22" width="18" height="34" rx="2" fill="#000000"/>
-  <rect x="34" y="8" width="18" height="48" rx="2" fill="#000000"/>
-  <rect x="17.5" y="28" width="7" height="5" fill="#ffffff" opacity="0.85"/>
-  <rect x="17.5" y="39" width="7" height="5" fill="#ffffff" opacity="0.85"/>
-  <rect x="39.5" y="16" width="7" height="5" fill="#ffffff" opacity="0.85"/>
-  <rect x="39.5" y="27" width="7" height="5" fill="#ffffff" opacity="0.85"/>
-  <rect x="39.5" y="38" width="7" height="5" fill="#ffffff" opacity="0.85"/>
+  <!-- Favicon: o monograma sobre o marinho da marca. Fundo escuro
+       porque a aba do navegador costuma ser clara — assim o M recorta. -->
+  <rect width="64" height="64" rx="14" fill="#14264A"/>
+  <!-- prédios subindo no vão do M -->
+  <rect x="27.5" y="12" width="5.5" height="24" fill="#FFFFFF" opacity="0.92"/>
+  <rect x="34.2" y="17" width="4.6" height="19" fill="#C6A052"/>
+  <!-- o M: esquerda clara, direita dourada -->
+  <path d="M14 52 V26 L32 44" stroke="#FFFFFF" stroke-width="6.4" fill="none"
+        stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M32 44 L50 26 V52" stroke="#C6A052" stroke-width="6.4" fill="none"
+        stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- janelinha da casa, sob o vértice -->
+  <rect x="29" y="46.5" width="6" height="6" rx="0.8" fill="#FFFFFF"/>
 </svg>

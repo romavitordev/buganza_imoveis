@@ -1,5 +1,5 @@
 /**
- * Busca por conversa do "Buganza Suporte" — transforma frases como
+ * Busca por conversa do "Assistente Marcelo" — transforma frases como
  * "apartamento 3 quartos até 500 mil" em filtros do catálogo. Sem IA:
  * expressões regulares sobre o texto normalizado, previsível e grátis.
  *

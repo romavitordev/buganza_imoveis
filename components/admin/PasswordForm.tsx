@@ -117,7 +117,7 @@ export default function PasswordForm() {
           {enviando ? "Salvando…" : "Trocar senha"}
         </button>
         {ok && (
-          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-black/60">
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-black/70">
             <Check size={15} aria-hidden="true" />
             Senha alterada
           </span>

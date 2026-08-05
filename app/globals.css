@@ -3,8 +3,17 @@
 @tailwind utilities;
 
 /* ============================================
-   Buganza Imóveis
-   Paleta: preto (#000/#111) e branco (#fff)
+   Marcelo Imóveis
+   Paleta: marinho (#14264A) e branco (#fff), do logotipo.
+
+   DOURADO (#C6A052) — a regra: sobre branco ele da 2,4:1, entao nunca
+   vira letra ali; entra como MATERIA (filete, borda, marcador, area
+   pequena). Sobre o marinho da 5,5:1 e pode ser texto normalmente.
+
+   VERDE DO WHATSAPP (#25D366) — so dentro de botao de acao principal.
+   Solto, como icone colorido no claro, ele vira a cor mais forte da
+   tela e desmonta a leitura marinho + dourado.
+
    Fonte: Inter (300, 400, 500, 600)
    Easing: cubic-bezier(0.16, 1, 0.3, 1)
    ============================================ */
@@ -22,7 +31,7 @@
 body {
   font-family: "Inter", system-ui, sans-serif;
   background: #ffffff;
-  color: #000;
+  color: #14264A;
   /* A Inter foi desenhada para render antialiasado; sem isto o texto
      fica encorpado demais no macOS e perde a leveza do peso 300 */
   -webkit-font-smoothing: antialiased;
@@ -45,7 +54,7 @@ h3 {
 }
 
 *:focus-visible {
-  outline: 2px solid #000;
+  outline: 2px solid #14264A;
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -173,7 +182,7 @@ h3 {
    o logo e o CTA deixam de flutuar soltos sobre o conteúdo */
 .bz-nav-scrolled {
   background: rgba(255, 255, 255, 0.82);
-  border-bottom-color: rgba(0, 0, 0, 0.08);
+  border-bottom-color: rgba(20, 38, 74, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -192,16 +201,19 @@ h3 {
 .bz-contact-circle {
   width: 28px; height: 28px;
   border-radius: 50%;
-  background: #000;
+  background: #14264A;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #25D366; /* verde só no glifo do ícone */
+  /* Sem o verde do WhatsApp aqui: ele agora fica reservado para os
+     botões de ação principal. Num objeto de 28px no topo da tela, o
+     verde saturado era o elemento mais barulhento da página. */
+  color: #ffffff;
 }
 .bz-contact-label {
   display: none;
   font-size: 12px;
-  color: #000;
+  color: #14264A;
   font-weight: 500;
   padding-right: 12px;
 }
@@ -230,14 +242,25 @@ h3 {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(0,0,0,0.6);
+  color: rgba(20, 38, 74, 0.7);
   background: rgba(255,255,255,0.75);
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(20, 38, 74,0.12);
   border-radius: 999px;
   padding: 8px 14px;
   backdrop-filter: blur(4px);
 }
-.bz-dot { width: 8px; height: 8px; border-radius: 50%; background: #000; flex: none; }
+/* Marcador dourado dos selos de seção.
+   Era um ponto de 8×8. Virou filete porque é a forma que existe no
+   logotipo (a base curva, o traço sob o nome) — e porque uma linha
+   ocupa mais campo visual que um ponto sem pesar mais, que é o que
+   faltava para o dourado existir na interface. */
+.bz-dot {
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: #C6A052;
+  flex: none;
+}
 
 /* Heading do hero — maior, com contraste de peso entre as linhas
    e reveal por linha com máscara */
@@ -246,7 +269,7 @@ h3 {
   font-size: clamp(2rem, 9vw, 3.2rem);
   letter-spacing: -0.04em;
   line-height: 1.04;
-  color: #000;
+  color: #14264A;
 }
 .bz-heading .bz-line {
   display: block;
@@ -273,12 +296,14 @@ h3 {
   }
 }
 
-/* Linha do CRECI: era 11px em preto 45% (contraste 3,4:1 — abaixo do
-   mínimo AA de 4,5:1 e difícil de ler no claro). 12px em 58% dá 5,3:1
-   e continua discreta ao lado do heading. */
+/* Linha do CRECI: discreta ao lado do heading, mas legível.
+   ATENÇÃO à conta de opacidade: o marinho a 58% sobre branco dá 3,6:1
+   (reprova), enquanto o preto puro a 58% dava 4,6:1. Marinho é mais
+   claro que preto, então toda opacidade herdada do design antigo caiu
+   de contraste na troca de tinta. Daí o 70%. */
 .bz-trust {
   font-size: 12px;
-  color: rgba(0,0,0,0.58);
+  color: rgba(20, 38, 74, 0.7);
   letter-spacing: 0.01em;
 }
 
@@ -297,11 +322,15 @@ h3 {
   cursor: pointer;
   transition: transform 0.25s var(--bz-ease), background 0.25s ease, border-color 0.25s ease;
 }
-.bz-btn-primary { background: #000; color: #fff; border: 1px solid #000; }
-.bz-btn-primary:hover { transform: translateY(-2px); }
-.bz-btn-primary svg { color: #25D366; }
-.bz-btn-secondary { background: transparent; color: #000; border: 1px solid rgba(0,0,0,0.35); }
-.bz-btn-secondary:hover { border-color: #000; transform: translateY(-2px); }
+.bz-btn-primary { background: #14264A; color: #fff; border: 1px solid #14264A; }
+/* O hover clareia para o degrau interativo do marinho, em vez de só
+   levantar: o movimento sozinho não confirma nada em tela sem mouse. */
+.bz-btn-primary:hover { background: #1E3A6B; border-color: #1E3A6B; transform: translateY(-2px); }
+/* O glifo herda o branco do botão. O verde do WhatsApp saiu de toda a
+   interface: o ícone de balão já diz que a ação abre uma conversa, e a
+   cor extra só disputava atenção com o marinho e o dourado. */
+.bz-btn-secondary { background: transparent; color: #14264A; border: 1px solid rgba(20, 38, 74,0.35); }
+.bz-btn-secondary:hover { border-color: #14264A; transform: translateY(-2px); }
 
 /* ---------- desktop (768px+) ---------- */
 @media (min-width: 768px) {
@@ -336,14 +365,14 @@ h3 {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(20, 38, 74, 0.15);
   background: rgba(255, 255, 255, 0.8);
-  color: rgba(0, 0, 0, 0.55);
+  color: rgba(20, 38, 74, 0.55);
   backdrop-filter: blur(4px);
   transition: color 0.25s ease, border-color 0.25s ease;
   animation: bzHintBounce 2.2s ease-in-out infinite;
 }
-.bz-scroll-hint:hover { color: #000; border-color: #000; }
+.bz-scroll-hint:hover { color: #14264A; border-color: #14264A; }
 
 @media (min-width: 768px) {
   .bz-scroll-hint { display: flex; }
@@ -367,7 +396,7 @@ section[id] {
   bottom: 4px;
   left: 0;
   border-radius: 999px;
-  background: #000;
+  background: #14264A;
   transition:
     transform 0.45s var(--bz-ease),
     width 0.45s var(--bz-ease),
@@ -382,7 +411,7 @@ section[id] {
   height: 28px;
   width: 48px;
   border-radius: 999px;
-  background: #000;
+  background: #14264A;
   transition:
     transform 0.4s var(--bz-ease),
     opacity 0.3s ease;

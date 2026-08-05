@@ -63,7 +63,7 @@ export default function ConfirmDialog({
           {titulo}
         </h2>
         {descricao && (
-          <p className="mt-1.5 text-[13px] leading-relaxed text-black/55">
+          <p className="mt-1.5 text-[13px] leading-relaxed text-black/70">
             {descricao}
           </p>
         )}

@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
  * O chatbot usa esta lista para reconhecer lugares na conversa
  * ("apartamento no Campolim"). Sem ela, seria preciso chutar nomes de
  * bairro — aqui o vocabulário vem do próprio banco, então o bot só
- * reconhece o que a Buganza realmente anuncia.
+ * reconhece o que a imobiliária realmente anuncia.
  *
  * Só nomes (nenhum dado de imóvel), com cache de CDN: a lista muda
  * pouco e é consultada a cada abertura de chat.
