@@ -199,7 +199,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
             title={`${titulo} — vídeo do imóvel`}
             allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="absolute inset-0 h-full w-full bg-black"
+            className="absolute inset-0 h-full w-full bg-preto-puro"
           />
         ) : (
           // key força remontar (e parar/reiniciar o player) ao voltar ao vídeo
@@ -209,7 +209,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
             controls
             preload="metadata"
             playsInline
-            className="absolute inset-0 h-full w-full bg-black object-contain"
+            className="absolute inset-0 h-full w-full bg-preto-puro object-contain"
           />
         )}
 
@@ -231,7 +231,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
             >
               <ChevronRight size={18} aria-hidden="true" />
             </button>
-            <span className="pointer-events-none absolute bottom-3 right-3 rounded-pill bg-black/70 px-3 py-1 text-[11px] font-medium text-white backdrop-blur">
+            <span className="pointer-events-none absolute bottom-3 right-3 rounded-pill bg-preto-puro/70 px-3 py-1 text-[11px] font-medium text-branco-puro backdrop-blur">
               {indiceAtivo + 1} / {total}
             </span>
           </>
@@ -300,7 +300,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
       {montado && (
         <div
           ref={dialogRef}
-          className={`bz-lightbox fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 ${
+          className={`bz-lightbox fixed inset-0 z-[100] flex items-center justify-center bg-preto-puro/95 p-4 ${
             fechando ? "bz-closing" : ""
           }`}
           role="dialog"
@@ -313,7 +313,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
             type="button"
             onClick={fechar}
             aria-label="Fechar galeria"
-            className="bz-lightbox-controls absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95"
+            className="bz-lightbox-controls absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-branco-puro/10 text-branco-puro transition-transform duration-200 ease-premium hover:scale-110 hover:bg-branco-puro/25 active:scale-95"
           >
             <X size={20} aria-hidden="true" />
           </button>
@@ -327,7 +327,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
                   navegar(-1);
                 }}
                 aria-label="Mídia anterior"
-                className="bz-lightbox-controls absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95 md:left-6"
+                className="bz-lightbox-controls absolute left-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-branco-puro/10 text-branco-puro transition-transform duration-200 ease-premium hover:scale-110 hover:bg-branco-puro/25 active:scale-95 md:left-6"
               >
                 <ChevronLeft size={22} aria-hidden="true" />
               </button>
@@ -338,7 +338,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
                   navegar(1);
                 }}
                 aria-label="Próxima mídia"
-                className="bz-lightbox-controls absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-transform duration-200 ease-premium hover:scale-110 hover:bg-white/25 active:scale-95 md:right-6"
+                className="bz-lightbox-controls absolute right-2 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-branco-puro/10 text-branco-puro transition-transform duration-200 ease-premium hover:scale-110 hover:bg-branco-puro/25 active:scale-95 md:right-6"
               >
                 <ChevronRight size={22} aria-hidden="true" />
               </button>

@@ -23,7 +23,10 @@ export default function SiteFooter() {
           <div className="flex items-start gap-3">
             <BrandMark size={46} />
             <div>
-              <p className="text-[15px] font-semibold tracking-tight text-marinho">
+              {/* text-black (a tinta, que acompanha o tema) e não
+                  text-marinho fixo: no modo escuro o marinho ficava
+                  invisível sobre o rodapé — 1,1:1 na auditoria. */}
+              <p className="text-[15px] font-semibold tracking-tight text-black">
                 {MARCA.nome}
               </p>
               {/* Filete dourado do logotipo — decorativo, não é texto */}

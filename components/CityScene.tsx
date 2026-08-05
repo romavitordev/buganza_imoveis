@@ -42,7 +42,7 @@ function WindowGrid({ x, y, cols, rows, w, h, gx, gy, lit }: WindowGridProps) {
           y={y + r * (h + gy)}
           width={w}
           height={h}
-          fill={isLit ? "#E0C27E" : "rgba(255,255,255,0.13)"}
+          fill={isLit ? "#E0C27E" : "var(--janela-apagada)"}
           className={isLit ? "bz-lit" : undefined}
           // Delay determinístico (evita mismatch de hidratação) mas
           // visualmente alternado, como o Math.random() da versão original
@@ -107,40 +107,66 @@ export default function CityScene() {
     >
       <defs>
         <linearGradient id="bzTower" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#14264A" />
-          <stop offset="100%" stopColor="#22406F" />
+          <stop offset="0%" stopColor="var(--predio-a)" />
+          <stop offset="100%" stopColor="var(--predio-c)" />
         </linearGradient>
       </defs>
 
       {/* O céu é o degradê do wrapper (.bz-media-wrap) — o SVG fica
           transparente para não criar emenda em telas de qualquer proporção */}
 
-      {/* Sol/disco discreto */}
+      {/* Sol de dia, lua crescente de noite.
+          Os dois ficam no SVG e quem escolhe é o CSS (.bz-sol / .bz-lua,
+          em globals.css, sob [data-theme]). Assim não existe estado de
+          tema dentro do React e nada pisca entre o HTML do servidor e a
+          hidratação — o problema clássico de "ler o tema" no componente. */}
       <g className="bz-layer-sun">
-        <circle cx="920" cy="150" r="70" fill="#ffffff" opacity="0.9" />
-        {/* Aro dourado: o sol era branco sobre um céu quase branco e
-            praticamente sumia. O aro dá a borda e leva a cor da marca
-            para o ponto mais alto da cena. */}
-        <circle
-          cx="920"
-          cy="150"
-          r="70"
-          fill="none"
-          stroke="#C6A052"
-          strokeWidth="1.5"
-          opacity="0.7"
-        />
+        <g className="bz-sol">
+          <circle cx="920" cy="150" r="70" fill="#ffffff" opacity="0.9" />
+          {/* Aro dourado: o sol era branco sobre um céu quase branco e
+              praticamente sumia. O aro dá a borda e leva a cor da marca
+              para o ponto mais alto da cena. */}
+          <circle
+            cx="920"
+            cy="150"
+            r="70"
+            fill="none"
+            stroke="#C6A052"
+            strokeWidth="1.5"
+            opacity="0.7"
+          />
+        </g>
+
+        {/* A crescente é UM disco com outro recortado fora do centro
+            (máscara), e não duas luas sobrepostas: assim a borda interna
+            fica limpa sobre qualquer céu, sem emenda visível. */}
+        <g className="bz-lua">
+          <mask id="bzLua">
+            <rect x="790" y="20" width="260" height="260" fill="black" />
+            <circle cx="920" cy="150" r="70" fill="white" />
+            <circle cx="884" cy="126" r="62" fill="black" />
+          </mask>
+          <circle cx="920" cy="150" r="70" fill="#E0C27E" mask="url(#bzLua)" />
+          {/* estrelas discretas — só o bastante para virar noite */}
+          <g fill="#E0C27E" opacity="0.5">
+            <circle cx="1060" cy="86" r="3" />
+            <circle cx="1112" cy="188" r="2.2" />
+            <circle cx="806" cy="70" r="2.4" />
+            <circle cx="752" cy="186" r="2" />
+            <circle cx="1016" cy="252" r="2.6" />
+          </g>
+        </g>
       </g>
 
       {/* Silhuetas de fundo — somem descendo ao scrollar */}
       <g className="bz-layer-bg">
-        <g fill="#DCE0EA">
+        <g fill="var(--predio-longe-a)">
           <rect x="60" y="300" width="120" height="400" />
           <rect x="330" y="260" width="90" height="440" />
           <rect x="760" y="320" width="110" height="380" />
           <rect x="1050" y="280" width="100" height="420" />
         </g>
-        <g fill="#A6AFC4">
+        <g fill="var(--predio-longe-b)">
           <rect x="150" y="340" width="100" height="360" />
           <rect x="700" y="380" width="80" height="320" />
           <rect x="960" y="360" width="120" height="340" />
@@ -152,8 +178,8 @@ export default function CityScene() {
         {/* Torre principal — preta, centro-direita */}
         <g>
           <rect x="480" y="140" width="180" height="560" fill="url(#bzTower)" />
-          <rect x="480" y="128" width="180" height="12" fill="#0F1D3A" />
-          <rect x="550" y="96" width="6" height="32" fill="#0F1D3A" />
+          <rect x="480" y="128" width="180" height="12" fill="var(--predio-topo)" />
+          <rect x="550" y="96" width="6" height="32" fill="var(--predio-topo)" />
           <WindowGrid
             x={500}
             y={170}
@@ -169,8 +195,8 @@ export default function CityScene() {
 
         {/* Torre secundária — preta, esquerda */}
         <g>
-          <rect x="230" y="240" width="130" height="460" fill="#182C55" />
-          <rect x="230" y="230" width="130" height="10" fill="#0F1D3A" />
+          <rect x="230" y="240" width="130" height="460" fill="var(--predio-b)" />
+          <rect x="230" y="230" width="130" height="10" fill="var(--predio-topo)" />
           <WindowGrid
             x={246}
             y={264}
@@ -186,7 +212,7 @@ export default function CityScene() {
 
         {/* Torre baixa comercial — direita */}
         <g>
-          <rect x="820" y="440" width="220" height="260" fill="#1B3160" />
+          <rect x="820" y="440" width="220" height="260" fill="var(--predio-c)" />
           <WindowGrid
             x={838}
             y={464}
@@ -202,7 +228,7 @@ export default function CityScene() {
       </g>
 
       {/* Linha do chão */}
-      <rect x="0" y="698" width="1200" height="2" fill="rgba(20,38,74,0.22)" />
+      <rect x="0" y="698" width="1200" height="2" fill="rgb(var(--ink) / 0.22)" />
     </svg>
   );
 }

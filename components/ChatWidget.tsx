@@ -9,7 +9,15 @@ import {
 } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Check, Loader2, MessageCircle, Search, Send, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Loader2,
+  MessageCircle,
+  Search,
+  Send,
+  X,
+} from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 import { EVENTO_ABRIR_SUPORTE } from "@/lib/suporte";
 import {
@@ -100,6 +108,21 @@ export default function ChatWidget() {
     window.addEventListener(EVENTO_ABRIR_SUPORTE, abrir);
     return () => window.removeEventListener(EVENTO_ABRIR_SUPORTE, abrir);
   }, []);
+
+  // Trava a rolagem do site enquanto o chat está aberto em tela cheia.
+  // Sem isto, arrastar dentro da conversa e chegar ao fim faz a PÁGINA
+  // atrás rolar junto — o efeito de "elástico" que denuncia que aquilo
+  // não é uma tela de verdade.
+  useEffect(() => {
+    if (!aberto) return;
+    const telaCheia = window.matchMedia("(max-width: 767px)").matches;
+    if (!telaCheia) return;
+    const anterior = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = anterior;
+    };
+  }, [aberto]);
 
   // Dados reais do imóvel em tela (modo "ciente do imóvel"). Carregado
   // na primeira abertura do chat; falha silenciosa = segue o modo geral.
@@ -630,11 +653,28 @@ export default function ChatWidget() {
           ref={painelRef}
           role="dialog"
           aria-label={MARCA.assistente}
-          className="fixed inset-x-4 bottom-4 z-[70] flex max-h-[80vh] flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_16px_56px_rgba(0,0,0,0.24)] md:inset-x-auto md:right-6 md:bottom-6 md:h-[560px] md:max-h-[80vh] md:w-[380px]"
+          /* No mobile ocupa a tela inteira, como um app de conversa: o
+             cartão flutuante deixava a bottom nav aparecendo por baixo e
+             o teclado do celular espremia a conversa em poucas linhas.
+             100dvh (e não 100vh) porque no iOS a barra do navegador
+             entra na conta do vh e cortava o campo de digitação.
+             No desktop segue como painel flutuante. */
+          className="fixed inset-0 z-[70] flex h-[100dvh] w-full flex-col overflow-hidden border-black/10 bg-white md:inset-auto md:right-6 md:bottom-6 md:h-[560px] md:max-h-[80vh] md:w-[380px] md:rounded-2xl md:border md:shadow-[0_16px_56px_rgba(0,0,0,0.24)]"
         >
           {/* Cabeçalho */}
-          <header className="flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3">
+          <header className="flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3">
             <div className="flex items-center gap-2.5">
+              {/* Seta de voltar — só no mobile, onde o chat é a tela
+                  inteira e é ela que devolve o visitante ao site. No
+                  desktop o fechar fica à direita, como em todo painel. */}
+              <button
+                type="button"
+                onClick={() => setAberto(false)}
+                aria-label="Voltar ao site"
+                className="-ml-1.5 rounded-full p-1.5 text-black/70 transition-colors hover:bg-mist hover:text-black md:hidden"
+              >
+                <ArrowLeft size={20} aria-hidden="true" />
+              </button>
               {/* 24px dentro do círculo de 36: com o logotipo real, o
                   tamanho padrão (30) encostava na borda e o desenho
                   ficava sem ar em volta. */}
@@ -655,7 +695,7 @@ export default function ChatWidget() {
               type="button"
               onClick={() => setAberto(false)}
               aria-label="Fechar atendimento"
-              className="rounded-full p-1.5 text-black/70 transition-colors hover:bg-mist hover:text-black"
+              className="hidden rounded-full p-1.5 text-black/70 transition-colors hover:bg-mist hover:text-black md:block"
             >
               <X size={18} aria-hidden="true" />
             </button>
@@ -741,7 +781,9 @@ export default function ChatWidget() {
           {!modoContato && (
             <form
               onSubmit={onEnviarTexto}
-              className="flex items-center gap-2 border-t border-black/10 p-3"
+              // pb com safe-area: em tela cheia o campo encosta na barra
+              // de gestos do celular sem essa folga.
+              className="flex items-center gap-2 border-t border-black/10 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:pb-3"
             >
               <input
                 value={entrada}

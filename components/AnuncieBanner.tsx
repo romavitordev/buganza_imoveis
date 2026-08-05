@@ -1,7 +1,15 @@
 import { MessageCircle } from "lucide-react";
 import { linkWhatsAppAnunciar } from "@/lib/whatsapp";
 
-/** Captação de imóveis — CTA para proprietários que querem vender/alugar. */
+/**
+ * Captação de imóveis — CTA para proprietários que querem vender/alugar.
+ *
+ * ATENÇÃO AO MODO ESCURO: esta faixa é escura NOS DOIS TEMAS. Por isso
+ * o texto dela usa `branco-puro` e `preto-puro` — as cores literais — e
+ * não `white`/`black`, que são os tokens que viram com o tema. Com os
+ * tokens, o "branco" virava quase-preto no modo escuro e o título
+ * sumia dentro da faixa (1,14:1 na auditoria).
+ */
 export default function AnuncieBanner() {
   return (
     // marinho-fundo (o degrau mais escuro) em vez da tinta: a faixa é uma
@@ -16,13 +24,13 @@ export default function AnuncieBanner() {
           </p>
           <h2
             id="anuncie-titulo"
-            className="text-3xl leading-tight tracking-tight text-white md:text-4xl"
+            className="text-3xl leading-tight tracking-tight text-branco-puro md:text-4xl"
           >
             Quer vender ou alugar
             <br />
             <span className="font-medium">o seu imóvel?</span>
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-white/65">
+          <p className="mt-4 text-[15px] leading-relaxed text-branco-puro/75">
             Avaliação honesta, fotos caprichadas e divulgação para quem
             realmente procura. Você não paga nada para anunciar — só na
             conclusão do negócio.
@@ -33,16 +41,12 @@ export default function AnuncieBanner() {
           href={linkWhatsAppAnunciar()}
           target="_blank"
           rel="noopener noreferrer"
-          className="bz-fade-up inline-flex flex-none items-center gap-2.5 rounded-pill bg-white px-8 py-4 text-sm font-medium text-black transition-transform duration-200 ease-premium hover:-translate-y-0.5"
+          className="bz-fade-up inline-flex flex-none items-center gap-2.5 rounded-pill bg-branco-puro px-8 py-4 text-sm font-medium text-marinho transition-transform duration-200 ease-premium hover:-translate-y-0.5"
         >
-          {/* text-white explícito: o botão é branco com texto marinho, então
-              sem isto o glifo herdaria marinho e sumiria no círculo. */}
-          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-black text-white">
-            <MessageCircle
-              size={13}
-              strokeWidth={2.5}
-              aria-hidden="true"
-            />
+          {/* Cores literais também aqui: o botão é branco em qualquer
+              tema, então o círculo é marinho e o glifo, branco. */}
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-marinho text-branco-puro">
+            <MessageCircle size={13} strokeWidth={2.5} aria-hidden="true" />
           </span>
           Anunciar meu imóvel
         </a>

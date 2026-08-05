@@ -20,6 +20,66 @@
 
 :root {
   --bz-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---- tokens que viram no modo escuro (canais R G B, ver
+     tailwind.config.ts) ---- */
+  --ink: 20 38 74; /* tinta: o marinho do logotipo */
+  --paper: 255 255 255; /* superfície dos cards */
+  --fundo: 245 247 250; /* superfície da página */
+  --mist: 243 244 247; /* preenchimento sutil */
+  --banda: 13 27 54; /* faixa escura de destaque */
+
+  /* céu do hero e prédios da cena */
+  --ceu-topo: #ffffff;
+  --ceu-meio: #f2f2f4;
+  --ceu-base: #ececee;
+  --predio-longe-a: #dce0ea;
+  --predio-longe-b: #a6afc4;
+  --predio-a: #14264a;
+  --predio-b: #182c55;
+  --predio-c: #1b3160;
+  --predio-topo: #0f1d3a;
+  --janela-apagada: rgba(255, 255, 255, 0.13);
+}
+
+/**
+ * MODO ESCURO.
+ *
+ * Só os cinco tokens mudam — o resto do site acompanha porque as
+ * classes do Tailwind apontam para eles. O azul não some: o escuro é
+ * um marinho bem fundo, não cinza neutro, senão a marca se perde.
+ *
+ * `data-theme` fica no <html> e é gravado antes da primeira pintura
+ * (script no app/layout.tsx), para a página não piscar branca.
+ */
+[data-theme="dark"] {
+  --ink: 226 232 243; /* 14,7:1 sobre o fundo */
+  --paper: 22 32 47;
+  --fundo: 14 22 33;
+  --mist: 29 40 57;
+  --banda: 27 42 68; /* mais claro que o fundo, senão a faixa some */
+
+  /* céu noturno + prédios como silhueta iluminada */
+  --ceu-topo: #0b1220;
+  --ceu-meio: #0e1826;
+  --ceu-base: #121e30;
+  --predio-longe-a: #1a2436;
+  --predio-longe-b: #24314a;
+  --predio-a: #0a1220;
+  --predio-b: #0d1728;
+  --predio-c: #101d33;
+  --predio-topo: #060c16;
+  --janela-apagada: rgba(255, 255, 255, 0.07);
+}
+
+/* A troca de tema não deve parecer um flash: as superfícies fazem uma
+   transição curta. Só cor — nada de transicionar layout. */
+body,
+.bz-nav,
+.bz-contact-pill,
+.bz-media-wrap {
+  transition: background-color 0.35s ease, color 0.35s ease,
+    border-color 0.35s ease;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -30,8 +90,8 @@
 
 body {
   font-family: "Inter", system-ui, sans-serif;
-  background: #ffffff;
-  color: #14264A;
+  background: rgb(var(--paper));
+  color: rgb(var(--ink));
   /* A Inter foi desenhada para render antialiasado; sem isto o texto
      fica encorpado demais no macOS e perde a leveza do peso 300 */
   -webkit-font-smoothing: antialiased;
@@ -54,7 +114,7 @@ h3 {
 }
 
 *:focus-visible {
-  outline: 2px solid #14264A;
+  outline: 2px solid rgb(var(--ink));
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -126,7 +186,7 @@ h3 {
      para que prédios e sol fiquem 100% visíveis sem disputar com o texto */
   padding: 72px 12px min(300px, 40svh);
   /* Mesmo degradê do céu do SVG — sem faixas quando a cena é "meet" */
-  background: linear-gradient(to bottom, #ffffff 0%, #f2f2f4 70%, #ececee 100%);
+  background: linear-gradient(to bottom, var(--ceu-topo) 0%, var(--ceu-meio) 70%, var(--ceu-base) 100%);
 }
 .bz-scene {
   /* Cena inteira (prédios + sol) sempre visível em qualquer tela */
@@ -150,6 +210,24 @@ h3 {
 .bz-layer-sun {
   opacity: calc(1 - var(--bz-p, 0) * 0.85);
 }
+
+/* Sol no claro, lua crescente no escuro. Os dois existem no SVG; aqui
+   só se escolhe qual aparece (ver CityScene.tsx). */
+.bz-lua { display: none; }
+[data-theme="dark"] .bz-sol { display: none; }
+[data-theme="dark"] .bz-lua { display: block; }
+
+/* Mesma ideia no botão de tema: os dois ícones existem, o CSS escolhe.
+   Aparece o ícone do modo PARA ONDE se vai. */
+.bz-icone-sol { display: none; }
+[data-theme="dark"] .bz-icone-lua { display: none; }
+[data-theme="dark"] .bz-icone-sol { display: block; }
+
+/* E no logotipo: a versão de fundo escuro tem o marinho trocado por
+   tinta clara, senão metade do desenho sumiria contra o céu noturno. */
+.bz-logo-escuro { display: none; }
+[data-theme="dark"] .bz-logo-claro { display: none; }
+[data-theme="dark"] .bz-logo-escuro { display: block; }
 
 @media (prefers-reduced-motion: reduce) {
   .bz-layer-bg,
@@ -181,8 +259,8 @@ h3 {
 /* Ao rolar, a barra ganha fundo translúcido com blur e borda sutil —
    o logo e o CTA deixam de flutuar soltos sobre o conteúdo */
 .bz-nav-scrolled {
-  background: rgba(255, 255, 255, 0.82);
-  border-bottom-color: rgba(20, 38, 74, 0.08);
+  background: rgb(var(--paper) / 0.82);
+  border-bottom-color: rgb(var(--ink) / 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -194,7 +272,7 @@ h3 {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #F4F4F6;
+  background: rgb(var(--mist));
   border: 0;
   border-radius: 999px;
   padding: 4px;
@@ -204,23 +282,23 @@ h3 {
   text-decoration: none;
   transition: background 0.25s ease;
 }
-.bz-contact-pill:hover { background: #e9e9ec; }
+.bz-contact-pill:hover { background: rgb(var(--ink) / 0.12); }
 .bz-contact-circle {
   width: 28px; height: 28px;
   border-radius: 50%;
-  background: #14264A;
+  background: rgb(var(--ink));
   display: flex;
   align-items: center;
   justify-content: center;
   /* Sem o verde do WhatsApp aqui: ele agora fica reservado para os
      botões de ação principal. Num objeto de 28px no topo da tela, o
      verde saturado era o elemento mais barulhento da página. */
-  color: #ffffff;
+  color: rgb(var(--paper));
 }
 .bz-contact-label {
   display: none;
   font-size: 12px;
-  color: #14264A;
+  color: rgb(var(--ink));
   font-weight: 500;
   padding-right: 12px;
 }
@@ -234,7 +312,7 @@ h3 {
      "Suporte" também flutuava aqui; ele virou ícone da navbar e a
      sobra devolvida some do caminho do CTA "Ver Imóveis". */
   padding: 24px 16px 104px;
-  background: linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.8) 50%, transparent 100%);
+  background: linear-gradient(to top, rgb(var(--paper)) 0%, rgb(var(--paper) / 0.8) 50%, transparent 100%);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -250,9 +328,9 @@ h3 {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(20, 38, 74, 0.7);
-  background: rgba(255,255,255,0.75);
-  border: 1px solid rgba(20, 38, 74,0.12);
+  color: rgb(var(--ink) / 0.7);
+  background: rgb(var(--paper) / 0.75);
+  border: 1px solid rgb(var(--ink) / 0.12);
   border-radius: 999px;
   padding: 8px 14px;
   backdrop-filter: blur(4px);
@@ -277,7 +355,7 @@ h3 {
   font-size: clamp(2rem, 9vw, 3.2rem);
   letter-spacing: -0.04em;
   line-height: 1.04;
-  color: #14264A;
+  color: rgb(var(--ink));
 }
 .bz-heading .bz-line {
   display: block;
@@ -311,7 +389,7 @@ h3 {
    de contraste na troca de tinta. Daí o 70%. */
 .bz-trust {
   font-size: 12px;
-  color: rgba(20, 38, 74, 0.7);
+  color: rgb(var(--ink) / 0.7);
   letter-spacing: 0.01em;
 }
 
@@ -330,15 +408,15 @@ h3 {
   cursor: pointer;
   transition: transform 0.25s var(--bz-ease), background 0.25s ease, border-color 0.25s ease;
 }
-.bz-btn-primary { background: #14264A; color: #fff; border: 1px solid #14264A; }
+.bz-btn-primary { background: rgb(var(--ink)); color: rgb(var(--paper)); border: 1px solid rgb(var(--ink)); }
 /* O hover clareia para o degrau interativo do marinho, em vez de só
    levantar: o movimento sozinho não confirma nada em tela sem mouse. */
 .bz-btn-primary:hover { background: #1E3A6B; border-color: #1E3A6B; transform: translateY(-2px); }
 /* O glifo herda o branco do botão. O verde do WhatsApp saiu de toda a
    interface: o ícone de balão já diz que a ação abre uma conversa, e a
    cor extra só disputava atenção com o marinho e o dourado. */
-.bz-btn-secondary { background: transparent; color: #14264A; border: 1px solid rgba(20, 38, 74,0.35); }
-.bz-btn-secondary:hover { border-color: #14264A; transform: translateY(-2px); }
+.bz-btn-secondary { background: transparent; color: rgb(var(--ink)); border: 1px solid rgb(var(--ink) / 0.35); }
+.bz-btn-secondary:hover { border-color: rgb(var(--ink)); transform: translateY(-2px); }
 
 /* ---------- desktop (768px+) ---------- */
 @media (min-width: 768px) {
@@ -373,14 +451,14 @@ h3 {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1px solid rgba(20, 38, 74, 0.15);
-  background: rgba(255, 255, 255, 0.8);
-  color: rgba(20, 38, 74, 0.55);
+  border: 1px solid rgb(var(--ink) / 0.15);
+  background: rgb(var(--paper) / 0.8);
+  color: rgb(var(--ink) / 0.55);
   backdrop-filter: blur(4px);
   transition: color 0.25s ease, border-color 0.25s ease;
   animation: bzHintBounce 2.2s ease-in-out infinite;
 }
-.bz-scroll-hint:hover { color: #14264A; border-color: #14264A; }
+.bz-scroll-hint:hover { color: rgb(var(--ink)); border-color: rgb(var(--ink)); }
 
 @media (min-width: 768px) {
   .bz-scroll-hint { display: flex; }
@@ -404,7 +482,7 @@ section[id] {
   bottom: 4px;
   left: 0;
   border-radius: 999px;
-  background: #14264A;
+  background: rgb(var(--ink));
   transition:
     transform 0.45s var(--bz-ease),
     width 0.45s var(--bz-ease),
@@ -419,7 +497,7 @@ section[id] {
   height: 28px;
   width: 48px;
   border-radius: 999px;
-  background: #14264A;
+  background: rgb(var(--ink));
   transition:
     transform 0.4s var(--bz-ease),
     opacity 0.3s ease;

@@ -13,6 +13,7 @@ import {
 import { Building2, Headset, Heart, Home, MessageCircle, Users } from "lucide-react";
 import { CORES, MARCA } from "@/lib/marca";
 import { abrirSuporte } from "@/lib/suporte";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface SiteNavProps {
   whatsappHref: string;
@@ -32,19 +33,29 @@ interface SiteNavProps {
  * next/image recebe), e trocar por next/image exigiria fixar a proporção
  * do arquivo no código. Aqui a variável fica vazia e nada muda.
  */
-const ARQUIVO_LOGO = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo.png`;
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const ARQUIVO_LOGO = `${BASE}/logo.png`;
+/**
+ * Variante para fundo escuro: mesmo desenho, com o marinho trocado pelo
+ * tom de tinta do modo escuro. Sem ela, metade do logotipo (justamente
+ * a metade marinho) desapareceria contra o fundo noturno — só o dourado
+ * sobreviveria e a marca ficaria irreconhecível.
+ */
+const ARQUIVO_LOGO_ESCURO = `${BASE}/logo-escuro.png`;
 
 /**
  * Logotipo da marca.
  *
- * Usa o arquivo oficial em `public/logo.svg` — é ELE que manda. O
- * desenho abaixo (MonogramaFallback) só aparece se o arquivo faltar,
- * para a navbar nunca mostrar ícone quebrado; ele é uma aproximação,
- * não a marca. Trocar o logotipo = substituir o arquivo, sem tocar em
- * código.
+ * Usa os arquivos oficiais em `public/` — são ELES que mandam. O desenho
+ * abaixo (MonogramaFallback) só aparece se o arquivo faltar, para a
+ * navbar nunca mostrar ícone quebrado; ele é uma aproximação, não a
+ * marca. Trocar o logotipo = substituir o arquivo, sem tocar em código.
  *
- * Aceita .svg; para PNG, mude ARQUIVO_LOGO. A altura é que manda — a
- * largura acompanha a proporção do arquivo.
+ * As duas versões (clara e escura) são renderizadas sempre e quem
+ * escolhe é o CSS, como no sol/lua da cena: assim o tema não vira estado
+ * do React e não há divergência entre servidor e hidratação.
+ *
+ * A altura é que manda — a largura acompanha a proporção do arquivo.
  */
 export function BrandMark({ size = 30 }: { size?: number }) {
   const [semArquivo, setSemArquivo] = useState(false);
@@ -60,17 +71,28 @@ export function BrandMark({ size = 30 }: { size?: number }) {
   }, []);
 
   if (!semArquivo) {
+    const estilo = { height: size, width: "auto" } as const;
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        ref={imgRef}
-        src={ARQUIVO_LOGO}
-        alt=""
-        aria-hidden="true"
-        style={{ height: size, width: "auto" }}
-        className="flex-none"
-        onError={() => setSemArquivo(true)}
-      />
+      <>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          ref={imgRef}
+          src={ARQUIVO_LOGO}
+          alt=""
+          aria-hidden="true"
+          style={estilo}
+          className="bz-logo-claro flex-none"
+          onError={() => setSemArquivo(true)}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={ARQUIVO_LOGO_ESCURO}
+          alt=""
+          aria-hidden="true"
+          style={estilo}
+          className="bz-logo-escuro flex-none"
+        />
+      </>
     );
   }
   return <MonogramaFallback size={size} />;
@@ -339,6 +361,8 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
+
           {/* Atendimento — só no mobile. No desktop quem abre o chat é o
               botão flutuante do ChatWidget; aqui ele evita empilhar mais
               um elemento fixo na base da tela, que já tem a bottom nav.
