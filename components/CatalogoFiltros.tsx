@@ -54,7 +54,7 @@ const selectCls =
   "w-full rounded-xl border border-black/15 bg-white px-3 py-2.5 text-[13px] outline-none transition-colors focus:border-black md:w-auto";
 const campoCls = "flex flex-col gap-1";
 const rotuloCls =
-  "text-[11px] font-medium uppercase tracking-wide text-black/70";
+  "text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70";
 
 /**
  * Barra de filtros do catálogo — tudo via URL (filtros compartilháveis).

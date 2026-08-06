@@ -231,7 +231,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
             >
               <ChevronRight size={18} aria-hidden="true" />
             </button>
-            <span className="pointer-events-none absolute bottom-3 right-3 rounded-pill bg-preto-puro/70 px-3 py-1 text-[11px] font-medium text-branco-puro backdrop-blur">
+            <span className="pointer-events-none absolute bottom-3 right-3 rounded-pill bg-preto-puro/70 px-3 py-1 text-[12px] md:text-[11px] font-medium text-branco-puro backdrop-blur">
               {indiceAtivo + 1} / {total}
             </span>
           </>

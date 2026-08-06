@@ -212,7 +212,7 @@ export default function LeadsList({
                         mudarStatus(lead, e.target.value as StatusLead)
                       }
                       aria-label={`Status do lead de ${lead.nome}`}
-                      className={`cursor-pointer appearance-none rounded-pill px-3 py-1.5 text-[11px] font-medium outline-none ${STATUS_LEAD_ESTILO[lead.status]}`}
+                      className={`cursor-pointer appearance-none rounded-pill px-3 py-1.5 text-[12px] md:text-[11px] font-medium outline-none ${STATUS_LEAD_ESTILO[lead.status]}`}
                     >
                       {Object.entries(STATUS_LEAD_LABEL).map(
                         ([valor, rotulo]) => (

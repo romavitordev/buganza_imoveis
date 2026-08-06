@@ -99,7 +99,7 @@ function CampoPreco({
         placeholder={placeholder ?? "Ex.: 450.000 (vazio = Sob consulta)"}
       />
       <span
-        className={`min-h-[16px] text-[11px] ${
+        className={`min-h-[16px] text-[12px] md:text-[11px] ${
           invalido ? "font-medium text-black" : "text-black/70"
         }`}
         aria-live="polite"
@@ -279,7 +279,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           Voltar ao painel
         </Link>
         {editando && property && (
-          <span className="rounded-pill bg-mist px-3 py-1 text-[11px] font-medium text-black/70">
+          <span className="rounded-pill bg-mist px-3 py-1 text-[12px] md:text-[11px] font-medium text-black/70">
             {property.codigo}
           </span>
         )}
@@ -368,7 +368,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             className={inputCls}
             placeholder="casa-terrea-3-quartos-jardim-europa"
           />
-          <span className="text-[11px] text-black/70">
+          <span className="text-[12px] md:text-[11px] text-black/70">
             {dominioDoSite()}/imoveis/{slug || "…"}
           </span>
         </label>
@@ -569,7 +569,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             placeholder="Descreva o imóvel com detalhes: cômodos, acabamentos, localização, diferenciais…"
           />
           <span
-            className={`text-[11px] ${
+            className={`text-[12px] md:text-[11px] ${
               descricao.length >= 300 ? "text-black/70" : "text-black/70"
             }`}
           >

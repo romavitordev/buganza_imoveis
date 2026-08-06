@@ -124,7 +124,7 @@ function LoginForm() {
                 className="rounded-xl border border-black/15 px-4 py-3 text-center text-sm tracking-[0.3em] outline-none transition-colors focus:border-black"
                 placeholder="000000"
               />
-              <span className="text-[11px] text-black/70">
+              <span className="text-[12px] md:text-[11px] text-black/70">
                 Sua conta tem verificação em duas etapas — abra o app e
                 digite o código de 6 dígitos.
               </span>

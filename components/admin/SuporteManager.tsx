@@ -241,7 +241,7 @@ export default function SuporteManager({
           placeholder="condominio, administracao, sindico"
           className="rounded-xl border border-black/15 px-3.5 py-2.5 text-sm outline-none focus:border-black"
         />
-        <span className="text-[11px] text-black/70">
+        <span className="text-[12px] md:text-[11px] text-black/70">
           {chavesPrevia.length > 0 ? (
             <>
               O bot vai responder quando a mensagem tiver:{" "}
@@ -316,7 +316,7 @@ export default function SuporteManager({
                       />
                       <span>“{p.texto}”</span>
                     </p>
-                    <p className="mt-1 pl-[23px] text-[11px] text-black/70">
+                    <p className="mt-1 pl-[23px] text-[12px] md:text-[11px] text-black/70">
                       {new Date(p.criadoEm).toLocaleDateString("pt-BR", {
                         day: "2-digit",
                         month: "2-digit",
@@ -384,7 +384,7 @@ export default function SuporteManager({
                     <p className="flex items-center gap-2 text-sm font-medium">
                       {item.titulo}
                       {!item.ativo && (
-                        <span className="rounded-pill bg-mist px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-black/70">
+                        <span className="rounded-pill bg-mist px-2 py-0.5 text-[12px] md:text-[10px] font-medium uppercase tracking-wide text-black/70">
                           Desativada
                         </span>
                       )}
@@ -392,7 +392,7 @@ export default function SuporteManager({
                     <p className="mt-1 line-clamp-2 text-[13px] text-black/70">
                       {item.resposta}
                     </p>
-                    <p className="mt-1.5 text-[11px] text-black/70">
+                    <p className="mt-1.5 text-[12px] md:text-[11px] text-black/70">
                       Ativa com: {item.palavras.join(" · ")}
                     </p>
                   </div>

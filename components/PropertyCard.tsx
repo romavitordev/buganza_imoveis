@@ -82,7 +82,7 @@ export default function PropertyCard({
             <ImageOff size={32} strokeWidth={1.5} aria-hidden="true" />
           </span>
         )}
-        <span className="absolute left-3 top-3 rounded-pill bg-white/90 px-3 py-1.5 text-[11px] font-medium text-black backdrop-blur">
+        <span className="absolute left-3 top-3 rounded-pill bg-white/90 px-3 py-1.5 text-[12px] md:text-[11px] font-medium text-black backdrop-blur">
           {imovel.subtipo ? SUBTIPO_LABEL[imovel.subtipo] : TIPO_LABEL[imovel.tipo]}
           {" · "}
           {TRANSACAO_LABEL[imovel.transacao]}
@@ -121,13 +121,14 @@ export default function PropertyCard({
           {imovel.bairro} · {imovel.cidade}
         </p>
 
+        {/* No MOBILE isto é uma linha de texto com separadores; no
+            desktop, as pílulas de sempre (ver .bz-ficha em globals.css).
+            Quatro pílulas em 375px quebravam em duas linhas, e pílula é
+            peso visual caro demais para dado secundário. */}
         {caracteristicas.length > 0 && (
-          <ul className="mt-1 flex flex-wrap gap-2">
+          <ul className="bz-ficha">
             {caracteristicas.map(({ icone: Icone, texto }) => (
-              <li
-                key={texto}
-                className="flex items-center gap-1.5 rounded-pill border border-black/10 px-3 py-1 text-[11px] font-medium text-black/70 transition-colors group-hover:border-black/25"
-              >
+              <li key={texto}>
                 <Icone size={12} strokeWidth={2} aria-hidden="true" />
                 {texto}
               </li>

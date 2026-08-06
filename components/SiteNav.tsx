@@ -305,6 +305,17 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
   const bottomLeft =
     indiceAtivo >= 0 ? (indiceAtivo + 0.5) * colunaMobile - 24 : 0;
 
+  /**
+   * Na página de um imóvel a bottom nav não aparece no mobile.
+   *
+   * Lá já existe o CTA fixo "Tenho interesse — chamar no WhatsApp", e as
+   * duas barras somadas à navbar comiam 207px de 812 (25% da tela) —
+   * com redundância, porque a bottom nav também tem um item WhatsApp
+   * colado embaixo do CTA. O CTA passa a SER a barra inferior; para
+   * navegar há o "Voltar para o catálogo" no topo e o logotipo.
+   */
+  const naPaginaDeImovel = /^\/imoveis\/[^/]+/.test(pathname ?? "");
+
   return (
     <>
       {/* ---------- barra superior ---------- */}
@@ -360,27 +371,30 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
           })}
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* HIERARQUIA DOS TRÊS BOTÕES.
+            Eram três círculos idênticos de 36px, colados: nada dizia
+            qual era o principal. Agora só o WhatsApp — que é a conversão
+            — mantém o disco marinho preenchido. Tema e atendimento viram
+            ícones "fantasma", sem disco, com a mesma área de toque
+            (44px) garantida por padding, e não por tamanho aparente. */}
+        <div className="flex items-center gap-0.5 md:gap-1.5">
           <ThemeToggle />
 
           {/* Atendimento — só no mobile. No desktop quem abre o chat é o
-              botão flutuante do ChatWidget; aqui ele evita empilhar mais
-              um elemento fixo na base da tela, que já tem a bottom nav.
-              Ícone de headset, e não de balão, para não virar um segundo
-              botão igual ao do WhatsApp ao lado. */}
+              botão flutuante do ChatWidget. Ícone de headset, e não de
+              balão, para não virar um segundo botão igual ao do
+              WhatsApp ao lado. */}
           <button
             type="button"
             onClick={abrirSuporte}
             aria-label={`Abrir atendimento ${MARCA.assistente}`}
-            className="bz-contact-pill md:hidden"
+            className="bz-icon-btn md:hidden"
           >
-            <span className="bz-contact-circle">
-              <Headset size={14} strokeWidth={2.5} aria-hidden="true" />
-            </span>
+            <Headset size={19} strokeWidth={1.9} aria-hidden="true" />
           </button>
 
           <a
-            className="bz-contact-pill"
+            className="bz-contact-pill ml-1"
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
@@ -393,10 +407,12 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         </div>
       </nav>
 
-      {/* ---------- bottom nav (só mobile) ---------- */}
+      {/* ---------- bottom nav (só mobile, fora da página de imóvel) ---------- */}
       <nav
         aria-label="Navegação inferior"
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+        className={`fixed inset-x-0 bottom-0 z-50 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden ${
+          naPaginaDeImovel ? "hidden" : ""
+        }`}
       >
         <div ref={bottomRef} className="relative grid h-16 grid-cols-5">
           <span

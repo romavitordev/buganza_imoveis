@@ -354,7 +354,7 @@ export default function PhotoManager({
                     className="object-cover"
                   />
                   {foto.capa && (
-                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-pill bg-black px-2.5 py-1 text-[10px] font-medium text-white">
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-pill bg-black px-2.5 py-1 text-[12px] md:text-[10px] font-medium text-white">
                       <Star size={10} className="fill-white" aria-hidden="true" />
                       Capa
                     </span>

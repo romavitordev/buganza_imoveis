@@ -42,7 +42,7 @@ export default function FavoriteButton({ id, titulo }: FavoriteButtonProps) {
           ? `Remover ${titulo} dos favoritos`
           : `Salvar ${titulo} nos favoritos`
       }
-      className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-[0_2px_12px_rgba(0,0,0,0.14)] backdrop-blur transition-all duration-200 ease-premium hover:scale-110 active:scale-95"
+      className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-[0_2px_12px_rgba(0,0,0,0.14)] backdrop-blur transition-all duration-200 ease-premium hover:scale-110 active:scale-95"
     >
       <Heart
         size={15}

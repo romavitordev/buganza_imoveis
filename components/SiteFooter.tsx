@@ -34,7 +34,7 @@ export default function SiteFooter() {
                 className="mt-1.5 block h-px w-14 bg-dourado"
                 aria-hidden="true"
               />
-              <p className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-black/70">
+              <p className="mt-1.5 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.14em] text-black/70">
                 {CIDADE_UF}
               </p>
             </div>
@@ -46,12 +46,12 @@ export default function SiteFooter() {
             Compra, venda e locação de imóveis residenciais e comerciais em{" "}
             {MARCA.regiao}.
           </p>
-          <p className="text-[11px] text-black/70">CRECI {MARCA.creci}</p>
+          <p className="text-[12px] md:text-[11px] text-black/70">CRECI {MARCA.creci}</p>
         </div>
 
         {/* Navegação */}
         <nav aria-label="Navegação do rodapé" className="flex flex-col gap-2">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
+          <p className="mb-1 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
             Navegação
           </p>
           {NAVEGACAO.map(({ href, rotulo }) => (
@@ -67,7 +67,7 @@ export default function SiteFooter() {
 
         {/* Atendimento */}
         <div className="flex flex-col gap-2">
-          <p className="mb-1 text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
+          <p className="mb-1 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
             Atendimento
           </p>
           <a
@@ -106,7 +106,7 @@ export default function SiteFooter() {
 
         {/* Proprietários */}
         <div className="flex flex-col gap-3">
-          <p className="mb-0 text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
+          <p className="mb-0 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-black/70">
             É proprietário?
           </p>
           <p className="text-[13px] leading-relaxed text-black/70">
@@ -131,7 +131,7 @@ export default function SiteFooter() {
 
       {/* Linha final */}
       <div className="border-t border-black/8">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 pb-28 pt-5 text-[11px] text-black/70 md:flex-row md:items-center md:px-8 md:pb-5">
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-2 px-4 pb-28 pt-5 text-[12px] md:text-[11px] text-black/70 md:flex-row md:items-center md:px-8 md:pb-5">
           <p>
             © {new Date().getFullYear()} {MARCA.nome} · CRECI {MARCA.creci} ·{" "}
             {CIDADE_UF}

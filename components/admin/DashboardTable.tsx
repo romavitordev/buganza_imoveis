@@ -346,7 +346,7 @@ export default function DashboardTable({
             <MessageCircle size={14} aria-hidden="true" />
             Leads
             {leadsNovos > 0 && (
-              <span className="rounded-pill bg-black px-2 py-0.5 text-[10px] font-semibold text-white">
+              <span className="rounded-pill bg-black px-2 py-0.5 text-[12px] md:text-[10px] font-semibold text-white">
                 {leadsNovos}
               </span>
             )}
@@ -373,7 +373,7 @@ export default function DashboardTable({
           Contagem única por dispositivo/dia; nenhum dado pessoal armazenado. */}
       <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
             <Eye size={13} aria-hidden="true" />
             Visualizações (7 dias)
           </p>
@@ -381,13 +381,13 @@ export default function DashboardTable({
             {resumo7d.visualizacoes}
           </p>
           {resumo7d.percentualMobile !== null && (
-            <p className="mt-0.5 text-[11px] text-black/70">
+            <p className="mt-0.5 text-[12px] md:text-[11px] text-black/70">
               {resumo7d.percentualMobile}% pelo celular
             </p>
           )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
             <MessageCircle size={13} aria-hidden="true" />
             Cliques no WhatsApp (7 dias)
           </p>
@@ -395,7 +395,7 @@ export default function DashboardTable({
             {resumo7d.cliquesWhatsApp}
           </p>
           {resumo7d.visualizacoes > 0 && (
-            <p className="mt-0.5 text-[11px] text-black/70">
+            <p className="mt-0.5 text-[12px] md:text-[11px] text-black/70">
               {Math.round(
                 (resumo7d.cliquesWhatsApp / resumo7d.visualizacoes) * 100
               )}
@@ -404,7 +404,7 @@ export default function DashboardTable({
           )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
             <Star size={13} aria-hidden="true" />
             Mais visto (total)
           </p>
@@ -417,7 +417,7 @@ export default function DashboardTable({
           </p>
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
             Origens do tráfego (7 dias)
           </p>
           {resumo7d.origens.length > 0 ? (
@@ -448,7 +448,7 @@ export default function DashboardTable({
         <div className="mb-8 rounded-2xl border border-black/10 p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-medium uppercase tracking-wide text-black/70">
+              <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
                 Perguntas que o chat não soube responder
               </p>
               <p className="mt-1 text-[12px] text-black/70">
@@ -469,7 +469,7 @@ export default function DashboardTable({
                 className="flex items-baseline justify-between gap-3 text-sm"
               >
                 <span className="truncate text-black/75">“{p.texto}”</span>
-                <span className="flex-none text-[11px] text-black/70">
+                <span className="flex-none text-[12px] md:text-[11px] text-black/70">
                   {new Date(p.criadoEm).toLocaleDateString("pt-BR", {
                     day: "2-digit",
                     month: "2-digit",
@@ -565,7 +565,7 @@ export default function DashboardTable({
               scroll lateral. Em telas estreitas, colunas secundárias somem. */}
           <table className="w-full text-left text-[13px]">
             <thead>
-              <tr className="border-b border-black/10 bg-mist/60 text-[11px] uppercase tracking-wide text-black/70">
+              <tr className="border-b border-black/10 bg-mist/60 text-[12px] md:text-[11px] uppercase tracking-wide text-black/70">
                 <ThOrdenavel campo="titulo" ordenacao={ordenacao} onOrdenar={ordenarPor}>
                   Imóvel
                 </ThOrdenavel>
@@ -636,7 +636,7 @@ export default function DashboardTable({
                           <span className="block truncate font-medium">
                             {p.titulo}
                           </span>
-                          <span className="mt-0.5 block truncate text-[11px] text-black/70">
+                          <span className="mt-0.5 block truncate text-[12px] md:text-[11px] text-black/70">
                             {p.codigo} · {TIPO_LABEL[p.tipo]} ·{" "}
                             {TRANSACAO_LABEL[p.transacao]} — {p.bairro},{" "}
                             {p.cidade}
@@ -656,7 +656,7 @@ export default function DashboardTable({
                           )
                         }
                         aria-label={`Status de ${p.codigo}`}
-                        className={`cursor-pointer appearance-none rounded-pill px-3 py-1 text-[11px] font-medium outline-none transition-opacity hover:opacity-80 ${STATUS_ESTILO[p.status]}`}
+                        className={`cursor-pointer appearance-none rounded-pill px-3 py-1 text-[12px] md:text-[11px] font-medium outline-none transition-opacity hover:opacity-80 ${STATUS_ESTILO[p.status]}`}
                       >
                         {Object.entries(STATUS_LABEL).map(
                           ([valor, rotulo]) => (

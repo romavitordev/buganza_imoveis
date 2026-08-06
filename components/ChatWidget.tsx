@@ -253,7 +253,7 @@ export default function ChatWidget() {
         : [];
 
     const chip =
-      "rounded-pill border border-black/15 bg-white px-2.5 py-1 text-[11px] font-medium text-black/70 transition-colors hover:border-black hover:text-black";
+      "rounded-pill border border-black/15 bg-white px-2.5 py-1 text-[12px] md:text-[11px] font-medium text-black/70 transition-colors hover:border-black hover:text-black";
 
     return (
       <div className="mt-3 flex flex-col gap-2">
@@ -280,7 +280,7 @@ export default function ChatWidget() {
 
         {chipsImovel.length > 0 && (
           <div className="mt-1 border-t border-black/8 pt-2.5">
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/70">
+            <p className="mb-1.5 text-[12px] md:text-[10px] font-semibold uppercase tracking-wide text-black/70">
               Sobre este imóvel
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -300,7 +300,7 @@ export default function ChatWidget() {
 
         {opcoes.length > 0 && (
           <div className="mt-1 border-t border-black/8 pt-2.5">
-            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-black/70">
+            <p className="mb-1.5 text-[12px] md:text-[10px] font-semibold uppercase tracking-wide text-black/70">
               {dentroDeCategoria
                 ? "Escolha o assunto"
                 : "Posso ajudar em mais algo?"}
@@ -320,7 +320,7 @@ export default function ChatWidget() {
                 <button
                   type="button"
                   onClick={voltarAosAssuntos}
-                  className="rounded-pill px-2.5 py-1 text-[11px] font-medium text-black/70 underline underline-offset-2 transition-colors hover:text-black"
+                  className="rounded-pill px-2.5 py-1 text-[12px] md:text-[11px] font-medium text-black/70 underline underline-offset-2 transition-colors hover:text-black"
                 >
                   ← Outros assuntos
                 </button>
@@ -426,7 +426,7 @@ export default function ChatWidget() {
                 <span className="block truncate text-[12px] font-medium text-black">
                   {p.titulo}
                 </span>
-                <span className="block text-[11px] text-black/70">
+                <span className="block text-[12px] md:text-[11px] text-black/70">
                   {p.bairro} · <strong>{preco}</strong>
                 </span>
               </span>
@@ -685,7 +685,7 @@ export default function ChatWidget() {
                 <p className="text-sm font-semibold tracking-tight">
                   {MARCA.assistente}
                 </p>
-                <p className="flex items-center gap-1.5 text-[11px] text-black/70">
+                <p className="flex items-center gap-1.5 text-[12px] md:text-[11px] text-black/70">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#25D366]" />
                   Online agora
                 </p>
@@ -905,7 +905,7 @@ function ContatoForm({
         )}
         {enviando ? "Enviando…" : "Enviar contato"}
       </button>
-      <p className="text-[10px] leading-relaxed text-black/70">
+      <p className="text-[12px] md:text-[10px] leading-relaxed text-black/70">
         Ao enviar, você concorda com nossa{" "}
         <a href="/privacidade" className="underline underline-offset-2">
           política de privacidade

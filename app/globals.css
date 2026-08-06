@@ -406,9 +406,98 @@ h3 {
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Serve tanto ao link do WhatsApp quanto ao botão de atendimento do
-   mobile — daí zerar borda e herdar a fonte, que o <button> traz do
-   navegador. */
+/**
+ * Ficha rápida do card (quartos, banheiros, vagas, área).
+ *
+ * MOBILE: uma linha de texto com separador. Em 375px as quatro pílulas
+ * quebravam em duas linhas, e a borda de cada uma somava oito traços
+ * disputando atenção com o preço e o título — peso caro demais para
+ * dado secundário.
+ * DESKTOP: as pílulas continuam; lá há largura de sobra e elas dão
+ * ritmo ao card.
+ */
+.bz-ficha {
+  margin-top: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-size: 12px;
+  color: rgb(var(--ink) / 0.7);
+}
+.bz-ficha li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+/* Sem ícones no mobile. Os quatro somavam ~68px entre glifo e espaço, e
+   era só isso que fazia a linha quebrar — tirando-os, os quatro dados
+   cabem numa linha só. A 12px, ao lado do texto, o ícone é decoração:
+   "2 quartos" já diz o que a caminha diria. */
+.bz-ficha li svg {
+  display: none;
+}
+/* Separador entre itens — no último, não. */
+.bz-ficha li:not(:last-child)::after {
+  content: "·";
+  margin-left: 10px;
+  color: rgb(var(--ink) / 0.35);
+}
+
+@media (min-width: 768px) {
+  .bz-ficha {
+    margin-top: 4px;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .bz-ficha li svg {
+    display: block;
+  }
+  .bz-ficha li {
+    gap: 6px;
+    padding: 4px 12px;
+    border: 1px solid rgb(var(--ink) / 0.1);
+    border-radius: 999px;
+    transition: border-color 0.2s ease;
+  }
+  .group:hover .bz-ficha li {
+    border-color: rgb(var(--ink) / 0.25);
+  }
+  .bz-ficha li:not(:last-child)::after {
+    content: none;
+  }
+}
+
+/**
+ * Botão de ícone "fantasma" da navbar (tema e atendimento).
+ *
+ * Sem disco de fundo, ao contrário do WhatsApp: na barra só a ação
+ * principal tem peso de preenchimento. O tamanho APARENTE é o do
+ * ícone; a área de TOQUE vem do padding, e chega aos 44px
+ * recomendados sem o botão parecer grande.
+ */
+.bz-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgb(var(--ink) / 0.75);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+.bz-icon-btn:hover {
+  color: rgb(var(--ink));
+  background: rgb(var(--ink) / 0.06);
+}
+
+/* Serve ao link do WhatsApp — daí zerar borda e herdar a fonte, que o
+   <button> traz do navegador. */
 .bz-contact-pill {
   display: flex;
   align-items: center;
@@ -425,7 +514,9 @@ h3 {
 }
 .bz-contact-pill:hover { background: rgb(var(--ink) / 0.12); }
 .bz-contact-circle {
-  width: 28px; height: 28px;
+  /* 32+4+4 = 40px de alvo no mobile. Com 28 dava 36, e este é o botão
+     de conversão da barra — não é lugar para alvo apertado. */
+  width: 32px; height: 32px;
   border-radius: 50%;
   background: rgb(var(--ink));
   display: flex;
@@ -469,7 +560,8 @@ h3 {
   align-items: center;
   gap: 8px;
   width: fit-content;
-  font-size: 11px;
+  /* 12px é o piso de leitura no celular; no desktop volta a 11. */
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -565,6 +657,7 @@ h3 {
 
 /* ---------- desktop (768px+) ---------- */
 @media (min-width: 768px) {
+  .bz-subtitle { font-size: 11px; }
   .bz-nav { padding: 20px 32px; }
   .bz-contact-label { display: block; }
   .bz-contact-circle { width: 32px; height: 32px; }

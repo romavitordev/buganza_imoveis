@@ -69,22 +69,23 @@ export default function ThemeToggle() {
       onClick={alternar}
       aria-label="Alternar entre modo claro e escuro"
       title="Alternar entre modo claro e escuro"
-      className="bz-contact-pill"
+      /* Ícone "fantasma", sem o disco marinho: na navbar só o WhatsApp
+         tem disco preenchido, porque é a ação principal. Ver o
+         comentário da hierarquia em SiteNav. */
+      className="bz-icon-btn"
     >
-      <span className="bz-contact-circle">
-        <Moon
-          size={14}
-          strokeWidth={2.5}
-          aria-hidden="true"
-          className="bz-icone-lua"
-        />
-        <Sun
-          size={14}
-          strokeWidth={2.5}
-          aria-hidden="true"
-          className="bz-icone-sol"
-        />
-      </span>
+      <Moon
+        size={19}
+        strokeWidth={1.9}
+        aria-hidden="true"
+        className="bz-icone-lua"
+      />
+      <Sun
+        size={19}
+        strokeWidth={1.9}
+        aria-hidden="true"
+        className="bz-icone-sol"
+      />
     </button>
   );
 }

@@ -228,7 +228,9 @@ export default async function ImovelPage({ params }: PageProps) {
       {/* Mesmo fundo do catálogo: sem ele o cartão de preço era branco
           sobre branco e não existia como bloco. */}
       <div className="bg-fundo">
-      <main className="mx-auto max-w-6xl px-4 pb-44 pt-24 md:px-8 md:pb-20 md:pt-36">
+      {/* pb menor no mobile: agora só o CTA fixo ocupa a base, e não
+          mais CTA + bottom nav. */}
+      <main className="mx-auto max-w-6xl px-4 pb-32 pt-24 md:px-8 md:pb-20 md:pt-36">
         <div className="mb-6 flex items-center justify-between gap-4">
           <Link
             href="/imoveis"
@@ -243,15 +245,15 @@ export default async function ImovelPage({ params }: PageProps) {
         {/* Cabeçalho do anúncio — identidade completa antes de tudo */}
         <header className="mb-8">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-pill bg-black px-3 py-1 text-[11px] font-medium text-white">
+            <span className="rounded-pill bg-black px-3 py-1 text-[12px] md:text-[11px] font-medium text-white">
               {imovel.subtipo
                 ? SUBTIPO_LABEL[imovel.subtipo]
                 : TIPO_LABEL[imovel.tipo]}
             </span>
-            <span className="rounded-pill border border-black/15 px-3 py-1 text-[11px] font-medium text-black/70">
+            <span className="rounded-pill border border-black/15 px-3 py-1 text-[12px] md:text-[11px] font-medium text-black/70">
               {TRANSACAO_LABEL[imovel.transacao]}
             </span>
-            <span className="text-[11px] font-medium uppercase tracking-wide text-black/70">
+            <span className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
               Cód. {imovel.codigo}
             </span>
           </div>
@@ -290,7 +292,7 @@ export default async function ImovelPage({ params }: PageProps) {
             <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
               {precoVenda && (
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/70">
+                  <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
                     Venda
                   </p>
                   <p className="bz-num text-3xl font-semibold tracking-tight">
@@ -300,7 +302,7 @@ export default async function ImovelPage({ params }: PageProps) {
               )}
               {precoLocacao && (
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wide text-black/70">
+                  <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
                     Locação
                   </p>
                   <p className="bz-num text-3xl font-semibold tracking-tight">
@@ -337,7 +339,7 @@ export default async function ImovelPage({ params }: PageProps) {
               />
               {rotuloCta}
             </WhatsAppLink>
-            <p className="mt-2 text-center text-[11px] text-black/70">
+            <p className="mt-2 text-center text-[12px] md:text-[11px] text-black/70">
               Resposta rápida · atendimento direto com os corretores
             </p>
 
@@ -345,7 +347,7 @@ export default async function ImovelPage({ params }: PageProps) {
                 ao lado da galeria e resume os números do imóvel */}
             {caracteristicas.length > 0 && (
               <div className="mt-6 border-t border-black/10 pt-5">
-                <p className="mb-3 text-[11px] font-medium uppercase tracking-wide text-black/70">
+                <p className="mb-3 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
                   Características
                 </p>
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-4">
@@ -358,7 +360,7 @@ export default async function ImovelPage({ params }: PageProps) {
                         <span className="block text-sm font-semibold leading-tight tracking-tight">
                           {valor}
                         </span>
-                        <span className="block truncate text-[10px] font-medium uppercase tracking-wide text-black/70">
+                        <span className="block truncate text-[12px] md:text-[10px] font-medium uppercase tracking-wide text-black/70">
                           {rotulo}
                         </span>
                       </span>
@@ -425,8 +427,11 @@ export default async function ImovelPage({ params }: PageProps) {
       </main>
       </div>
 
-      {/* CTA sticky no mobile — acima da bottom nav */}
-      <div className="fixed inset-x-0 bottom-16 z-40 border-t border-black/10 bg-white/95 p-3 backdrop-blur md:hidden">
+      {/* CTA fixo no mobile. AQUI ELE É A BARRA INFERIOR: nesta página a
+          bottom nav se esconde (ver SiteNav), porque as duas somadas à
+          navbar comiam 25% da tela e a bottom nav ainda repetia o mesmo
+          botão de WhatsApp logo abaixo deste. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-black/10 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden">
         <WhatsAppLink
           href={whatsappHref}
           className="flex items-center justify-center gap-2 rounded-pill bg-black px-6 py-4 text-sm font-medium text-white"

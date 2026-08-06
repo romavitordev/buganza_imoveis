@@ -152,7 +152,7 @@ export default function TwoFactorCard({ ativado }: { ativado: boolean }) {
             className="rounded-xl border border-black/10"
           />
           {segredo && (
-            <p className="text-[11px] text-black/70">
+            <p className="text-[12px] md:text-[11px] text-black/70">
               Sem câmera? Digite o código manualmente no app:{" "}
               <code className="rounded bg-mist px-1.5 py-0.5">{segredo}</code>
             </p>

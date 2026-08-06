@@ -19,7 +19,7 @@ export default function AnuncieBanner() {
         <div className="bz-fade-up max-w-xl">
           {/* Aqui o dourado PODE ser letra: sobre o marinho fundo ele dá
               7:1, bem acima do mínimo. É o oposto do que vale no claro. */}
-          <p className="mb-3 inline-flex items-center gap-2 rounded-pill border border-dourado/45 px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-dourado-claro">
+          <p className="mb-3 inline-flex items-center gap-2 rounded-pill border border-dourado/45 px-3.5 py-1.5 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-dourado-claro">
             Para proprietários
           </p>
           <h2

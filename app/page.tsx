@@ -71,7 +71,18 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+          {/* No MOBILE só os três primeiros aparecem.
+              Cada card tem ~516px de altura: os seis somavam 4,4 telas
+              só nesta seção, de uma home que já tinha quase 12. Quem
+              quer ver mais tem o "Ver todos os imóveis" logo acima.
+
+              MEDIDO: `display:none` tira os outros três do layout, mas
+              NÃO garante que a foto deixe de ser baixada — o Chrome
+              ainda buscou duas das três. Se a banda virar problema, o
+              caminho é cortar a lista no servidor, e aí o desktop
+              precisaria de outra fonte de dados. Hoje o ganho de tela
+              compensa duas miniaturas a mais. */}
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3 [&>*:nth-child(n+4)]:hidden md:[&>*:nth-child(n+4)]:block">
             {destaques.map((imovel, i) => (
               <PropertyCard key={imovel.id} imovel={imovel} prioridade={i < 3} />
             ))}
