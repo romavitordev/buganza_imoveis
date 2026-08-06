@@ -72,14 +72,58 @@
   --janela-apagada: rgba(255, 255, 255, 0.07);
 }
 
-/* A troca de tema não deve parecer um flash: as superfícies fazem uma
-   transição curta. Só cor — nada de transicionar layout. */
-body,
-.bz-nav,
-.bz-contact-pill,
-.bz-media-wrap {
-  transition: background-color 0.35s ease, color 0.35s ease,
-    border-color 0.35s ease;
+/* ---------- troca de tema ----------
+   A transição só existe DURANTE a troca (o atributo data-trocando é
+   posto e retirado pelo ThemeToggle). Deixar isto ligado o tempo todo
+   custaria caro: seria um `transition` em todo elemento da página,
+   competindo com hovers e com o scroll do hero. */
+[data-trocando] *,
+[data-trocando] *::before,
+[data-trocando] *::after {
+  transition: background-color 0.7s ease, color 0.7s ease,
+    border-color 0.7s ease, fill 0.7s ease, stroke 0.7s ease !important;
+}
+
+/* Varredura dourada que atravessa a tela — a "linha do amanhecer".
+   Fica sempre no DOM (dentro do ThemeToggle), parada e invisível;
+   só corre quando a troca acontece. */
+.bz-varredura {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(198, 160, 82, 0.14) 44%,
+    rgba(224, 194, 126, 0.3) 50%,
+    rgba(198, 160, 82, 0.14) 56%,
+    transparent 70%
+  );
+}
+@keyframes bzVarredura {
+  from { transform: translateX(-120%); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  to   { transform: translateX(120%); opacity: 0; }
+}
+[data-trocando] .bz-varredura {
+  animation: bzVarredura 0.95s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* O corpo celeste que ENTRA nasce pela esquerda, um pouco abaixo; o que
+   SAI se põe à direita. Sempre no mesmo sentido, como a rotação da
+   Terra: nada volta pelo caminho de onde veio. */
+@keyframes bzNasce {
+  from { transform: translate(-560px, 70px); opacity: 0; }
+  40%  { opacity: 1; }
+  to   { transform: translate(0, 0); opacity: 1; }
+}
+@keyframes bzSePoe {
+  from { transform: translate(0, 0); opacity: 1; }
+  60%  { opacity: 1; }
+  to   { transform: translate(560px, 70px); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -158,6 +202,14 @@ h3 {
     transform: none;
   }
   .bz-lit { animation: none; }
+  /* A troca de tema fica instantânea: nem varredura, nem sol nascendo.
+     O ThemeToggle nem chega a marcar data-trocando, mas a regra fica
+     aqui como rede de segurança. */
+  .bz-varredura,
+  [data-trocando] .bz-sol,
+  [data-trocando] .bz-lua {
+    animation: none !important;
+  }
   * {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
@@ -212,10 +264,37 @@ h3 {
 }
 
 /* Sol no claro, lua crescente no escuro. Os dois existem no SVG; aqui
-   só se escolhe qual aparece (ver CityScene.tsx). */
-.bz-lua { display: none; }
-[data-theme="dark"] .bz-sol { display: none; }
-[data-theme="dark"] .bz-lua { display: block; }
+   só se escolhe qual aparece (ver CityScene.tsx).
+
+   Por que visibility+opacity e não display:none: um elemento com
+   display:none não anima. Para o corpo celeste poder SE PÔR ao trocar
+   o tema, ele precisa continuar existindo na tela durante a saída. */
+.bz-sol,
+.bz-lua {
+  visibility: hidden;
+  opacity: 0;
+}
+[data-theme="light"] .bz-sol,
+[data-theme="dark"] .bz-lua {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Durante a troca, os dois ficam visíveis: um nasce, o outro se põe.
+   Qual é qual sai do data-theme, que já está no valor NOVO quando o
+   data-trocando entra. */
+[data-trocando] .bz-sol,
+[data-trocando] .bz-lua {
+  visibility: visible;
+}
+[data-trocando][data-theme="dark"] .bz-lua,
+[data-trocando][data-theme="light"] .bz-sol {
+  animation: bzNasce 0.95s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[data-trocando][data-theme="dark"] .bz-sol,
+[data-trocando][data-theme="light"] .bz-lua {
+  animation: bzSePoe 0.95s cubic-bezier(0.4, 0, 0.6, 1) both;
+}
 
 /* Mesma ideia no botão de tema: os dois ícones existem, o CSS escolhe.
    Aparece o ícone do modo PARA ONDE se vai. */
