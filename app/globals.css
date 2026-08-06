@@ -231,17 +231,44 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Mobile: a cena encosta na base e ocupa a altura livre. O conteúdo
-     do hero passa POR CIMA dela, com desfoque — é o que permite a torre
-     ser grande sem competir com o texto. */
+  /* MOBILE: a cena vive na metade de cima e o texto na de baixo, em
+     superfície limpa. Antes o conteúdo passava POR CIMA da torre com um
+     véu translúcido — e a grade de janelas atravessava as letras, que
+     era o que "apagava" o texto. Véu nenhum resolve isso: fundo com
+     padrão atrás de texto é ilegível por natureza.
+     A emenda entre as duas zonas é desfocada (::after), então a torre
+     se dissolve na superfície em vez de terminar num corte reto. */
+  inset: 0 0 auto;
+  height: 54svh;
   align-items: flex-end;
-  padding: 64px 0 0;
+  padding: 60px 0 0;
   /* Mesmo degradê do céu do SVG — sem faixas quando a cena é "meet" */
   background: linear-gradient(to bottom, var(--ceu-topo) 0%, var(--ceu-meio) 70%, var(--ceu-base) 100%);
 }
 .bz-cena-raiz {
   display: contents;
 }
+/* A base da cena se dissolve na superfície do conteúdo. O desfoque
+   pega a torre, e a máscara faz o efeito nascer do nada — sem ela, o
+   corte reto do blur vira uma linha atravessando o desenho. */
+.bz-media-wrap::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 110px;
+  pointer-events: none;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  mask-image: linear-gradient(to bottom, transparent, #000 62%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 62%);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(var(--paper) / 0.75) 62%,
+    rgb(var(--paper)) 100%
+  );
+}
+
 .bz-scene {
   /* Cena inteira (prédios + sol) sempre visível em qualquer tela */
   width: 100%;
@@ -427,27 +454,10 @@ h3 {
      sobra devolvida some do caminho do CTA "Ver Imóveis". */
   padding: 24px 16px 104px;
 
-  /* MOBILE: desfoque atrás do texto em vez de um véu branco opaco.
-     A cena continua visível — só perde a nitidez que competia com o
-     título e os botões. O véu que sobrou é bem mais leve por isso.
-
-     A máscara faz o desfoque nascer do nada no alto: sem ela, o corte
-     reto do blur vira uma linha atravessando a cena.
-
-     `backdrop-filter` cria bloco de contenção para descendentes
-     position:fixed — aqui não há nenhum (a bottom nav e o chat são
-     irmãos, não filhos), mas é bom lembrar antes de pendurar algo aqui. */
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  mask-image: linear-gradient(to top, #000 72%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, #000 72%, transparent 100%);
-  background: linear-gradient(
-    to top,
-    rgb(var(--paper) / 0.97) 0%,
-    rgb(var(--paper) / 0.9) 48%,
-    rgb(var(--paper) / 0.55) 80%,
-    transparent 100%
-  );
+  /* Superfície limpa: no mobile a cena termina acima (ver
+     .bz-media-wrap), então aqui não há nada atrás do texto para
+     disfarçar — e é justamente isso que o deixa legível. */
+  background: rgb(var(--paper));
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -558,19 +568,16 @@ h3 {
   .bz-nav { padding: 20px 32px; }
   .bz-contact-label { display: block; }
   .bz-contact-circle { width: 32px; height: 32px; }
-  .bz-media-wrap { align-items: flex-end; padding: 0; }
+  .bz-media-wrap { inset: 0; height: auto; align-items: flex-end; padding: 0; }
+  .bz-media-wrap::after { content: none; }
   .bz-scene { aspect-ratio: auto; height: min(86%, 100%); max-height: none; }
   .bz-footer {
     flex-direction: row;
     align-items: flex-end;
     justify-content: space-between;
     padding: 32px 32px 36px;
-    /* O desfoque é remédio para tela pequena: no desktop há espaço de
-       sobra entre o texto e a cena, e o véu simples basta. */
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    mask-image: none;
-    -webkit-mask-image: none;
+    /* No desktop a cena volta a ocupar o fundo inteiro e o texto se
+       apoia nela — lá há espaço de sobra e o véu em degradê basta. */
     background: linear-gradient(
       to top,
       rgb(var(--paper)) 0%,
