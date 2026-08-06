@@ -20,8 +20,8 @@ const DURACAO_MS = 1500;
  * Mostramos o ícone do modo PARA ONDE se vai, não o do modo atual:
  * lua no claro, sol no escuro.
  *
- * A troca marca `data-trocando` no <html> por ~1s. É esse atributo que
- * liga, só durante a transição, a varredura dourada, o amaciamento das
+ * A troca marca `data-trocando` no <html> pela duração da coreografia.
+ * É esse atributo que liga, só durante a transição, o amaciamento das
  * cores e o nascer/pôr do corpo celeste da cena do hero.
  */
 export default function ThemeToggle() {
@@ -87,18 +87,4 @@ export default function ThemeToggle() {
       </span>
     </button>
   );
-}
-
-/**
- * A faixa dourada que atravessa a tela na troca de tema.
- *
- * MORA NO LAYOUT, e não aqui dentro do botão, por um motivo específico:
- * a navbar usa `backdrop-filter` quando rolada, e um elemento com
- * filtro vira BLOCO DE CONTENÇÃO para descendentes `position: fixed`.
- * Dentro da navbar, esta faixa media 82px de altura (a da barra) em vez
- * da tela inteira — parecia um "sol atravessando o topo da página".
- * Fora dela, o fixed volta a se referir à viewport.
- */
-export function VarreduraTema() {
-  return <span className="bz-varredura" aria-hidden="true" />;
 }

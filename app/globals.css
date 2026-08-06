@@ -30,6 +30,12 @@
   --banda: 13 27 54; /* faixa escura de destaque */
 
   /* céu do hero e prédios da cena */
+  /* Distância que o astro percorre na troca de tema. É proporcional ao
+     recorte da cena: no mobile o viewBox é quase metade da largura, e
+     manter os 1000 do desktop faria o astro atravessar num piscar. */
+  --arco-x: 1000px;
+  --arco-y: 480px;
+
   --ceu-topo: #ffffff;
   --ceu-meio: #f2f2f4;
   --ceu-base: #ececee;
@@ -83,40 +89,11 @@
   /* SEM `fill` e `stroke` nesta lista, de propósito. A cena do hero tem
      199 formas SVG, 23 delas já piscando em laço — pôr todas para
      interpolar cor ao mesmo tempo era a origem do engasgo. As cores da
-     cena trocam de uma vez, escondidas atrás da varredura. */
-  transition: background-color 0.55s ease, color 0.55s ease,
-    border-color 0.55s ease !important;
-}
-
-/* Varredura dourada que atravessa a tela — a "linha do amanhecer".
-   Fica sempre no DOM (dentro do ThemeToggle), parada e invisível;
-   só corre quando a troca acontece. */
-.bz-varredura {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  pointer-events: none;
-  opacity: 0;
-  background: linear-gradient(
-    100deg,
-    transparent 30%,
-    rgba(198, 160, 82, 0.14) 44%,
-    rgba(224, 194, 126, 0.3) 50%,
-    rgba(198, 160, 82, 0.14) 56%,
-    transparent 70%
-  );
-}
-@keyframes bzVarredura {
-  from { transform: translate3d(-120%, 0, 0); opacity: 0; }
-  18%  { opacity: 1; }
-  82%  { opacity: 1; }
-  to   { transform: translate3d(120%, 0, 0); opacity: 0; }
-}
-[data-trocando] .bz-varredura {
-  /* linear: a faixa é a "linha do amanhecer" varrendo a cidade num
-     ritmo constante. Com easing ela acelera e denuncia que é um efeito. */
-  animation: bzVarredura 1.5s linear both;
-  will-change: transform, opacity;
+     cena trocam de uma vez — o movimento do astro é o que sustenta a
+     troca, e o olho não acompanha as duas coisas ao mesmo tempo. */
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* O ARCO DO ASTRO.
@@ -133,18 +110,18 @@
  * então ele some por oclusão, como sumiria de verdade.
  */
 @keyframes bzNasce {
-  0%   { transform: translate3d(-1000px, 480px, 0); }
-  25%  { transform: translate3d(-720px, 300px, 0); }
-  55%  { transform: translate3d(-420px, 140px, 0); }
-  80%  { transform: translate3d(-190px, 45px, 0); }
+  0%   { transform: translate3d(calc(var(--arco-x) * -1),    var(--arco-y),        0); }
+  25%  { transform: translate3d(calc(var(--arco-x) * -0.72), calc(var(--arco-y) * 0.63), 0); }
+  55%  { transform: translate3d(calc(var(--arco-x) * -0.42), calc(var(--arco-y) * 0.29), 0); }
+  80%  { transform: translate3d(calc(var(--arco-x) * -0.19), calc(var(--arco-y) * 0.09), 0); }
   100% { transform: translate3d(0, 0, 0); }
 }
 @keyframes bzSePoe {
   0%   { transform: translate3d(0, 0, 0); }
-  20%  { transform: translate3d(190px, 45px, 0); }
-  45%  { transform: translate3d(420px, 140px, 0); }
-  75%  { transform: translate3d(720px, 300px, 0); }
-  100% { transform: translate3d(1000px, 480px, 0); }
+  20%  { transform: translate3d(calc(var(--arco-x) * 0.19), calc(var(--arco-y) * 0.09), 0); }
+  45%  { transform: translate3d(calc(var(--arco-x) * 0.42), calc(var(--arco-y) * 0.29), 0); }
+  75%  { transform: translate3d(calc(var(--arco-x) * 0.72), calc(var(--arco-y) * 0.63), 0); }
+  100% { transform: translate3d(var(--arco-x), var(--arco-y), 0); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -223,10 +200,9 @@ h3 {
     transform: none;
   }
   .bz-lit { animation: none; }
-  /* A troca de tema fica instantânea: nem varredura, nem sol nascendo.
-     O ThemeToggle nem chega a marcar data-trocando, mas a regra fica
-     aqui como rede de segurança. */
-  .bz-varredura,
+  /* A troca de tema fica instantânea, sem o astro nascendo. O
+     ThemeToggle nem chega a marcar data-trocando, mas a regra fica aqui
+     como rede de segurança. */
   [data-trocando] .bz-sol,
   [data-trocando] .bz-lua {
     animation: none !important;
@@ -255,18 +231,49 @@ h3 {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Mobile: cena centralizada na área livre entre a navbar e o conteúdo,
-     para que prédios e sol fiquem 100% visíveis sem disputar com o texto */
-  padding: 72px 12px min(300px, 40svh);
+  /* Mobile: a cena encosta na base e ocupa a altura livre. O conteúdo
+     do hero passa POR CIMA dela, com desfoque — é o que permite a torre
+     ser grande sem competir com o texto. */
+  align-items: flex-end;
+  padding: 64px 0 0;
   /* Mesmo degradê do céu do SVG — sem faixas quando a cena é "meet" */
   background: linear-gradient(to bottom, var(--ceu-topo) 0%, var(--ceu-meio) 70%, var(--ceu-base) 100%);
+}
+.bz-cena-raiz {
+  display: contents;
 }
 .bz-scene {
   /* Cena inteira (prédios + sol) sempre visível em qualquer tela */
   width: 100%;
   max-height: 100%;
-  aspect-ratio: 1200 / 700;
   display: block;
+}
+
+/* MOBILE: entra a montagem compacta (uma torre + astro), num recorte
+   quase quadrado. A cidade inteira em 375px virava um amontoado de
+   retângulos pequenos demais para se ler como cidade. */
+.bz-scene-amplo { display: none; }
+.bz-scene-compacto {
+  aspect-ratio: 360 / 640;
+}
+@media (min-width: 768px) {
+  .bz-scene-compacto { display: none; }
+  .bz-scene-amplo {
+    display: block;
+    aspect-ratio: 1200 / 700;
+  }
+}
+@media (max-width: 767px) {
+  /* O arco do mobile é OUTRO, e não uma redução do desktop.
+     No quadro estreito existe um corredor de céu aberto só: a faixa à
+     direita da torre. Com um arco horizontal como o do desktop, o astro
+     passava o trecho do meio ATRÁS do prédio e simplesmente sumia.
+     Aqui ele sobe quase na vertical, saindo de trás da torre e ganhando
+     o céu — que é como um nascer se lê numa janela estreita. */
+  :root {
+    --arco-x: 170px;
+    --arco-y: 430px;
+  }
 }
 
 /* ---------- efeito de scroll do hero (var --bz-p: 0 no topo → 1 fora) ---------- */
@@ -419,7 +426,28 @@ h3 {
      "Suporte" também flutuava aqui; ele virou ícone da navbar e a
      sobra devolvida some do caminho do CTA "Ver Imóveis". */
   padding: 24px 16px 104px;
-  background: linear-gradient(to top, rgb(var(--paper)) 0%, rgb(var(--paper) / 0.8) 50%, transparent 100%);
+
+  /* MOBILE: desfoque atrás do texto em vez de um véu branco opaco.
+     A cena continua visível — só perde a nitidez que competia com o
+     título e os botões. O véu que sobrou é bem mais leve por isso.
+
+     A máscara faz o desfoque nascer do nada no alto: sem ela, o corte
+     reto do blur vira uma linha atravessando a cena.
+
+     `backdrop-filter` cria bloco de contenção para descendentes
+     position:fixed — aqui não há nenhum (a bottom nav e o chat são
+     irmãos, não filhos), mas é bom lembrar antes de pendurar algo aqui. */
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  mask-image: linear-gradient(to top, #000 72%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, #000 72%, transparent 100%);
+  background: linear-gradient(
+    to top,
+    rgb(var(--paper) / 0.97) 0%,
+    rgb(var(--paper) / 0.9) 48%,
+    rgb(var(--paper) / 0.55) 80%,
+    transparent 100%
+  );
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -436,7 +464,7 @@ h3 {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgb(var(--ink) / 0.7);
-  background: rgb(var(--paper) / 0.75);
+  background: rgb(var(--paper) / 0.9);
   border: 1px solid rgb(var(--ink) / 0.12);
   border-radius: 999px;
   padding: 8px 14px;
@@ -537,6 +565,18 @@ h3 {
     align-items: flex-end;
     justify-content: space-between;
     padding: 32px 32px 36px;
+    /* O desfoque é remédio para tela pequena: no desktop há espaço de
+       sobra entre o texto e a cena, e o véu simples basta. */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    mask-image: none;
+    -webkit-mask-image: none;
+    background: linear-gradient(
+      to top,
+      rgb(var(--paper)) 0%,
+      rgb(var(--paper) / 0.8) 50%,
+      transparent 100%
+    );
   }
   .bz-heading { font-size: clamp(3.2rem, 6.2vw, 6rem); }
 }

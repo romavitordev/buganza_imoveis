@@ -3,14 +3,22 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Cena SVG do hero — prédios pretos minimalistas sobre céu claro.
- * Recriação fiel da landing original: torres com janelas em grade,
- * algumas acesas com brilho pulsante alternado, torres cinzas de fundo
- * e disco de sol discreto.
+ * Cena SVG do hero — torres minimalistas sobre o céu.
+ *
+ * DUAS MONTAGENS, uma para cada largura de tela:
+ *  - "amplo" (desktop): a cidade inteira, sete silhuetas e três torres.
+ *  - "compacto" (mobile): SÓ a torre principal e o astro. A cidade
+ *    inteira espremida em 375px virava um amontoado de retângulos
+ *    pequenos demais para se ler como cidade, e ainda disputava atenção
+ *    com o título e os botões, que são o que importa na primeira dobra.
+ *
+ * As duas são o MESMO desenho — muda o recorte (viewBox) e o que entra
+ * nele. Vivem as duas no DOM e o CSS escolhe: trocar o viewBox por
+ * JavaScript faria a cena saltar depois da hidratação, justamente
+ * durante a animação de entrada do hero.
  *
  * Efeito de scroll (reversível, ligado ao progresso do scroll):
- *  - saindo do hero: silhuetas de fundo somem descendo (fade out),
- *    torres principais descem e desaparecem;
+ *  - saindo do hero: silhuetas de fundo somem descendo, torres descem;
  *  - voltando ao topo: tudo sobe e reaparece.
  * Respeita prefers-reduced-motion.
  */
@@ -25,9 +33,22 @@ interface WindowGridProps {
   gx: number;
   gy: number;
   lit: number[];
+  /** Prefixo da key — as duas montagens coexistem no DOM. */
+  id: string;
 }
 
-function WindowGrid({ x, y, cols, rows, w, h, gx, gy, lit }: WindowGridProps) {
+function WindowGrid({
+  x,
+  y,
+  cols,
+  rows,
+  w,
+  h,
+  gx,
+  gy,
+  lit,
+  id,
+}: WindowGridProps) {
   const litSet = new Set(lit);
   const windows = [];
 
@@ -37,7 +58,7 @@ function WindowGrid({ x, y, cols, rows, w, h, gx, gy, lit }: WindowGridProps) {
       const isLit = litSet.has(idx);
       windows.push(
         <rect
-          key={idx}
+          key={`${id}-${idx}`}
           x={x + c * (w + gx)}
           y={y + r * (h + gy)}
           width={w}
@@ -59,12 +80,95 @@ function WindowGrid({ x, y, cols, rows, w, h, gx, gy, lit }: WindowGridProps) {
   return <g>{windows}</g>;
 }
 
+/** O astro: sol de dia, lua crescente de noite. */
+function Astro({ id }: { id: string }) {
+  const mascara = `bzLua-${id}`;
+  return (
+    /* Os dois ficam no SVG e quem escolhe é o CSS (.bz-sol / .bz-lua, em
+       globals.css, sob [data-theme]). Assim não existe estado de tema
+       dentro do React e nada pisca entre o HTML do servidor e a
+       hidratação — o problema clássico de "ler o tema" no componente. */
+    <g className="bz-layer-sun">
+      <g className="bz-sol">
+        <circle cx="920" cy="150" r="70" fill="#ffffff" opacity="0.9" />
+        {/* Aro dourado: o sol era branco sobre um céu quase branco e
+            praticamente sumia. O aro dá a borda e leva a cor da marca
+            para o ponto mais alto da cena. */}
+        <circle
+          cx="920"
+          cy="150"
+          r="70"
+          fill="none"
+          stroke="#C6A052"
+          strokeWidth="1.5"
+          opacity="0.7"
+        />
+      </g>
+
+      {/* A crescente é UM disco com outro recortado fora do centro
+          (máscara), e não duas luas sobrepostas: assim a borda interna
+          fica limpa sobre qualquer céu, sem emenda visível. */}
+      <g className="bz-lua">
+        <mask id={mascara}>
+          <rect x="790" y="20" width="260" height="260" fill="black" />
+          <circle cx="920" cy="150" r="70" fill="white" />
+          <circle cx="884" cy="126" r="62" fill="black" />
+        </mask>
+        <circle
+          cx="920"
+          cy="150"
+          r="70"
+          fill="#E0C27E"
+          mask={`url(#${mascara})`}
+        />
+        {/* estrelas discretas — só o bastante para virar noite */}
+        <g fill="#E0C27E" opacity="0.5">
+          <circle cx="1060" cy="86" r="3" />
+          <circle cx="1112" cy="188" r="2.2" />
+          <circle cx="806" cy="70" r="2.4" />
+          <circle cx="752" cy="186" r="2" />
+          <circle cx="1016" cy="252" r="2.6" />
+        </g>
+      </g>
+    </g>
+  );
+}
+
+/** A torre principal, a única que sobrevive no recorte do mobile. */
+function TorrePrincipal({ id }: { id: string }) {
+  return (
+    <g>
+      <rect
+        x="480"
+        y="140"
+        width="180"
+        height="560"
+        fill={`url(#bzTower-${id})`}
+      />
+      <rect x="480" y="128" width="180" height="12" fill="var(--predio-topo)" />
+      <rect x="550" y="96" width="6" height="32" fill="var(--predio-topo)" />
+      <WindowGrid
+        id={id}
+        x={500}
+        y={170}
+        cols={5}
+        rows={16}
+        w={22}
+        h={18}
+        gx={12}
+        gy={14}
+        lit={[3, 7, 12, 21, 26, 34, 43, 48, 57, 62, 71]}
+      />
+    </g>
+  );
+}
+
 export default function CityScene() {
-  const svgRef = useRef<SVGSVGElement>(null);
+  const raizRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const svg = svgRef.current;
-    if (!svg) return;
+    const raiz = raizRef.current;
+    if (!raiz) return;
 
     const reduzMovimento = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
@@ -75,13 +179,15 @@ export default function CityScene() {
 
     function aplicar() {
       raf = 0;
-      const el = svgRef.current;
+      const el = raizRef.current;
       if (!el) return;
       // Progresso 0 → 1 ao longo de ~70% da altura da viewport
       const progresso = Math.min(
         Math.max(window.scrollY / (window.innerHeight * 0.7), 0),
         1
       );
+      // No elemento que ENVOLVE as duas montagens: assim a variável é
+      // herdada pelas duas e o efeito não depende de qual está visível.
       el.style.setProperty("--bz-p", progresso.toFixed(4));
     }
 
@@ -98,137 +204,161 @@ export default function CityScene() {
   }, []);
 
   return (
-    <svg
-      ref={svgRef}
-      viewBox="0 0 1200 700"
-      preserveAspectRatio="xMidYMax meet"
-      className="bz-scene"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="bzTower" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--predio-a)" />
-          <stop offset="100%" stopColor="var(--predio-c)" />
-        </linearGradient>
-      </defs>
+    <div ref={raizRef} className="bz-cena-raiz">
+      {/* ---------- desktop: a cidade inteira ---------- */}
+      <svg
+        viewBox="0 0 1200 700"
+        preserveAspectRatio="xMidYMax meet"
+        className="bz-scene bz-scene-amplo"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="bzTower-amplo" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--predio-a)" />
+            <stop offset="100%" stopColor="var(--predio-c)" />
+          </linearGradient>
+        </defs>
 
-      {/* O céu é o degradê do wrapper (.bz-media-wrap) — o SVG fica
-          transparente para não criar emenda em telas de qualquer proporção */}
+        {/* O céu é o degradê do wrapper (.bz-media-wrap) — o SVG fica
+            transparente para não criar emenda em telas de qualquer proporção */}
 
-      {/* Sol de dia, lua crescente de noite.
-          Os dois ficam no SVG e quem escolhe é o CSS (.bz-sol / .bz-lua,
-          em globals.css, sob [data-theme]). Assim não existe estado de
-          tema dentro do React e nada pisca entre o HTML do servidor e a
-          hidratação — o problema clássico de "ler o tema" no componente. */}
-      <g className="bz-layer-sun">
-        <g className="bz-sol">
-          <circle cx="920" cy="150" r="70" fill="#ffffff" opacity="0.9" />
-          {/* Aro dourado: o sol era branco sobre um céu quase branco e
-              praticamente sumia. O aro dá a borda e leva a cor da marca
-              para o ponto mais alto da cena. */}
-          <circle
-            cx="920"
-            cy="150"
-            r="70"
-            fill="none"
-            stroke="#C6A052"
-            strokeWidth="1.5"
-            opacity="0.7"
-          />
-        </g>
+        <Astro id="amplo" />
 
-        {/* A crescente é UM disco com outro recortado fora do centro
-            (máscara), e não duas luas sobrepostas: assim a borda interna
-            fica limpa sobre qualquer céu, sem emenda visível. */}
-        <g className="bz-lua">
-          <mask id="bzLua">
-            <rect x="790" y="20" width="260" height="260" fill="black" />
-            <circle cx="920" cy="150" r="70" fill="white" />
-            <circle cx="884" cy="126" r="62" fill="black" />
-          </mask>
-          <circle cx="920" cy="150" r="70" fill="#E0C27E" mask="url(#bzLua)" />
-          {/* estrelas discretas — só o bastante para virar noite */}
-          <g fill="#E0C27E" opacity="0.5">
-            <circle cx="1060" cy="86" r="3" />
-            <circle cx="1112" cy="188" r="2.2" />
-            <circle cx="806" cy="70" r="2.4" />
-            <circle cx="752" cy="186" r="2" />
-            <circle cx="1016" cy="252" r="2.6" />
+        {/* Silhuetas de fundo — somem descendo ao scrollar */}
+        <g className="bz-layer-bg">
+          <g fill="var(--predio-longe-a)">
+            <rect x="60" y="300" width="120" height="400" />
+            <rect x="330" y="260" width="90" height="440" />
+            <rect x="760" y="320" width="110" height="380" />
+            <rect x="1050" y="280" width="100" height="420" />
+          </g>
+          <g fill="var(--predio-longe-b)">
+            <rect x="150" y="340" width="100" height="360" />
+            <rect x="700" y="380" width="80" height="320" />
+            <rect x="960" y="360" width="120" height="340" />
           </g>
         </g>
-      </g>
 
-      {/* Silhuetas de fundo — somem descendo ao scrollar */}
-      <g className="bz-layer-bg">
-        <g fill="var(--predio-longe-a)">
-          <rect x="60" y="300" width="120" height="400" />
-          <rect x="330" y="260" width="90" height="440" />
-          <rect x="760" y="320" width="110" height="380" />
-          <rect x="1050" y="280" width="100" height="420" />
-        </g>
-        <g fill="var(--predio-longe-b)">
-          <rect x="150" y="340" width="100" height="360" />
-          <rect x="700" y="380" width="80" height="320" />
-          <rect x="960" y="360" width="120" height="340" />
-        </g>
-      </g>
+        {/* Torres principais — descem e desaparecem ao scrollar */}
+        <g className="bz-layer-main">
+          <TorrePrincipal id="amplo" />
 
-      {/* Torres principais — descem e desaparecem ao scrollar */}
-      <g className="bz-layer-main">
-        {/* Torre principal — preta, centro-direita */}
-        <g>
-          <rect x="480" y="140" width="180" height="560" fill="url(#bzTower)" />
-          <rect x="480" y="128" width="180" height="12" fill="var(--predio-topo)" />
-          <rect x="550" y="96" width="6" height="32" fill="var(--predio-topo)" />
-          <WindowGrid
-            x={500}
-            y={170}
-            cols={5}
-            rows={16}
-            w={22}
-            h={18}
-            gx={12}
-            gy={14}
-            lit={[3, 7, 12, 21, 26, 34, 43, 48, 57, 62, 71]}
+          {/* Torre secundária — esquerda */}
+          <g>
+            <rect
+              x="230"
+              y="240"
+              width="130"
+              height="460"
+              fill="var(--predio-b)"
+            />
+            <rect
+              x="230"
+              y="230"
+              width="130"
+              height="10"
+              fill="var(--predio-topo)"
+            />
+            <WindowGrid
+              id="amplo-b"
+              x={246}
+              y={264}
+              cols={4}
+              rows={13}
+              w={20}
+              h={16}
+              gx={10}
+              gy={16}
+              lit={[2, 9, 14, 23, 30, 37, 44]}
+            />
+          </g>
+
+          {/* Torre baixa comercial — direita */}
+          <g>
+            <rect
+              x="820"
+              y="440"
+              width="220"
+              height="260"
+              fill="var(--predio-c)"
+            />
+            <WindowGrid
+              id="amplo-c"
+              x={838}
+              y={464}
+              cols={7}
+              rows={6}
+              w={22}
+              h={20}
+              gx={6}
+              gy={16}
+              lit={[4, 11, 18, 27, 33]}
+            />
+          </g>
+        </g>
+
+        {/* Linha do chão */}
+        <rect
+          x="0"
+          y="698"
+          width="1200"
+          height="2"
+          fill="rgb(var(--ink) / 0.22)"
+        />
+      </svg>
+
+      {/* ---------- mobile: uma torre e o astro ----------
+          Recorte EM RETRATO (360×640), na proporção da tela do celular.
+          Com o recorte largo do desktop sobrava uma faixa morta embaixo
+          e a torre ficava minúscula; assim ela ocupa a altura toda.
+
+          O astro é o mesmo componente, só reposicionado: no desktop ele
+          mora em x=920, longe demais para caber num quadro estreito.
+          O translate o traz para o lado da torre. */}
+      <svg
+        viewBox="440 60 360 640"
+        preserveAspectRatio="xMidYMax meet"
+        className="bz-scene bz-scene-compacto"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient id="bzTower-compacto" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--predio-a)" />
+            <stop offset="100%" stopColor="var(--predio-c)" />
+          </linearGradient>
+        </defs>
+
+        <g
+          transform="translate(-185 -10) scale(0.86)"
+          style={{ transformOrigin: "920px 150px" }}
+        >
+          <Astro id="compacto" />
+        </g>
+
+        {/* Uma silhueta só, atrás da torre: sem nenhuma, a torre flutua
+            sem chão; com várias, volta a poluir. */}
+        <g className="bz-layer-bg">
+          <rect
+            x="690"
+            y="420"
+            width="120"
+            height="280"
+            fill="var(--predio-longe-a)"
           />
         </g>
 
-        {/* Torre secundária — preta, esquerda */}
-        <g>
-          <rect x="230" y="240" width="130" height="460" fill="var(--predio-b)" />
-          <rect x="230" y="230" width="130" height="10" fill="var(--predio-topo)" />
-          <WindowGrid
-            x={246}
-            y={264}
-            cols={4}
-            rows={13}
-            w={20}
-            h={16}
-            gx={10}
-            gy={16}
-            lit={[2, 9, 14, 23, 30, 37, 44]}
-          />
+        <g className="bz-layer-main">
+          <TorrePrincipal id="compacto" />
         </g>
 
-        {/* Torre baixa comercial — direita */}
-        <g>
-          <rect x="820" y="440" width="220" height="260" fill="var(--predio-c)" />
-          <WindowGrid
-            x={838}
-            y={464}
-            cols={7}
-            rows={6}
-            w={22}
-            h={20}
-            gx={6}
-            gy={16}
-            lit={[4, 11, 18, 27, 33]}
-          />
-        </g>
-      </g>
-
-      {/* Linha do chão */}
-      <rect x="0" y="698" width="1200" height="2" fill="rgb(var(--ink) / 0.22)" />
-    </svg>
+        <rect
+          x="440"
+          y="698"
+          width="360"
+          height="2"
+          fill="rgb(var(--ink) / 0.22)"
+        />
+      </svg>
+    </div>
   );
 }

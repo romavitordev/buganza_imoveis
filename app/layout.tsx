@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { siteUrl } from "@/lib/site-url";
 import ChatWidget from "@/components/ChatWidget";
-import { VarreduraTema } from "@/components/ThemeToggle";
 import "./globals.css";
 import { MARCA } from "@/lib/marca";
 
@@ -69,7 +68,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(negocioJsonLd) }}
         />
         {children}
-        <VarreduraTema />
         <ChatWidget />
       </body>
     </html>
