@@ -43,13 +43,13 @@ export default function NotFound() {
           <rect x="0" y="128" width="320" height="2" fill="rgba(20,38,74,0.22)" />
         </svg>
 
-        <p className="text-[13px] font-medium uppercase tracking-wide text-black/70">
+        <p className="text-[13px] font-medium uppercase tracking-wide text-secundario">
           Erro 404
         </p>
         <h1 className="max-w-xl text-4xl tracking-tight md:text-5xl">
           Este imóvel já encontrou um dono — ou a página não existe.
         </h1>
-        <p className="max-w-md text-sm leading-relaxed text-black/70">
+        <p className="max-w-md text-sm leading-relaxed text-secundario">
           O anúncio pode ter sido vendido, alugado ou pausado. Veja o catálogo
           atualizado ou fale direto com a gente.
         </p>

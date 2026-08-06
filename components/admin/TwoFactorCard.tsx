@@ -137,7 +137,7 @@ export default function TwoFactorCard({ ativado }: { ativado: boolean }) {
 
       {!ativado && qr && (
         <form onSubmit={confirmar} className="flex flex-col gap-3">
-          <ol className="list-decimal pl-5 text-[13px] leading-relaxed text-black/70">
+          <ol className="list-decimal pl-5 text-[13px] leading-relaxed text-secundario">
             <li>
               Abra o app autenticador (Google Authenticator, Authy,
               1Password…) e escaneie o QR abaixo.
@@ -152,7 +152,7 @@ export default function TwoFactorCard({ ativado }: { ativado: boolean }) {
             className="rounded-xl border border-black/10"
           />
           {segredo && (
-            <p className="text-[12px] md:text-[11px] text-black/70">
+            <p className="text-[12px] md:text-[11px] text-secundario">
               Sem câmera? Digite o código manualmente no app:{" "}
               <code className="rounded bg-mist px-1.5 py-0.5">{segredo}</code>
             </p>
@@ -173,7 +173,7 @@ export default function TwoFactorCard({ ativado }: { ativado: boolean }) {
 
       {ativado && (
         <form onSubmit={desativar} className="flex flex-col gap-2">
-          <p className="text-[12px] text-black/70">
+          <p className="text-[12px] text-secundario">
             Para desativar, confirme um código atual do app:
           </p>
           <div className="flex items-center gap-2">

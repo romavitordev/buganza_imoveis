@@ -154,7 +154,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
 
   if (total === 0) {
     return (
-      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-mist text-sm text-black/70">
+      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-mist text-sm text-secundario">
         Fotos em breve — consulte pelo WhatsApp
       </div>
     );

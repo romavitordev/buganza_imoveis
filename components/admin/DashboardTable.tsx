@@ -30,9 +30,9 @@ import { STATUS_LABEL, TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 
 const STATUS_ESTILO: Record<AdminProperty["status"], string> = {
   ATIVO: "bg-black text-white",
-  PAUSADO: "bg-mist text-black/70",
-  VENDIDO: "border border-black/20 text-black/70",
-  ALUGADO: "border border-black/20 text-black/70",
+  PAUSADO: "bg-mist text-secundario",
+  VENDIDO: "border border-black/20 text-secundario",
+  ALUGADO: "border border-black/20 text-secundario",
 };
 
 const POR_PAGINA = 10;
@@ -326,7 +326,7 @@ export default function DashboardTable({
       <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl tracking-tight">Painel de imóveis</h1>
-          <p className="mt-1 text-[13px] text-black/70">
+          <p className="mt-1 text-[13px] text-secundario">
             {properties.length} imóve{properties.length === 1 ? "l" : "is"}{" "}
             cadastrado{properties.length === 1 ? "" : "s"}
           </p>
@@ -341,7 +341,7 @@ export default function DashboardTable({
           </Link>
           <Link
             href="/admin/leads"
-            className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-black/70 transition-colors hover:border-black"
+            className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-secundario transition-colors hover:border-black"
           >
             <MessageCircle size={14} aria-hidden="true" />
             Leads
@@ -354,14 +354,14 @@ export default function DashboardTable({
           <Link
             href="/admin/conta"
             aria-label="Minha conta"
-            className="inline-flex items-center gap-2 rounded-pill border border-black/15 p-2.5 text-black/70 transition-colors hover:border-black"
+            className="inline-flex items-center gap-2 rounded-pill border border-black/15 p-2.5 text-secundario transition-colors hover:border-black"
           >
             <UserRound size={14} aria-hidden="true" />
           </Link>
           <button
             type="button"
             onClick={sair}
-            className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-black/70 transition-colors hover:border-black"
+            className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-secundario transition-colors hover:border-black"
           >
             <LogOut size={14} aria-hidden="true" />
             Sair
@@ -373,7 +373,7 @@ export default function DashboardTable({
           Contagem única por dispositivo/dia; nenhum dado pessoal armazenado. */}
       <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
             <Eye size={13} aria-hidden="true" />
             Visualizações (7 dias)
           </p>
@@ -381,13 +381,13 @@ export default function DashboardTable({
             {resumo7d.visualizacoes}
           </p>
           {resumo7d.percentualMobile !== null && (
-            <p className="mt-0.5 text-[12px] md:text-[11px] text-black/70">
+            <p className="mt-0.5 text-[12px] md:text-[11px] text-secundario">
               {resumo7d.percentualMobile}% pelo celular
             </p>
           )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
             <MessageCircle size={13} aria-hidden="true" />
             Cliques no WhatsApp (7 dias)
           </p>
@@ -395,7 +395,7 @@ export default function DashboardTable({
             {resumo7d.cliquesWhatsApp}
           </p>
           {resumo7d.visualizacoes > 0 && (
-            <p className="mt-0.5 text-[12px] md:text-[11px] text-black/70">
+            <p className="mt-0.5 text-[12px] md:text-[11px] text-secundario">
               {Math.round(
                 (resumo7d.cliquesWhatsApp / resumo7d.visualizacoes) * 100
               )}
@@ -404,7 +404,7 @@ export default function DashboardTable({
           )}
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="flex items-center gap-2 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
             <Star size={13} aria-hidden="true" />
             Mais visto (total)
           </p>
@@ -417,7 +417,7 @@ export default function DashboardTable({
           </p>
         </div>
         <div className="rounded-2xl border border-black/10 p-5">
-          <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+          <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
             Origens do tráfego (7 dias)
           </p>
           {resumo7d.origens.length > 0 ? (
@@ -428,12 +428,12 @@ export default function DashboardTable({
                   className="flex items-center justify-between gap-2 text-[12px]"
                 >
                   <span className="truncate font-medium">{origem}</span>
-                  <span className="tabular-nums text-black/70">{total}</span>
+                  <span className="tabular-nums text-secundario">{total}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-1 text-sm font-medium text-black/70">
+            <p className="mt-1 text-sm font-medium text-secundario">
               Acessos diretos por enquanto
             </p>
           )}
@@ -448,10 +448,10 @@ export default function DashboardTable({
         <div className="mb-8 rounded-2xl border border-black/10 p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+              <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
                 Perguntas que o chat não soube responder
               </p>
-              <p className="mt-1 text-[12px] text-black/70">
+              <p className="mt-1 text-[12px] text-secundario">
                 Responda uma vez e o bot passa a responder sozinho.
               </p>
             </div>
@@ -468,8 +468,8 @@ export default function DashboardTable({
                 key={p.id}
                 className="flex items-baseline justify-between gap-3 text-sm"
               >
-                <span className="truncate text-black/75">“{p.texto}”</span>
-                <span className="flex-none text-[12px] md:text-[11px] text-black/70">
+                <span className="truncate text-secundario">“{p.texto}”</span>
+                <span className="flex-none text-[12px] md:text-[11px] text-secundario">
                   {new Date(p.criadoEm).toLocaleDateString("pt-BR", {
                     day: "2-digit",
                     month: "2-digit",
@@ -485,7 +485,7 @@ export default function DashboardTable({
         <div className="relative max-w-sm flex-1">
           <Search
             size={15}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-black/70"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-secundario"
             aria-hidden="true"
           />
           <input
@@ -529,11 +529,11 @@ export default function DashboardTable({
                 className={`rounded-pill border px-3.5 py-1.5 text-[12px] font-medium transition-colors ${
                   ativo
                     ? "border-black bg-black text-white"
-                    : "border-black/12 bg-white text-black/70 hover:border-black/40"
+                    : "border-black/12 bg-white text-secundario hover:border-black/40"
                 }`}
               >
                 {valor === "TODOS" ? "Todos" : STATUS_LABEL[valor]}{" "}
-                <span className={ativo ? "opacity-70" : "text-black/70"}>
+                <span className={ativo ? "opacity-70" : "text-secundario"}>
                   {quantidade}
                 </span>
               </button>
@@ -553,7 +553,7 @@ export default function DashboardTable({
 
       {filtradas.length === 0 ? (
         <div className="rounded-2xl bg-mist px-6 py-16 text-center">
-          <p className="text-sm text-black/70">
+          <p className="text-sm text-secundario">
             {properties.length === 0
               ? "Nenhum imóvel cadastrado ainda. Clique em “Novo imóvel” para começar."
               : "Nenhum imóvel corresponde à busca."}
@@ -565,7 +565,7 @@ export default function DashboardTable({
               scroll lateral. Em telas estreitas, colunas secundárias somem. */}
           <table className="w-full text-left text-[13px]">
             <thead>
-              <tr className="border-b border-black/10 bg-mist/60 text-[12px] md:text-[11px] uppercase tracking-wide text-black/70">
+              <tr className="border-b border-black/10 bg-mist/60 text-[12px] md:text-[11px] uppercase tracking-wide text-secundario">
                 <ThOrdenavel campo="titulo" ordenacao={ordenacao} onOrdenar={ordenarPor}>
                   Imóvel
                 </ThOrdenavel>
@@ -636,7 +636,7 @@ export default function DashboardTable({
                           <span className="block truncate font-medium">
                             {p.titulo}
                           </span>
-                          <span className="mt-0.5 block truncate text-[12px] md:text-[11px] text-black/70">
+                          <span className="mt-0.5 block truncate text-[12px] md:text-[11px] text-secundario">
                             {p.codigo} · {TIPO_LABEL[p.tipo]} ·{" "}
                             {TRANSACAO_LABEL[p.transacao]} — {p.bairro},{" "}
                             {p.cidade}
@@ -697,7 +697,7 @@ export default function DashboardTable({
                     <td className="hidden px-4 py-3 text-right tabular-nums md:table-cell">
                       {p.cliquesWhatsApp}
                     </td>
-                    <td className="hidden whitespace-nowrap px-4 py-3 text-black/70 lg:table-cell">
+                    <td className="hidden whitespace-nowrap px-4 py-3 text-secundario lg:table-cell">
                       {dataCurta(p.atualizadoEm)}
                     </td>
                     <td className="px-4 py-3">
@@ -708,7 +708,7 @@ export default function DashboardTable({
                             target="_blank"
                             rel="noopener noreferrer"
                             aria-label={`Ver ${p.codigo} no site`}
-                            className="rounded-full p-2 text-black/70 transition-colors hover:bg-mist hover:text-black"
+                            className="rounded-full p-2 text-secundario transition-colors hover:bg-mist hover:text-black"
                           >
                             <ExternalLink size={15} aria-hidden="true" />
                           </a>
@@ -718,7 +718,7 @@ export default function DashboardTable({
                           disabled={ocupado}
                           onClick={() => duplicar(p)}
                           aria-label={`Duplicar ${p.codigo}`}
-                          className="rounded-full p-2 text-black/70 transition-colors hover:bg-mist hover:text-black"
+                          className="rounded-full p-2 text-secundario transition-colors hover:bg-mist hover:text-black"
                         >
                           <Copy size={15} aria-hidden="true" />
                         </button>
@@ -734,7 +734,7 @@ export default function DashboardTable({
                           disabled={ocupado}
                           onClick={() => setParaExcluir(p)}
                           aria-label={`Excluir ${p.codigo}`}
-                          className="rounded-full p-2 text-black/70 transition-colors hover:bg-mist hover:text-black"
+                          className="rounded-full p-2 text-secundario transition-colors hover:bg-mist hover:text-black"
                         >
                           <Trash2 size={15} aria-hidden="true" />
                         </button>
@@ -751,7 +751,7 @@ export default function DashboardTable({
               aria-label="Paginação da tabela"
               className="flex items-center justify-between border-t border-black/10 px-4 py-3"
             >
-              <p className="text-[12px] text-black/70">
+              <p className="text-[12px] text-secundario">
                 Página {paginaAtual} de {totalPaginas} · {filtradas.length}{" "}
                 imóve{filtradas.length === 1 ? "l" : "is"}
               </p>

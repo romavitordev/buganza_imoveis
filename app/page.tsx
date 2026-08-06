@@ -52,7 +52,7 @@ export default async function HomePage() {
         >
           <div className="bz-fade-up mb-10 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="mb-2 flex items-center gap-2 text-[13px] text-black/70">
+              <p className="mb-2 flex items-center gap-2 text-[13px] text-secundario">
                 <span className="bz-dot" aria-hidden="true" />
                 Selecionados para você
               </p>

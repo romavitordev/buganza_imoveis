@@ -234,7 +234,7 @@ export default async function ImovelPage({ params }: PageProps) {
         <div className="mb-6 flex items-center justify-between gap-4">
           <Link
             href="/imoveis"
-            className="inline-flex items-center gap-2 text-[13px] font-medium text-black/70 transition-colors hover:text-black"
+            className="inline-flex items-center gap-2 text-[13px] font-medium text-secundario transition-colors hover:text-black"
           >
             <ArrowLeft size={15} aria-hidden="true" />
             Voltar para o catálogo
@@ -250,17 +250,17 @@ export default async function ImovelPage({ params }: PageProps) {
                 ? SUBTIPO_LABEL[imovel.subtipo]
                 : TIPO_LABEL[imovel.tipo]}
             </span>
-            <span className="rounded-pill border border-black/15 px-3 py-1 text-[12px] md:text-[11px] font-medium text-black/70">
+            <span className="rounded-pill border border-black/15 px-3 py-1 text-[12px] md:text-[11px] font-medium text-secundario">
               {TRANSACAO_LABEL[imovel.transacao]}
             </span>
-            <span className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+            <span className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
               Cód. {imovel.codigo}
             </span>
           </div>
           <h1 className="max-w-3xl text-3xl leading-tight tracking-tight md:text-4xl">
             {imovel.titulo}
           </h1>
-          <p className="mt-2 flex items-center gap-1.5 text-sm text-black/70">
+          <p className="mt-2 flex items-center gap-1.5 text-sm text-secundario">
             <MapPin size={14} aria-hidden="true" />
             {imovel.bairro} · {imovel.cidade}
           </p>
@@ -292,7 +292,7 @@ export default async function ImovelPage({ params }: PageProps) {
             <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
               {precoVenda && (
                 <div>
-                  <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+                  <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
                     Venda
                   </p>
                   <p className="bz-num text-3xl font-semibold tracking-tight">
@@ -302,7 +302,7 @@ export default async function ImovelPage({ params }: PageProps) {
               )}
               {precoLocacao && (
                 <div>
-                  <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+                  <p className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
                     Locação
                   </p>
                   <p className="bz-num text-3xl font-semibold tracking-tight">
@@ -315,7 +315,7 @@ export default async function ImovelPage({ params }: PageProps) {
                   <p className="bz-num text-3xl font-semibold tracking-tight">
                     Sob consulta
                   </p>
-                  <p className="mt-1 text-[12px] text-black/70">
+                  <p className="mt-1 text-[12px] text-secundario">
                     Chame no WhatsApp — respondemos rápido
                   </p>
                 </div>
@@ -323,7 +323,7 @@ export default async function ImovelPage({ params }: PageProps) {
             </div>
 
             {custos.length > 0 && (
-              <p className="mt-3 border-t border-black/8 pt-3 text-[12px] text-black/70">
+              <p className="mt-3 border-t border-black/8 pt-3 text-[12px] text-secundario">
                 {custos.join(" · ")}
               </p>
             )}
@@ -339,7 +339,7 @@ export default async function ImovelPage({ params }: PageProps) {
               />
               {rotuloCta}
             </WhatsAppLink>
-            <p className="mt-2 text-center text-[12px] md:text-[11px] text-black/70">
+            <p className="mt-2 text-center text-[12px] md:text-[11px] text-secundario">
               Resposta rápida · atendimento direto com os corretores
             </p>
 
@@ -347,20 +347,20 @@ export default async function ImovelPage({ params }: PageProps) {
                 ao lado da galeria e resume os números do imóvel */}
             {caracteristicas.length > 0 && (
               <div className="mt-6 border-t border-black/10 pt-5">
-                <p className="mb-3 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+                <p className="mb-3 text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
                   Características
                 </p>
                 <ul className="grid grid-cols-2 gap-x-4 gap-y-4">
                   {caracteristicas.map(({ icone: Icone, rotulo, valor }) => (
                     <li key={rotulo} className="flex items-center gap-2.5">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-mist text-black/70">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-mist text-secundario">
                         <Icone size={16} strokeWidth={1.75} aria-hidden="true" />
                       </span>
                       <span className="min-w-0">
                         <span className="block text-sm font-semibold leading-tight tracking-tight">
                           {valor}
                         </span>
-                        <span className="block truncate text-[12px] md:text-[10px] font-medium uppercase tracking-wide text-black/70">
+                        <span className="block truncate text-[12px] md:text-[10px] font-medium uppercase tracking-wide text-secundario">
                           {rotulo}
                         </span>
                       </span>
@@ -383,7 +383,7 @@ export default async function ImovelPage({ params }: PageProps) {
               >
                 Sobre este imóvel
               </h2>
-              <div className="max-w-2xl space-y-3 text-[15px] leading-relaxed text-black/70">
+              <div className="max-w-2xl space-y-3 text-[15px] leading-relaxed text-secundario">
                 {imovel.descricao.split(/\n{2,}/).map((paragrafo, i) => (
                   <p key={i}>{paragrafo}</p>
                 ))}
@@ -412,7 +412,7 @@ export default async function ImovelPage({ params }: PageProps) {
                 allowFullScreen
                 className="aspect-video w-full rounded-2xl border border-black/10 grayscale transition-[filter] duration-500 ease-premium hover:grayscale-0"
               />
-              <p className="mt-2 text-[12px] text-black/70">
+              <p className="mt-2 text-[12px] text-secundario">
                 Localização aproximada ({imovel.bairro}) — o endereço
                 completo é passado no atendimento pelo WhatsApp.
               </p>

@@ -38,7 +38,7 @@ export default function QuemSomos() {
     >
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 py-16 md:grid-cols-[2fr_3fr] md:gap-16 md:px-8 md:py-24">
         <div className="bz-fade-up flex flex-col gap-5">
-          <p className="flex items-center gap-2 text-[13px] text-black/70">
+          <p className="flex items-center gap-2 text-[13px] text-secundario">
             <span className="bz-dot" aria-hidden="true" />
             Quem somos
           </p>
@@ -50,13 +50,13 @@ export default function QuemSomos() {
             <br />
             Um jeito mais humano de negociar imóveis.
           </h2>
-          <p className="text-[15px] leading-relaxed text-black/70">
+          <p className="text-[15px] leading-relaxed text-secundario">
             A {MARCA.nome} nasceu em {MARCA.cidade} da parceria de um casal que
             resolveu fazer diferente: menos vitrine, mais conversa. A gente
             acompanha cada cliente pessoalmente — do primeiro “oi” no WhatsApp
             até a entrega das chaves.
           </p>
-          <p className="text-[15px] leading-relaxed text-black/70">
+          <p className="text-[15px] leading-relaxed text-secundario">
             Trabalhamos com um catálogo enxuto e escolhido a dedo, porque
             preferimos conhecer bem cada imóvel a anunciar qualquer um.
           </p>
@@ -74,16 +74,19 @@ export default function QuemSomos() {
               />
               Conversar com a gente
             </a>
-            <span className="text-[12px] md:text-[11px] text-black/70">
+            <span className="text-[12px] md:text-[11px] text-secundario">
               CRECI {MARCA.creci}
             </span>
           </div>
 
-          {/* Números — informações fictícias por enquanto */}
+          {/* CONFIRMAR COM OS DONOS ANTES DE IR AO AR.
+              Os "+15 anos" vieram deles. O volume de imóveis é uma
+              projeção a partir disso — o +120 antigo era de quando se
+              supunha 5 anos de mercado. Está no CHECKLIST-DEPLOY. */}
           <dl className="mt-4 grid grid-cols-3 gap-4 border-t border-black/10 pt-6">
             {[
-              { numero: "+120", rotulo: "imóveis negociados" },
-              { numero: "+5", rotulo: "anos de mercado" },
+              { numero: "+400", rotulo: "imóveis negociados" },
+              { numero: "+15", rotulo: "anos de mercado" },
               { numero: "100%", rotulo: "acompanhamento pessoal" },
             ].map(({ numero, rotulo }) => (
               <div key={rotulo}>
@@ -91,7 +94,7 @@ export default function QuemSomos() {
                 <dd className="text-2xl font-semibold tracking-tight md:text-3xl">
                   {numero}
                 </dd>
-                <dd className="mt-0.5 text-[12px] md:text-[11px] leading-snug text-black/70">
+                <dd className="mt-0.5 text-[12px] md:text-[11px] leading-snug text-secundario">
                   {rotulo}
                 </dd>
               </div>
@@ -118,7 +121,7 @@ export default function QuemSomos() {
                 <h3 className="mb-1 text-base font-medium tracking-tight">
                   {titulo}
                 </h3>
-                <p className="text-[13px] leading-relaxed text-black/70">
+                <p className="text-[13px] leading-relaxed text-secundario">
                   {texto}
                 </p>
               </div>

@@ -37,7 +37,7 @@ function slugPreview(texto: string): string {
 const inputCls =
   "rounded-xl border border-black/15 px-4 py-2.5 text-sm outline-none transition-colors focus:border-black disabled:bg-mist";
 const labelCls = "flex flex-col gap-1.5";
-const legendaCls = "text-[12px] font-medium text-black/70";
+const legendaCls = "text-[12px] font-medium text-secundario";
 
 /** Card de seção do formulário. */
 function Secao({
@@ -53,7 +53,7 @@ function Secao({
     <section className="rounded-2xl border border-black/10 p-5 md:p-6">
       <h2 className="text-lg tracking-tight">{titulo}</h2>
       {descricao && (
-        <p className="mt-1 text-[12px] leading-relaxed text-black/70">
+        <p className="mt-1 text-[12px] leading-relaxed text-secundario">
           {descricao}
         </p>
       )}
@@ -100,7 +100,7 @@ function CampoPreco({
       />
       <span
         className={`min-h-[16px] text-[12px] md:text-[11px] ${
-          invalido ? "font-medium text-black" : "text-black/70"
+          invalido ? "font-medium text-black" : "text-secundario"
         }`}
         aria-live="polite"
       >
@@ -273,13 +273,13 @@ export default function PropertyForm({ property }: PropertyFormProps) {
       <div className="flex items-center justify-between gap-4">
         <Link
           href="/admin"
-          className="inline-flex items-center gap-2 text-[13px] font-medium text-black/70 transition-colors hover:text-black"
+          className="inline-flex items-center gap-2 text-[13px] font-medium text-secundario transition-colors hover:text-black"
         >
           <ArrowLeft size={15} aria-hidden="true" />
           Voltar ao painel
         </Link>
         {editando && property && (
-          <span className="rounded-pill bg-mist px-3 py-1 text-[12px] md:text-[11px] font-medium text-black/70">
+          <span className="rounded-pill bg-mist px-3 py-1 text-[12px] md:text-[11px] font-medium text-secundario">
             {property.codigo}
           </span>
         )}
@@ -368,7 +368,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
             className={inputCls}
             placeholder="casa-terrea-3-quartos-jardim-europa"
           />
-          <span className="text-[12px] md:text-[11px] text-black/70">
+          <span className="text-[12px] md:text-[11px] text-secundario">
             {dominioDoSite()}/imoveis/{slug || "…"}
           </span>
         </label>
@@ -508,7 +508,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
                     className={`rounded-pill border px-3.5 py-2 text-[12px] font-medium transition-colors ${
                       ativa
                         ? "border-black bg-black text-white"
-                        : "border-black/12 bg-white text-black/70 hover:border-black/40"
+                        : "border-black/12 bg-white text-secundario hover:border-black/40"
                     }`}
                   >
                     {rotulo}
@@ -570,7 +570,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           />
           <span
             className={`text-[12px] md:text-[11px] ${
-              descricao.length >= 300 ? "text-black/70" : "text-black/70"
+              descricao.length >= 300 ? "text-secundario" : "text-secundario"
             }`}
           >
             {descricao.length} caracteres
@@ -641,13 +641,13 @@ export default function PropertyForm({ property }: PropertyFormProps) {
               : "Criar e adicionar fotos"}
         </button>
         {salvo && (
-          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-black/70">
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-secundario">
             <Check size={15} aria-hidden="true" />
             Alterações salvas
           </span>
         )}
         {!editando && (
-          <span className="text-[12px] text-black/70">
+          <span className="text-[12px] text-secundario">
             As fotos entram no próximo passo.
           </span>
         )}

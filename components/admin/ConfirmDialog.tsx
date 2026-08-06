@@ -56,14 +56,14 @@ export default function ConfirmDialog({
         className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-[0_16px_56px_rgba(0,0,0,0.18)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-mist text-black/70">
+        <span className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-mist text-secundario">
           <TriangleAlert size={20} strokeWidth={1.75} aria-hidden="true" />
         </span>
         <h2 id="confirm-titulo" className="text-lg tracking-tight">
           {titulo}
         </h2>
         {descricao && (
-          <p className="mt-1.5 text-[13px] leading-relaxed text-black/70">
+          <p className="mt-1.5 text-[13px] leading-relaxed text-secundario">
             {descricao}
           </p>
         )}
@@ -72,7 +72,7 @@ export default function ConfirmDialog({
             ref={cancelarRef}
             type="button"
             onClick={onCancelar}
-            className="rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-black/70 transition-colors hover:border-black"
+            className="rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-secundario transition-colors hover:border-black"
           >
             Cancelar
           </button>

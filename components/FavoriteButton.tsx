@@ -52,7 +52,7 @@ export default function FavoriteButton({ id, titulo }: FavoriteButtonProps) {
         // precisa saltar, e o dourado como preenchimento (não como texto)
         // é exatamente o uso permitido da cor sobre fundo claro.
         className={`transition-colors duration-200 ${
-          favorito ? "fill-dourado text-dourado" : "text-black/70"
+          favorito ? "fill-dourado text-dourado" : "text-secundario"
         }`}
       />
     </button>

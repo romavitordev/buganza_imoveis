@@ -51,7 +51,7 @@ export default function PasswordForm() {
   return (
     <form onSubmit={onSubmit} className="flex max-w-sm flex-col gap-4">
       <label className="flex flex-col gap-1.5">
-        <span className="text-[12px] font-medium text-black/70">
+        <span className="text-[12px] font-medium text-secundario">
           Senha atual
         </span>
         <input
@@ -65,7 +65,7 @@ export default function PasswordForm() {
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-[12px] font-medium text-black/70">
+        <span className="text-[12px] font-medium text-secundario">
           Nova senha (mínimo 8 caracteres)
         </span>
         <input
@@ -80,7 +80,7 @@ export default function PasswordForm() {
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-[12px] font-medium text-black/70">
+        <span className="text-[12px] font-medium text-secundario">
           Confirmar a nova senha
         </span>
         <input
@@ -117,7 +117,7 @@ export default function PasswordForm() {
           {enviando ? "Salvando…" : "Trocar senha"}
         </button>
         {ok && (
-          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-black/70">
+          <span className="inline-flex items-center gap-1.5 text-[13px] font-medium text-secundario">
             <Check size={15} aria-hidden="true" />
             Senha alterada
           </span>

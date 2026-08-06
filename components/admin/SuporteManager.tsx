@@ -203,7 +203,7 @@ export default function SuporteManager({
       className="mt-3 flex flex-col gap-3 rounded-xl border border-black/15 bg-white p-4"
     >
       <label className="flex flex-col gap-1.5">
-        <span className="text-[12px] font-medium text-black/70">
+        <span className="text-[12px] font-medium text-secundario">
           Assunto (vira o rótulo do atalho no chat)
         </span>
         <input
@@ -217,7 +217,7 @@ export default function SuporteManager({
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-[12px] font-medium text-black/70">
+        <span className="text-[12px] font-medium text-secundario">
           Resposta que o bot vai dar
         </span>
         <textarea
@@ -232,7 +232,7 @@ export default function SuporteManager({
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-[12px] font-medium text-black/70">
+        <span className="text-[12px] font-medium text-secundario">
           Palavras-chave (separadas por vírgula) — opcional
         </span>
         <input
@@ -241,7 +241,7 @@ export default function SuporteManager({
           placeholder="condominio, administracao, sindico"
           className="rounded-xl border border-black/15 px-3.5 py-2.5 text-sm outline-none focus:border-black"
         />
-        <span className="text-[12px] md:text-[11px] text-black/70">
+        <span className="text-[12px] md:text-[11px] text-secundario">
           {chavesPrevia.length > 0 ? (
             <>
               O bot vai responder quando a mensagem tiver:{" "}
@@ -290,13 +290,13 @@ export default function SuporteManager({
         <h2 id="pendentes-titulo" className="mb-1 text-lg tracking-tight">
           Perguntas sem resposta ({pendentes.length})
         </h2>
-        <p className="mb-4 text-[12px] text-black/70">
+        <p className="mb-4 text-[12px] text-secundario">
           O que os visitantes perguntaram e o bot não soube responder.
           Responda para ele aprender, ou ignore se for só um teste.
         </p>
 
         {pendentes.length === 0 ? (
-          <div className="rounded-2xl bg-mist px-6 py-10 text-center text-sm text-black/70">
+          <div className="rounded-2xl bg-mist px-6 py-10 text-center text-sm text-secundario">
             Nenhuma pendência — o bot respondeu tudo que perguntaram. 🎉
           </div>
         ) : (
@@ -311,12 +311,12 @@ export default function SuporteManager({
                     <p className="flex items-start gap-2 text-sm">
                       <MessageCircleQuestion
                         size={15}
-                        className="mt-0.5 flex-none text-black/70"
+                        className="mt-0.5 flex-none text-secundario"
                         aria-hidden="true"
                       />
                       <span>“{p.texto}”</span>
                     </p>
-                    <p className="mt-1 pl-[23px] text-[12px] md:text-[11px] text-black/70">
+                    <p className="mt-1 pl-[23px] text-[12px] md:text-[11px] text-secundario">
                       {new Date(p.criadoEm).toLocaleDateString("pt-BR", {
                         day: "2-digit",
                         month: "2-digit",
@@ -336,7 +336,7 @@ export default function SuporteManager({
                       type="button"
                       onClick={() => ignorar(p)}
                       disabled={ocupado}
-                      className="rounded-pill border border-black/20 px-4 py-2 text-[12px] font-medium text-black/70 transition-colors hover:border-black hover:text-black disabled:opacity-60"
+                      className="rounded-pill border border-black/20 px-4 py-2 text-[12px] font-medium text-secundario transition-colors hover:border-black hover:text-black disabled:opacity-60"
                     >
                       Ignorar
                     </button>
@@ -364,7 +364,7 @@ export default function SuporteManager({
             Nova resposta
           </button>
         </div>
-        <p className="mb-4 text-[12px] text-black/70">
+        <p className="mb-4 text-[12px] text-secundario">
           Estas valem junto com as respostas que já vêm prontas no bot.
           Desative uma para tirá-la do ar sem apagar.
         </p>
@@ -372,7 +372,7 @@ export default function SuporteManager({
         {editando === "novo" && formulario}
 
         {itens.length === 0 ? (
-          <div className="mt-3 rounded-2xl bg-mist px-6 py-10 text-center text-sm text-black/70">
+          <div className="mt-3 rounded-2xl bg-mist px-6 py-10 text-center text-sm text-secundario">
             Você ainda não ensinou nenhuma resposta.
           </div>
         ) : (
@@ -384,15 +384,15 @@ export default function SuporteManager({
                     <p className="flex items-center gap-2 text-sm font-medium">
                       {item.titulo}
                       {!item.ativo && (
-                        <span className="rounded-pill bg-mist px-2 py-0.5 text-[12px] md:text-[10px] font-medium uppercase tracking-wide text-black/70">
+                        <span className="rounded-pill bg-mist px-2 py-0.5 text-[12px] md:text-[10px] font-medium uppercase tracking-wide text-secundario">
                           Desativada
                         </span>
                       )}
                     </p>
-                    <p className="mt-1 line-clamp-2 text-[13px] text-black/70">
+                    <p className="mt-1 line-clamp-2 text-[13px] text-secundario">
                       {item.resposta}
                     </p>
-                    <p className="mt-1.5 text-[12px] md:text-[11px] text-black/70">
+                    <p className="mt-1.5 text-[12px] md:text-[11px] text-secundario">
                       Ativa com: {item.palavras.join(" · ")}
                     </p>
                   </div>
@@ -426,7 +426,7 @@ export default function SuporteManager({
                       type="button"
                       onClick={() => setParaExcluir(item)}
                       aria-label={`Excluir ${item.titulo}`}
-                      className="rounded-full p-2 text-black/70 transition-colors hover:bg-mist hover:text-black"
+                      className="rounded-full p-2 text-secundario transition-colors hover:bg-mist hover:text-black"
                     >
                       <Trash2 size={14} aria-hidden="true" />
                     </button>

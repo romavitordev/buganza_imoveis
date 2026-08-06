@@ -362,7 +362,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
                 onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
                 className={`relative z-10 rounded-pill px-4 py-2 text-[12px] font-medium transition-colors duration-300 ${
-                  ativo ? "text-white" : "text-black/75 hover:text-black"
+                  ativo ? "text-white" : "text-secundario hover:text-black"
                 }`}
               >
                 {rotulo}
@@ -432,7 +432,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
                 onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
                 className={`relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors duration-300 ${
-                  ativo ? "text-black" : "text-black/70"
+                  ativo ? "text-black" : "text-secundario"
                 }`}
               >
                 <span className="flex h-7 w-12 items-center justify-center">
@@ -452,7 +452,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
             href={whatsappHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-black/70"
+            className="relative z-10 flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-secundario"
           >
             {/* Glifo branco, não verde: aqui ele é um item de navegação
                 ao lado de outros quatro, e o verde o transformava no

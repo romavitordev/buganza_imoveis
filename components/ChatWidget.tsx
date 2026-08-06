@@ -253,7 +253,7 @@ export default function ChatWidget() {
         : [];
 
     const chip =
-      "rounded-pill border border-black/15 bg-white px-2.5 py-1 text-[12px] md:text-[11px] font-medium text-black/70 transition-colors hover:border-black hover:text-black";
+      "rounded-pill border border-black/15 bg-white px-2.5 py-1 text-[12px] md:text-[11px] font-medium text-secundario transition-colors hover:border-black hover:text-black";
 
     return (
       <div className="mt-3 flex flex-col gap-2">
@@ -273,14 +273,14 @@ export default function ChatWidget() {
         <button
           type="button"
           onClick={iniciarContato}
-          className="rounded-pill border border-black/15 px-4 py-2.5 text-[12px] font-medium text-black/70 transition-colors hover:border-black"
+          className="rounded-pill border border-black/15 px-4 py-2.5 text-[12px] font-medium text-secundario transition-colors hover:border-black"
         >
           Deixar meu contato
         </button>
 
         {chipsImovel.length > 0 && (
           <div className="mt-1 border-t border-black/8 pt-2.5">
-            <p className="mb-1.5 text-[12px] md:text-[10px] font-semibold uppercase tracking-wide text-black/70">
+            <p className="mb-1.5 text-[12px] md:text-[10px] font-semibold uppercase tracking-wide text-secundario">
               Sobre este imóvel
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -300,7 +300,7 @@ export default function ChatWidget() {
 
         {opcoes.length > 0 && (
           <div className="mt-1 border-t border-black/8 pt-2.5">
-            <p className="mb-1.5 text-[12px] md:text-[10px] font-semibold uppercase tracking-wide text-black/70">
+            <p className="mb-1.5 text-[12px] md:text-[10px] font-semibold uppercase tracking-wide text-secundario">
               {dentroDeCategoria
                 ? "Escolha o assunto"
                 : "Posso ajudar em mais algo?"}
@@ -320,7 +320,7 @@ export default function ChatWidget() {
                 <button
                   type="button"
                   onClick={voltarAosAssuntos}
-                  className="rounded-pill px-2.5 py-1 text-[12px] md:text-[11px] font-medium text-black/70 underline underline-offset-2 transition-colors hover:text-black"
+                  className="rounded-pill px-2.5 py-1 text-[12px] md:text-[11px] font-medium text-secundario underline underline-offset-2 transition-colors hover:text-black"
                 >
                   ← Outros assuntos
                 </button>
@@ -426,7 +426,7 @@ export default function ChatWidget() {
                 <span className="block truncate text-[12px] font-medium text-black">
                   {p.titulo}
                 </span>
-                <span className="block text-[12px] md:text-[11px] text-black/70">
+                <span className="block text-[12px] md:text-[11px] text-secundario">
                   {p.bairro} · <strong>{preco}</strong>
                 </span>
               </span>
@@ -671,7 +671,7 @@ export default function ChatWidget() {
                 type="button"
                 onClick={() => setAberto(false)}
                 aria-label="Voltar ao site"
-                className="-ml-1.5 rounded-full p-1.5 text-black/70 transition-colors hover:bg-mist hover:text-black md:hidden"
+                className="-ml-1.5 rounded-full p-1.5 text-secundario transition-colors hover:bg-mist hover:text-black md:hidden"
               >
                 <ArrowLeft size={20} aria-hidden="true" />
               </button>
@@ -685,7 +685,7 @@ export default function ChatWidget() {
                 <p className="text-sm font-semibold tracking-tight">
                   {MARCA.assistente}
                 </p>
-                <p className="flex items-center gap-1.5 text-[12px] md:text-[11px] text-black/70">
+                <p className="flex items-center gap-1.5 text-[12px] md:text-[11px] text-secundario">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#25D366]" />
                   Online agora
                 </p>
@@ -695,7 +695,7 @@ export default function ChatWidget() {
               type="button"
               onClick={() => setAberto(false)}
               aria-label="Fechar atendimento"
-              className="hidden rounded-full p-1.5 text-black/70 transition-colors hover:bg-mist hover:text-black md:block"
+              className="hidden rounded-full p-1.5 text-secundario transition-colors hover:bg-mist hover:text-black md:block"
             >
               <X size={18} aria-hidden="true" />
             </button>
@@ -752,7 +752,7 @@ export default function ChatWidget() {
                       ),
                     })
                   }
-                  className="w-fit text-[12px] font-medium text-black/70 underline underline-offset-2 transition-colors hover:text-black"
+                  className="w-fit text-[12px] font-medium text-secundario underline underline-offset-2 transition-colors hover:text-black"
                 >
                   Ver assuntos frequentes
                 </button>
@@ -790,7 +790,7 @@ export default function ChatWidget() {
                 onChange={(e) => setEntrada(e.target.value)}
                 placeholder="Escreva sua dúvida…"
                 aria-label="Sua mensagem"
-                className="flex-1 rounded-pill border border-black/15 px-4 py-2.5 text-sm outline-none transition-colors focus:border-black"
+                className="flex-1 rounded-pill border border-black/15 bg-white px-4 py-2.5 text-sm text-black outline-none transition-colors focus:border-black"
               />
               <button
                 type="submit"
@@ -864,7 +864,7 @@ function ContatoForm({
         onChange={(e) => setNome(e.target.value)}
         placeholder="Seu nome"
         aria-label="Seu nome"
-        className="rounded-xl border border-black/15 px-3.5 py-2.5 text-sm outline-none focus:border-black"
+        className="rounded-xl border border-black/15 bg-white px-3.5 py-2.5 text-sm text-black outline-none focus:border-black"
       />
       <input
         required
@@ -875,7 +875,7 @@ function ContatoForm({
         onChange={(e) => setWhatsapp(e.target.value)}
         placeholder="WhatsApp com DDD"
         aria-label="Seu WhatsApp"
-        className="rounded-xl border border-black/15 px-3.5 py-2.5 text-sm outline-none focus:border-black"
+        className="rounded-xl border border-black/15 bg-white px-3.5 py-2.5 text-sm text-black outline-none focus:border-black"
       />
       {/* Honeypot anti-bot */}
       <input
@@ -905,7 +905,7 @@ function ContatoForm({
         )}
         {enviando ? "Enviando…" : "Enviar contato"}
       </button>
-      <p className="text-[12px] md:text-[10px] leading-relaxed text-black/70">
+      <p className="text-[12px] md:text-[10px] leading-relaxed text-secundario">
         Ao enviar, você concorda com nossa{" "}
         <a href="/privacidade" className="underline underline-offset-2">
           política de privacidade

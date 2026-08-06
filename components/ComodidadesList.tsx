@@ -63,7 +63,7 @@ export default function ComodidadesList({ valores }: { valores: string[] }) {
           return (
             <li
               key={valor}
-              className="flex items-center gap-2 rounded-pill border border-black/10 bg-white px-3.5 py-2 text-[12px] font-medium text-black/75"
+              className="flex items-center gap-2 rounded-pill border border-black/10 bg-white px-3.5 py-2 text-[12px] font-medium text-secundario"
             >
               <Icone size={14} strokeWidth={1.75} aria-hidden="true" />
               {rotulo}

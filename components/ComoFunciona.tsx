@@ -50,7 +50,7 @@ export default function ComoFunciona() {
     >
       <div className="mx-auto max-w-6xl px-4 py-16 md:px-8 md:py-24">
         <div className="bz-fade-up mb-12">
-          <p className="mb-2 flex items-center gap-2 text-[13px] text-black/70">
+          <p className="mb-2 flex items-center gap-2 text-[13px] text-secundario">
             <span className="bz-dot" aria-hidden="true" />
             Simples assim
           </p>
@@ -87,7 +87,7 @@ export default function ComoFunciona() {
                 <h3 className="mb-1 text-base font-medium tracking-tight">
                   {titulo}
                 </h3>
-                <p className="text-[13px] leading-relaxed text-black/70">
+                <p className="text-[13px] leading-relaxed text-secundario">
                   {texto}
                 </p>
               </div>

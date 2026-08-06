@@ -18,7 +18,7 @@ export default function AdminError({
   return (
     <main className="flex min-h-[60vh] flex-col items-center justify-center gap-5 px-4 text-center">
       <h1 className="text-2xl tracking-tight">Erro ao carregar o painel</h1>
-      <p className="max-w-md text-sm text-black/70">
+      <p className="max-w-md text-sm text-secundario">
         Não foi possível concluir a operação. Verifique a conexão e tente
         novamente.
       </p>

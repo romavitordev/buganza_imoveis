@@ -87,7 +87,7 @@ export default function QualidadeAnuncio({
             </li>
             <li
               className={`flex items-center gap-1.5 ${
-                totalFotos > 0 ? "text-black" : "text-black/70"
+                totalFotos > 0 ? "text-black" : "text-secundario"
               }`}
             >
               {totalFotos > 0 ? (
@@ -97,7 +97,7 @@ export default function QualidadeAnuncio({
               )}
               2. Fotos ({totalFotos})
             </li>
-            <li className="flex items-center gap-1.5 text-black/70">
+            <li className="flex items-center gap-1.5 text-secundario">
               <Circle size={11} aria-hidden="true" />
               3. Publicar
             </li>
@@ -157,7 +157,7 @@ export default function QualidadeAnuncio({
           <li
             key={rotulo}
             className={`flex items-start gap-2 text-[13px] ${
-              ok ? "text-black/70" : "text-black/75"
+              ok ? "text-secundario" : "text-secundario"
             }`}
           >
             {ok ? (

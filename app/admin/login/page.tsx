@@ -70,7 +70,7 @@ function LoginForm() {
             <h1 className="text-xl font-semibold tracking-tight">
               {MARCA.painel}
             </h1>
-            <p className="mt-1 text-[13px] text-black/70">
+            <p className="mt-1 text-[13px] text-secundario">
               Acesso restrito aos corretores
             </p>
           </div>
@@ -78,7 +78,7 @@ function LoginForm() {
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className="text-[12px] font-medium text-black/70">
+            <span className="text-[12px] font-medium text-secundario">
               E-mail
             </span>
             <input
@@ -93,7 +93,7 @@ function LoginForm() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-[12px] font-medium text-black/70">
+            <span className="text-[12px] font-medium text-secundario">
               Senha
             </span>
             <input
@@ -109,7 +109,7 @@ function LoginForm() {
 
           {pedirCodigo && (
             <label className="flex flex-col gap-1.5">
-              <span className="text-[12px] font-medium text-black/70">
+              <span className="text-[12px] font-medium text-secundario">
                 Código do app autenticador
               </span>
               <input
@@ -124,7 +124,7 @@ function LoginForm() {
                 className="rounded-xl border border-black/15 px-4 py-3 text-center text-sm tracking-[0.3em] outline-none transition-colors focus:border-black"
                 placeholder="000000"
               />
-              <span className="text-[12px] md:text-[11px] text-black/70">
+              <span className="text-[12px] md:text-[11px] text-secundario">
                 Sua conta tem verificação em duas etapas — abra o app e
                 digite o código de 6 dígitos.
               </span>
@@ -156,7 +156,7 @@ function LoginForm() {
 
         <Link
           href="/"
-          className="mt-6 flex items-center justify-center gap-1.5 text-[13px] font-medium text-black/70 transition-colors hover:text-black"
+          className="mt-6 flex items-center justify-center gap-1.5 text-[13px] font-medium text-secundario transition-colors hover:text-black"
         >
           <ArrowLeft size={14} aria-hidden="true" />
           Voltar para o site

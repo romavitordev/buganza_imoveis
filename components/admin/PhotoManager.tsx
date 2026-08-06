@@ -290,7 +290,7 @@ export default function PhotoManager({
         />
       </div>
 
-      <p className="text-[12px] text-black/70">
+      <p className="text-[12px] text-secundario">
         Pode mandar a foto direto do celular (até 25 MB) — otimizamos
         automaticamente antes do envio. A foto marcada com ★ é a capa do
         anúncio. Arraste as fotos para reordenar.
@@ -306,7 +306,7 @@ export default function PhotoManager({
       )}
 
       {ordenadas.length === 0 ? (
-        <div className="rounded-2xl bg-mist px-6 py-12 text-center text-sm text-black/70">
+        <div className="rounded-2xl bg-mist px-6 py-12 text-center text-sm text-secundario">
           Nenhuma foto ainda. Anúncios com fotos convertem muito mais —
           adicione pelo menos 3.
         </div>
@@ -397,7 +397,7 @@ export default function PhotoManager({
                     disabled={ocupada}
                     onClick={() => setParaExcluir(foto)}
                     aria-label="Excluir foto"
-                    className="rounded-full p-1.5 text-black/70 transition-colors hover:bg-mist hover:text-black"
+                    className="rounded-full p-1.5 text-secundario transition-colors hover:bg-mist hover:text-black"
                   >
                     <Trash2 size={14} aria-hidden="true" />
                   </button>

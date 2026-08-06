@@ -40,14 +40,14 @@ function CartaoDepoimento({
           ativo ? "text-black" : "text-black/20"
         }`}
       />
-      <p className="flex-1 text-[14px] leading-relaxed text-black/70">
+      <p className="flex-1 text-[14px] leading-relaxed text-secundario">
         {depoimento.texto}
       </p>
       <div>
         <p className="text-sm font-semibold tracking-tight">
           {depoimento.nome}
         </p>
-        <p className="mt-0.5 text-[12px] text-black/70">
+        <p className="mt-0.5 text-[12px] text-secundario">
           {depoimento.contexto}
         </p>
       </div>
@@ -71,7 +71,7 @@ export default function Depoimentos() {
       aria-labelledby="depoimentos-titulo"
     >
       <div className="bz-fade-up mx-auto mb-10 max-w-6xl px-4 md:px-8">
-        <p className="mb-2 flex items-center gap-2 text-[13px] text-black/70">
+        <p className="mb-2 flex items-center gap-2 text-[13px] text-secundario">
           <span className="bz-dot" aria-hidden="true" />
           Quem já fechou negócio
         </p>

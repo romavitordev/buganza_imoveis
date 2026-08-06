@@ -32,6 +32,13 @@ const config: Config = {
          */
         black: "rgb(var(--ink) / <alpha-value>)",
         white: "rgb(var(--paper) / <alpha-value>)",
+        /**
+         * Texto secundário. Use no lugar de `text-black/70`: aquilo era
+         * a tinta com opacidade, e a mesma opacidade nos dois temas
+         * deixava o escuro parecendo apagado (ver a nota em globals.css).
+         */
+        secundario: "rgb(var(--ink-2) / <alpha-value>)",
+
         /** Superfície da página, atrás dos cards. */
         fundo: "rgb(var(--fundo) / <alpha-value>)",
         /** Preenchimento sutil: esqueletos, avatares, chips. */

@@ -351,13 +351,12 @@ export default function CityScene() {
           <TorrePrincipal id="compacto" />
         </g>
 
-        <rect
-          x="440"
-          y="698"
-          width="360"
-          height="2"
-          fill="rgb(var(--ink) / 0.22)"
-        />
+        {/* SEM linha de chão aqui, de propósito.
+            No mobile a base da cena é dissolvida pelo desfoque da emenda
+            (.bz-media-wrap::after). Uma linha de 2px atravessando a
+            largura toda reaparecia por baixo dela em telas de outra
+            proporção — era a "barrinha vazando" na parte de baixo. Quem
+            marca o fim da cena agora é a própria emenda. */}
       </svg>
     </div>
   );

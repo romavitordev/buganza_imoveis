@@ -103,7 +103,7 @@ export default function PropertyCard({
             {preco ?? "Sob consulta"}
           </p>
           {precoExtra && (
-            <p className="bz-num text-[12px] font-medium text-black/70">
+            <p className="bz-num text-[12px] font-medium text-secundario">
               ou {precoExtra}
             </p>
           )}
@@ -117,7 +117,7 @@ export default function PropertyCard({
             {imovel.titulo}
           </Link>
         </h3>
-        <p className="text-sm text-black/70">
+        <p className="text-sm text-secundario">
           {imovel.bairro} · {imovel.cidade}
         </p>
 

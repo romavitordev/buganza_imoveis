@@ -75,7 +75,7 @@ export default function ShareButton({ titulo }: ShareButtonProps) {
     <button
       type="button"
       onClick={compartilhar}
-      className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-4 py-2 text-[12px] font-medium text-black/70 transition-colors hover:border-black hover:text-black"
+      className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-4 py-2 text-[12px] font-medium text-secundario transition-colors hover:border-black hover:text-black"
     >
       {copiado ? (
         <Check size={13} aria-hidden="true" />

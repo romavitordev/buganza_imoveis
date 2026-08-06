@@ -43,7 +43,7 @@ export default async function SuportePage() {
     <main className="mx-auto flex max-w-4xl flex-col gap-8 px-4 py-10 md:px-8">
       <Link
         href="/admin"
-        className="inline-flex items-center gap-2 text-[13px] font-medium text-black/70 transition-colors hover:text-black"
+        className="inline-flex items-center gap-2 text-[13px] font-medium text-secundario transition-colors hover:text-black"
       >
         <ArrowLeft size={15} aria-hidden="true" />
         Voltar ao painel
@@ -51,7 +51,7 @@ export default async function SuportePage() {
 
       <div>
         <h1 className="text-3xl tracking-tight">{MARCA.assistente}</h1>
-        <p className="mt-1 max-w-2xl text-[13px] text-black/70">
+        <p className="mt-1 max-w-2xl text-[13px] text-secundario">
           Aqui você ensina o assistente do site. Responda o que os visitantes
           perguntaram e o bot passa a responder sozinho da próxima vez.
         </p>

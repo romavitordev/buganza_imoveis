@@ -23,10 +23,26 @@
 
   /* ---- tokens que viram no modo escuro (canais R G B, ver
      tailwind.config.ts) ---- */
+  /* Diz ao NAVEGADOR qual é o tema. Sem isto, tudo que ele desenha
+     sozinho continua claro no modo escuro: campo de formulário sem
+     estilo próprio, barra de rolagem, cursor de texto e o amarelo do
+     autofill. Foi assim que o campo do chat ficou branco no escuro. */
+  color-scheme: light;
+
   --ink: 20 38 74; /* tinta: o marinho do logotipo */
   --paper: 255 255 255; /* superfície dos cards */
   --fundo: 245 247 250; /* superfície da página */
   --mist: 243 244 247; /* preenchimento sutil */
+  /**
+   * TEXTO SECUNDÁRIO — token próprio, e não a tinta com opacidade.
+   *
+   * Por quê: texto claro sobre fundo escuro parece mais FINO que a
+   * mesma razão de contraste no claro (o fundo "invade" as hastes da
+   * letra). Com `tinta a 70%` os dois temas ficavam na mesma conta e o
+   * escuro parecia apagado mesmo passando em 7:1. Aqui cada tema tem o
+   * seu valor, e o escuro é propositalmente mais alto.
+   */
+  --ink-2: 88 100 124; /* 5,9:1 sobre branco */
   --banda: 13 27 54; /* faixa escura de destaque */
 
   /* céu do hero e prédios da cena */
@@ -59,10 +75,14 @@
  * (script no app/layout.tsx), para a página não piscar branca.
  */
 [data-theme="dark"] {
+  color-scheme: dark;
+
   --ink: 226 232 243; /* 14,7:1 sobre o fundo */
   --paper: 22 32 47;
   --fundo: 14 22 33;
   --mist: 29 40 57;
+  /* Mais claro que a tinta a 70% daria: compensa o afinamento óptico. */
+  --ink-2: 176 186 202; /* 7,2:1 sobre o fundo, 8,3:1 sobre o card */
   --banda: 27 42 68; /* mais claro que o fundo, senão a faixa some */
 
   /* céu noturno + prédios como silhueta iluminada */
@@ -155,6 +175,20 @@ h3 {
   font-feature-settings: "tnum";
 }
 
+/* Campos herdam a tinta e o papel do tema. O color-scheme acima já
+   resolveria a maioria dos casos, mas há campo sem classe de cor no
+   projeto e o padrão do navegador não conhece a nossa paleta. */
+input,
+textarea,
+select {
+  color: rgb(var(--ink));
+  background-color: rgb(var(--paper));
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgb(var(--ink) / 0.55);
+}
+
 *:focus-visible {
   outline: 2px solid rgb(var(--ink));
   outline-offset: 3px;
@@ -243,7 +277,18 @@ h3 {
   align-items: flex-end;
   padding: 60px 0 0;
   /* Mesmo degradê do céu do SVG — sem faixas quando a cena é "meet" */
-  background: linear-gradient(to bottom, var(--ceu-topo) 0%, var(--ceu-meio) 70%, var(--ceu-base) 100%);
+  /* No mobile o céu termina em PAPEL, não no tom do horizonte: a caixa
+     da cena acaba no meio da tela, e uma última linha de #ececee
+     encostando na superfície branca do conteúdo virava um degrau
+     atravessando a largura inteira — a "barrinha" que aparecia ou não
+     conforme a proporção do aparelho. */
+  background: linear-gradient(
+    to bottom,
+    var(--ceu-topo) 0%,
+    var(--ceu-meio) 55%,
+    var(--ceu-base) 82%,
+    rgb(var(--paper)) 100%
+  );
 }
 .bz-cena-raiz {
   display: contents;
@@ -255,17 +300,23 @@ h3 {
   content: "";
   position: absolute;
   inset: auto 0 0;
-  height: 110px;
+  height: 130px;
   pointer-events: none;
   backdrop-filter: blur(9px);
   -webkit-backdrop-filter: blur(9px);
-  mask-image: linear-gradient(to bottom, transparent, #000 62%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 62%);
+  mask-image: linear-gradient(to bottom, transparent, #000 55%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 55%);
+  /* O véu precisa chegar a 100% ANTES do fim, e não no fim.
+     Com o topo do degradê em 0,75 sobrando até a última linha, a base
+     da torre atravessava os ~40px finais — era a "barrinha" que vazava
+     embaixo, e ela aparecia ou não conforme a proporção da tela. Dos
+     78% para baixo é papel puro, igual à superfície do conteúdo, então
+     não há emenda visível. */
   background: linear-gradient(
     to bottom,
     transparent,
-    rgb(var(--paper) / 0.75) 62%,
-    rgb(var(--paper)) 100%
+    rgb(var(--paper) / 0.62) 45%,
+    rgb(var(--paper)) 78%
   );
 }
 
@@ -282,6 +333,13 @@ h3 {
 .bz-scene-amplo { display: none; }
 .bz-scene-compacto {
   aspect-ratio: 360 / 640;
+  /* A CENA se dissolve, e não só um véu por cima dela.
+     Cobrir com degradê dependia de o véu ficar acima do SVG na ordem de
+     pintura e de acertar a última linha de cada forma — e sobrava a
+     borda de baixo da torre e da silhueta, aquelas duas barrinhas
+     curtas. Mascarando o próprio desenho, não há borda para sobrar. */
+  mask-image: linear-gradient(to bottom, #000 58%, transparent 94%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 94%);
 }
 @media (min-width: 768px) {
   .bz-scene-compacto { display: none; }
@@ -661,7 +719,15 @@ h3 {
   .bz-nav { padding: 20px 32px; }
   .bz-contact-label { display: block; }
   .bz-contact-circle { width: 32px; height: 32px; }
-  .bz-media-wrap { inset: 0; height: auto; align-items: flex-end; padding: 0; }
+  .bz-media-wrap {
+    inset: 0;
+    height: auto;
+    align-items: flex-end;
+    padding: 0;
+    /* Aqui a cena vai até a base da tela: o céu volta a terminar no
+       tom do horizonte, sem precisar virar papel. */
+    background: linear-gradient(to bottom, var(--ceu-topo) 0%, var(--ceu-meio) 70%, var(--ceu-base) 100%);
+  }
   .bz-media-wrap::after { content: none; }
   .bz-scene { aspect-ratio: auto; height: min(86%, 100%); max-height: none; }
   .bz-footer {

@@ -181,6 +181,11 @@ marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
 **Ainda precisa mexer à mão em:**
 - [ ] `app/icon.svg` — o favicon (desenho próprio, marinho + dourado)
 - [ ] `components/QuemSomos.tsx` — o texto da história
+- [ ] **Os três números do Quem Somos.** Hoje estão **+400 imóveis
+      negociados · +15 anos de mercado · 100% acompanhamento pessoal**.
+      Os 15 anos vieram dos donos; o **+400 é projeção** feita a partir
+      disso e precisa ser confirmado antes de ir ao ar — número de prova
+      social errado no site é o tipo de coisa que o cliente cobra depois.
 - [ ] Nome dos repositórios no GitHub (opcional, é cosmético)
 
 ---

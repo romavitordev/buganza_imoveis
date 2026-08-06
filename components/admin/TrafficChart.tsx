@@ -25,7 +25,7 @@ export default function TrafficChart({ serie }: { serie: DiaTrafego[] }) {
 
   if (serie.length === 0 || total === 0) {
     return (
-      <div className="flex h-40 items-center justify-center rounded-2xl border border-black/10 text-sm text-black/70">
+      <div className="flex h-40 items-center justify-center rounded-2xl border border-black/10 text-sm text-secundario">
         Sem acessos registrados nos últimos 30 dias.
       </div>
     );
@@ -47,10 +47,10 @@ export default function TrafficChart({ serie }: { serie: DiaTrafego[] }) {
   return (
     <figure className="rounded-2xl border border-black/10 p-5">
       <figcaption className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <span className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-black/70">
+        <span className="text-[12px] md:text-[11px] font-medium uppercase tracking-wide text-secundario">
           Acessos por dia (30 dias)
         </span>
-        <span className="flex items-center gap-4 text-[12px] md:text-[11px] text-black/70">
+        <span className="flex items-center gap-4 text-[12px] md:text-[11px] text-secundario">
           <span className="flex items-center gap-1.5">
             <span
               className="h-2.5 w-2.5 rounded-sm bg-black/20"
@@ -105,7 +105,7 @@ export default function TrafficChart({ serie }: { serie: DiaTrafego[] }) {
         })}
       </svg>
 
-      <div className="mt-2 flex justify-between text-[12px] md:text-[10px] text-black/70">
+      <div className="mt-2 flex justify-between text-[12px] md:text-[10px] text-secundario">
         <span>{dataCurta(serie[0].dia)}</span>
         <span>{dataCurta(serie[serie.length - 1].dia)}</span>
       </div>
