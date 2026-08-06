@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { Moon, Sun } from "lucide-react";
 
 /** Quanto dura a coreografia da troca (igual ao CSS, em globals.css). */
-const DURACAO_MS = 950;
+const DURACAO_MS = 1500;
 
 /**
  * Botão de modo claro/escuro.
@@ -64,33 +64,41 @@ export default function ThemeToggle() {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={alternar}
-        aria-label="Alternar entre modo claro e escuro"
-        title="Alternar entre modo claro e escuro"
-        className="bz-contact-pill"
-      >
-        <span className="bz-contact-circle">
-          <Moon
-            size={14}
-            strokeWidth={2.5}
-            aria-hidden="true"
-            className="bz-icone-lua"
-          />
-          <Sun
-            size={14}
-            strokeWidth={2.5}
-            aria-hidden="true"
-            className="bz-icone-sol"
-          />
-        </span>
-      </button>
-
-      {/* A faixa que atravessa a tela na troca. Fica sempre no DOM,
-          parada e invisível — só o CSS a põe para correr. */}
-      <span className="bz-varredura" aria-hidden="true" />
-    </>
+    <button
+      type="button"
+      onClick={alternar}
+      aria-label="Alternar entre modo claro e escuro"
+      title="Alternar entre modo claro e escuro"
+      className="bz-contact-pill"
+    >
+      <span className="bz-contact-circle">
+        <Moon
+          size={14}
+          strokeWidth={2.5}
+          aria-hidden="true"
+          className="bz-icone-lua"
+        />
+        <Sun
+          size={14}
+          strokeWidth={2.5}
+          aria-hidden="true"
+          className="bz-icone-sol"
+        />
+      </span>
+    </button>
   );
+}
+
+/**
+ * A faixa dourada que atravessa a tela na troca de tema.
+ *
+ * MORA NO LAYOUT, e não aqui dentro do botão, por um motivo específico:
+ * a navbar usa `backdrop-filter` quando rolada, e um elemento com
+ * filtro vira BLOCO DE CONTENÇÃO para descendentes `position: fixed`.
+ * Dentro da navbar, esta faixa media 82px de altura (a da barra) em vez
+ * da tela inteira — parecia um "sol atravessando o topo da página".
+ * Fora dela, o fixed volta a se referir à viewport.
+ */
+export function VarreduraTema() {
+  return <span className="bz-varredura" aria-hidden="true" />;
 }
