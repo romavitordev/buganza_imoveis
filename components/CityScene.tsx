@@ -80,6 +80,62 @@ function WindowGrid({
   return <g>{windows}</g>;
 }
 
+/**
+ * Céu estrelado do modo escuro.
+ *
+ * FORA do grupo da lua, de propósito. Enquanto viviam dentro dele, as
+ * estrelas viajavam junto no arco da troca de tema — o céu inteiro
+ * deslizava com o astro, o que denuncia o truque. Agora a lua chega
+ * sozinha e só depois elas acendem (o atraso está em globals.css, na
+ * transição de .bz-estrelas).
+ *
+ * Cada cena tem o seu campo: o recorte do mobile é estreito e uma
+ * estrela posicionada para o desktop simplesmente cairia fora dele.
+ */
+function Estrelas({ pontos }: { pontos: [number, number, number][] }) {
+  return (
+    <g className="bz-estrelas" fill="#E0C27E">
+      {pontos.map(([cx, cy, r]) => (
+        <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} opacity={0.75} />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * Campo do desktop: espalhado pelo céu todo e LONGE da lua (que fica em
+ * 920,150). Amontoadas em volta dela, viravam um brilho só.
+ */
+const ESTRELAS_AMPLO: [number, number, number][] = [
+  [140, 96, 2.2],
+  [268, 176, 1.7],
+  [352, 62, 2.6],
+  [196, 292, 1.9],
+  [430, 250, 1.6],
+  [318, 372, 2],
+  [592, 54, 2.1],
+  [706, 268, 1.8],
+  [806, 70, 2.4],
+  [752, 186, 2],
+  [878, 336, 1.7],
+  [1016, 252, 2.6],
+  [1060, 86, 3],
+  [1112, 188, 2.2],
+  [1150, 330, 1.9],
+  [980, 42, 2.3],
+];
+
+/** Campo do mobile: só o que cabe no recorte 440–800, fora da torre. */
+const ESTRELAS_COMPACTO: [number, number, number][] = [
+  [470, 120, 2.2],
+  [452, 250, 1.8],
+  [700, 96, 2],
+  [772, 300, 2.2],
+  [618, 74, 1.8],
+  [790, 190, 1.6],
+  [684, 372, 1.9],
+];
+
 /** O astro: sol de dia, lua crescente de noite. */
 function Astro({ id }: { id: string }) {
   const mascara = `bzLua-${id}`;
@@ -121,14 +177,6 @@ function Astro({ id }: { id: string }) {
           fill="#E0C27E"
           mask={`url(#${mascara})`}
         />
-        {/* estrelas discretas — só o bastante para virar noite */}
-        <g fill="#E0C27E" opacity="0.5">
-          <circle cx="1060" cy="86" r="3" />
-          <circle cx="1112" cy="188" r="2.2" />
-          <circle cx="806" cy="70" r="2.4" />
-          <circle cx="752" cy="186" r="2" />
-          <circle cx="1016" cy="252" r="2.6" />
-        </g>
       </g>
     </g>
   );
@@ -222,6 +270,7 @@ export default function CityScene() {
         {/* O céu é o degradê do wrapper (.bz-media-wrap) — o SVG fica
             transparente para não criar emenda em telas de qualquer proporção */}
 
+        <Estrelas pontos={ESTRELAS_AMPLO} />
         <Astro id="amplo" />
 
         {/* Silhuetas de fundo — somem descendo ao scrollar */}
@@ -334,6 +383,10 @@ export default function CityScene() {
         >
           <Astro id="compacto" />
         </g>
+
+        {/* Fora do <g> do astro: as estrelas não acompanham o translate
+            do recorte compacto, elas têm posições próprias. */}
+        <Estrelas pontos={ESTRELAS_COMPACTO} />
 
         {/* Uma silhueta só, atrás da torre: sem nenhuma, a torre flutua
             sem chão; com várias, volta a poluir. */}

@@ -253,6 +253,13 @@ textarea::placeholder {
   [data-trocando] .bz-lua {
     animation: none !important;
   }
+  /* As estrelas também: sem o atraso, elas simplesmente já estão lá.
+     Precisa de seletor tão específico quanto o delas — a regra `*` logo
+     abaixo tem especificidade menor e perderia do !important de lá. */
+  .bz-estrelas,
+  [data-theme="dark"] .bz-estrelas {
+    transition: none !important;
+  }
   * {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
@@ -444,6 +451,34 @@ textarea::placeholder {
 .bz-icone-sol { display: none; }
 [data-theme="dark"] .bz-icone-lua { display: none; }
 [data-theme="dark"] .bz-icone-sol { display: block; }
+
+/**
+ * ESTRELAS — acendem depois, e sozinhas.
+ *
+ * O atraso de 1,05s é exatamente a duração do arco: a lua atravessa o
+ * céu sem companhia e só quando pousa é que o céu se enche. Antes elas
+ * moravam dentro do grupo da lua e viajavam junto, o que fazia o céu
+ * inteiro deslizar e entregava o truque.
+ *
+ * O atraso vive na regra do TEMA ESCURO, e não na regra base: assim a
+ * ida (acender) espera, e a volta (apagar) é imediata — ninguém quer
+ * ver estrela sumindo aos poucos num céu que já é dia.
+ *
+ * Carregando a página já no escuro não há transição nenhuma: o valor
+ * final já é o inicial, e transição só dispara quando algo muda.
+ */
+.bz-estrelas {
+  opacity: 0;
+  /* !important obrigatório: durante a troca, a regra `[data-trocando] *`
+     lá em cima redefine o atalho `transition` INTEIRO com !important, e
+     levaria junto o opacity daqui — as estrelas apareceriam de uma vez,
+     no instante do clique, que é exatamente o que se quer evitar. */
+  transition: opacity 0.4s ease !important;
+}
+[data-theme="dark"] .bz-estrelas {
+  opacity: 1;
+  transition: opacity 0.8s ease 1.05s !important;
+}
 
 /* E no logotipo: a versão de fundo escuro tem o marinho trocado por
    tinta clara, senão metade do desenho sumiria contra o céu noturno. */
