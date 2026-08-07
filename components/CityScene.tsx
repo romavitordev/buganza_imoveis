@@ -121,29 +121,34 @@ function Estrelas({ pontos }: { pontos: [number, number, number][] }) {
  * e as silhuetas de fundo, senão branco sobre branco some.
  *
  * Andam com `transform`, que o navegador resolve na composição, e bem
- * devagar: 100 e 140 segundos para atravessar. Precisa ser lento a
- * ponto de o visitante não "ver" o movimento, só sentir que a cena está
- * viva.
+ * devagar: 150, 190 e 230 segundos para atravessar o quadro. Precisa
+ * ser lento a ponto de o visitante não "ver" o movimento, só sentir que
+ * a cena está viva. Ao sair pela direita, o laço traz cada uma de volta
+ * pela esquerda.
  */
 function Nuvem({
-  x,
   y,
   escala = 1,
   className,
 }: {
-  x: number;
   y: number;
   escala?: number;
   className: string;
 }) {
   return (
-    /* DOIS grupos, e não um. No SVG o atributo `transform` e a
-       propriedade CSS `transform` são a MESMA coisa: a animação
-       apagaria o translate/scale que põe a nuvem no lugar, e todas
-       partiriam da origem, empilhadas. O de fora posiciona, o de
-       dentro anda. */
-    <g transform={`translate(${x} ${y}) scale(${escala})`}>
-      <g className={`bz-nuvem ${className}`} fill="var(--nuvem)">
+    /* DOIS grupos, e não um, e nesta ordem.
+     *
+     * O de FORA anda, em coordenadas cruas do viewBox. O de DENTRO
+     * cuida da altura e do tamanho. Se fosse ao contrário — a escala
+     * por fora —, cada nuvem percorreria uma distância diferente, já
+     * que o translate herdaria o scale do pai.
+     *
+     * Não existe mais um `x` inicial: se existisse, a nuvem voltaria
+     * do laço para a posição dela em vez de vir da esquerda. Onde cada
+     * uma começa é escolhido pelo animation-delay negativo, no CSS.
+     */
+    <g className={`bz-nuvem ${className}`}>
+      <g transform={`translate(0 ${y}) scale(${escala})`} fill="var(--nuvem)">
         <ellipse cx="0" cy="0" rx="54" ry="20" />
         <ellipse cx="-34" cy="6" rx="34" ry="14" />
         <ellipse cx="30" cy="7" rx="30" ry="13" />
@@ -321,13 +326,14 @@ export default function CityScene() {
             transparente para não criar emenda em telas de qualquer proporção */}
 
         <Estrelas pontos={ESTRELAS_AMPLO} />
-        {/* Nuvens ANTES do astro: passam por trás do sol, não por cima.
-            Alturas diferentes e velocidades diferentes — duas nuvens no
-            mesmo ritmo entregam que é um laço. */}
-        <Nuvem x={210} y={120} escala={1} className="bz-nuvem-a" />
-        <Nuvem x={640} y={230} escala={0.72} className="bz-nuvem-b" />
-        <Nuvem x={980} y={90} escala={0.85} className="bz-nuvem-c" />
         <Astro id="amplo" />
+        {/* Nuvens DEPOIS do astro e ANTES dos prédios: é essa fatia da
+            ordem do SVG que as faz passar na frente do sol e atrás da
+            cidade. Alturas, tamanhos e velocidades diferentes — duas no
+            mesmo ritmo entregam que é um laço. */}
+        <Nuvem y={120} escala={1} className="bz-nuvem-a" />
+        <Nuvem y={230} escala={0.72} className="bz-nuvem-b" />
+        <Nuvem y={90} escala={0.85} className="bz-nuvem-c" />
 
         {/* Silhuetas de fundo — somem descendo ao scrollar */}
         <g className="bz-layer-bg">
@@ -445,8 +451,8 @@ export default function CityScene() {
         <Estrelas pontos={ESTRELAS_COMPACTO} />
         {/* Duas só: o recorte do mobile é estreito e três viravam
             trânsito de nuvem. */}
-        <Nuvem x={500} y={150} escala={0.7} className="bz-nuvem-a" />
-        <Nuvem x={730} y={280} escala={0.55} className="bz-nuvem-b" />
+        <Nuvem y={150} escala={0.7} className="bz-nuvem-a" />
+        <Nuvem y={280} escala={0.55} className="bz-nuvem-b" />
 
         {/* Uma silhueta só, atrás da torre: sem nenhuma, a torre flutua
             sem chão; com várias, volta a poluir. */}

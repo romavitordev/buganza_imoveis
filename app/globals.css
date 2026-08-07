@@ -528,12 +528,17 @@ textarea::placeholder {
  * Some no escuro pela cor (--nuvem: transparent) e não por display,
  * para a troca de tema poder interpolar em vez de estalar.
  */
+/* O percurso é ABSOLUTO no viewBox (que vai de 0 a 1200) e igual para
+   todas: entram fora do quadro à esquerda, saem fora à direita, e o
+   laço as devolve à esquerda. Antes cada nuvem somava esta distância à
+   posição inicial dela, então ao fechar o ciclo reaparecia no meio do
+   céu do nada, em vez de vir da borda. */
 @keyframes bzNuvemAnda {
   from {
-    transform: translateX(-320px);
+    transform: translateX(-400px);
   }
   to {
-    transform: translateX(1320px);
+    transform: translateX(1400px);
   }
 }
 .bz-nuvem {
@@ -546,17 +551,22 @@ textarea::placeholder {
 [data-theme="dark"] .bz-nuvem {
   animation-play-state: paused;
 }
+/* O atraso negativo adianta o ciclo: é assim que a cena abre com as
+   nuvens já espalhadas, em vez de um céu vazio esperando a primeira
+   entrar. A conta, para nascer num x qualquer do viewBox:
+       atraso = -((x + 400) / 1800) * duração
+   Aqui: x = 210, 640 e 980. */
 .bz-nuvem-a {
   animation-duration: 150s;
-  animation-delay: -40s;
+  animation-delay: -51s;
 }
 .bz-nuvem-b {
   animation-duration: 190s;
-  animation-delay: -44s;
+  animation-delay: -110s;
 }
 .bz-nuvem-c {
   animation-duration: 230s;
-  animation-delay: -69s;
+  animation-delay: -176s;
 }
 
 /* E no logotipo: a versão de fundo escuro tem o marinho trocado por
