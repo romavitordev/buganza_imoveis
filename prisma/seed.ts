@@ -34,6 +34,27 @@ async function main() {
   console.log(`✔ Admin criado/atualizado: ${email}`);
 
   // ---------- Imóveis de exemplo ----------
+  //
+  // EM PRODUÇÃO O CATÁLOGO NASCE VAZIO.
+  //
+  // Estes três imóveis são de demonstração — endereços, textos e preços
+  // inventados, fotos de banco de imagem. Rodar o seed no banco de
+  // produção com eles publicaria anúncio falso no site de uma
+  // imobiliária de verdade, que é o pior tipo de erro possível aqui.
+  //
+  // Para carregá-los no ambiente de desenvolvimento:
+  //     SEED_DEMO=1 npm run db:seed
+  const carregarDemo = process.env.SEED_DEMO === "1";
+
+  if (!carregarDemo) {
+    console.log(
+      "\nCatálogo intacto: nenhum imóvel de demonstração foi criado." +
+        "\n(Para carregar os exemplos em desenvolvimento: SEED_DEMO=1 npm run db:seed)"
+    );
+    console.log("\nSeed concluído com sucesso.");
+    return;
+  }
+
   const imoveis = [
     {
       codigo: "BZ-0001",

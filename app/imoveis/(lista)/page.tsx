@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
+  Building2,
   ChevronLeft,
   ChevronRight,
   MessageCircle,
@@ -226,6 +227,11 @@ export default async function ImoveisPage({
     ordem,
   };
 
+  // A ordenação não conta: ela não filtra nada, só reordena.
+  const temFiltro = Boolean(
+    q || tipo || transacao || cidade || bairro || quartosMin || temFaixa
+  );
+
   return (
     <>
       <SiteNav whatsappHref={linkWhatsAppGeral()} />
@@ -320,16 +326,28 @@ export default async function ImoveisPage({
           // anulavam. O bloco vazio virou superfície branca, como o card.
           <div className="bz-fade-up flex flex-col items-center gap-5 rounded-2xl border border-black/8 bg-white px-6 py-20 text-center">
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-fundo text-secundario">
-              <SearchX size={24} strokeWidth={1.5} aria-hidden="true" />
+              {temFiltro ? (
+                <SearchX size={24} strokeWidth={1.5} aria-hidden="true" />
+              ) : (
+                <Building2 size={24} strokeWidth={1.5} aria-hidden="true" />
+              )}
             </span>
             <div>
+              {/* DUAS SITUAÇÕES DIFERENTES, e por muito tempo elas
+                  dividiram o mesmo texto. "Nenhum imóvel com esses
+                  filtros" com o catálogo vazio e nenhum filtro aplicado
+                  é simplesmente falso — e é justamente a tela que o
+                  visitante encontra no dia da estreia, antes do primeiro
+                  anúncio entrar. */}
               <h2 className="mb-2 text-2xl tracking-tight">
-                Nenhum imóvel com esses filtros — por enquanto.
+                {temFiltro
+                  ? "Nenhum imóvel com esses filtros — por enquanto."
+                  : "Estamos preparando os primeiros anúncios."}
               </h2>
               <p className="mx-auto max-w-md text-sm leading-relaxed text-secundario">
-                Nosso catálogo muda toda semana e nem tudo chega a ser
-                publicado. Conte pelo WhatsApp o que você procura e vamos
-                atrás do imóvel certo para você.
+                {temFiltro
+                  ? "Nosso catálogo muda toda semana e nem tudo chega a ser publicado. Conte pelo WhatsApp o que você procura e vamos atrás do imóvel certo para você."
+                  : "O catálogo entra no ar em breve. Enquanto isso, conte pelo WhatsApp o que você procura — boa parte do que negociamos nem chega a ser publicado."}
               </p>
             </div>
             <a

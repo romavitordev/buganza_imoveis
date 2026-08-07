@@ -69,8 +69,19 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 ## Fase 2 — Preparar o conteúdo (antes de qualquer um ver)
 
-- [ ] **2.1 — Apagar os imóveis fictícios**
-      "Casa bla", bairro "jaenjkadnslkj" e afins. São dados de teste.
+- [x] **2.1 — Apagar os imóveis fictícios** ✅ feito
+      O banco de desenvolvimento foi zerado (6 imóveis, 16 fotos e 51
+      eventos) e o seed não cria mais exemplos por padrão. O banco de
+      produção nasce vazio.
+
+      Para zerar um catálogo de novo (ele **pede confirmação**, e mostra
+      se está num banco local ou remoto antes de qualquer coisa):
+      ```bash
+      node scripts/limpar-catalogo.mjs            # só lista
+      node scripts/limpar-catalogo.mjs --apagar   # apaga
+      ```
+      Apaga imóveis, fotos e métricas. Admin, leads e a base do chatbot
+      ficam de fora.
 - [ ] **2.2 — Revisar os textos institucionais**
       `components/QuemSomos.tsx` tem a história do casal — hoje é
       fictícia. Reescreva com a história real.
@@ -122,7 +133,15 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       ```bash
       DATABASE_URL="<url do Neon>" ADMIN_EMAIL="<seu e-mail>" ADMIN_PASSWORD="<sua senha forte>" npm run db:seed
       ```
-      > O seed também insere imóveis de exemplo — apague depois (2.1).
+      > **O catálogo nasce vazio.** O seed cria só o administrador — os
+      > três imóveis de demonstração ficam atrás de `SEED_DEMO=1` e são
+      > para desenvolvimento. Se eles fossem para produção, o site de uma
+      > imobiliária de verdade estrearia com anúncio inventado.
+      >
+      > Enquanto o primeiro imóvel real não entra, o catálogo mostra
+      > "Estamos preparando os primeiros anúncios" com o convite ao
+      > WhatsApp — e a seção de destaques da home simplesmente não
+      > aparece.
 
 - [ ] **3.5 — Deploy** → botão *Deploy* na Vercel.
 
