@@ -95,9 +95,59 @@ function WindowGrid({
 function Estrelas({ pontos }: { pontos: [number, number, number][] }) {
   return (
     <g className="bz-estrelas" fill="#E0C27E">
-      {pontos.map(([cx, cy, r]) => (
-        <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} opacity={0.75} />
+      {pontos.map(([cx, cy, r], i) => (
+        <circle
+          key={`${cx}-${cy}`}
+          cx={cx}
+          cy={cy}
+          r={r}
+          className="bz-estrela"
+          // Cada uma no seu tempo. O atraso é determinístico (nada de
+          // Math.random, que quebraria a hidratação) mas com passo primo,
+          // então nunca cai em fase: o céu nunca pisca todo junto.
+          style={{ animationDelay: `${((i * 1373) % 5200) / 1000}s` }}
+        />
       ))}
+    </g>
+  );
+}
+
+/**
+ * Nuvens do modo claro.
+ *
+ * São o contrapeso das estrelas: o céu da noite ganhou textura e o do
+ * dia tinha só o sol num vazio. Feitas de três círculos sobrepostos —
+ * a forma mais simples que ainda lê como nuvem — e num tom entre o céu
+ * e as silhuetas de fundo, senão branco sobre branco some.
+ *
+ * Andam com `transform`, que o navegador resolve na composição, e bem
+ * devagar: 100 e 140 segundos para atravessar. Precisa ser lento a
+ * ponto de o visitante não "ver" o movimento, só sentir que a cena está
+ * viva.
+ */
+function Nuvem({
+  x,
+  y,
+  escala = 1,
+  className,
+}: {
+  x: number;
+  y: number;
+  escala?: number;
+  className: string;
+}) {
+  return (
+    /* DOIS grupos, e não um. No SVG o atributo `transform` e a
+       propriedade CSS `transform` são a MESMA coisa: a animação
+       apagaria o translate/scale que põe a nuvem no lugar, e todas
+       partiriam da origem, empilhadas. O de fora posiciona, o de
+       dentro anda. */
+    <g transform={`translate(${x} ${y}) scale(${escala})`}>
+      <g className={`bz-nuvem ${className}`} fill="var(--nuvem)">
+        <ellipse cx="0" cy="0" rx="54" ry="20" />
+        <ellipse cx="-34" cy="6" rx="34" ry="14" />
+        <ellipse cx="30" cy="7" rx="30" ry="13" />
+      </g>
     </g>
   );
 }
@@ -271,6 +321,12 @@ export default function CityScene() {
             transparente para não criar emenda em telas de qualquer proporção */}
 
         <Estrelas pontos={ESTRELAS_AMPLO} />
+        {/* Nuvens ANTES do astro: passam por trás do sol, não por cima.
+            Alturas diferentes e velocidades diferentes — duas nuvens no
+            mesmo ritmo entregam que é um laço. */}
+        <Nuvem x={210} y={120} escala={1} className="bz-nuvem-a" />
+        <Nuvem x={640} y={230} escala={0.72} className="bz-nuvem-b" />
+        <Nuvem x={980} y={90} escala={0.85} className="bz-nuvem-c" />
         <Astro id="amplo" />
 
         {/* Silhuetas de fundo — somem descendo ao scrollar */}
@@ -387,6 +443,10 @@ export default function CityScene() {
         {/* Fora do <g> do astro: as estrelas não acompanham o translate
             do recorte compacto, elas têm posições próprias. */}
         <Estrelas pontos={ESTRELAS_COMPACTO} />
+        {/* Duas só: o recorte do mobile é estreito e três viravam
+            trânsito de nuvem. */}
+        <Nuvem x={500} y={150} escala={0.7} className="bz-nuvem-a" />
+        <Nuvem x={730} y={280} escala={0.55} className="bz-nuvem-b" />
 
         {/* Uma silhueta só, atrás da torre: sem nenhuma, a torre flutua
             sem chão; com várias, volta a poluir. */}

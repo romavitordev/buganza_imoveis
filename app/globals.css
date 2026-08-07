@@ -62,6 +62,9 @@
   --predio-c: #1b3160;
   --predio-topo: #0f1d3a;
   --janela-apagada: rgba(255, 255, 255, 0.13);
+  /* Um degrau ENTRE o céu (#ececee) e a silhueta mais clara (#dce0ea).
+     Branco puro sobre céu branco simplesmente não existiria. */
+  --nuvem: rgba(206, 215, 232, 0.55);
 }
 
 /**
@@ -96,6 +99,8 @@
   --predio-c: #101d33;
   --predio-topo: #060c16;
   --janela-apagada: rgba(255, 255, 255, 0.07);
+  /* Não existe no escuro: quem faz o céu da noite são as estrelas. */
+  --nuvem: transparent;
 }
 
 /* ---------- troca de tema ----------
@@ -246,6 +251,11 @@ textarea::placeholder {
     transform: none;
   }
   .bz-lit { animation: none; }
+  /* Estrelas paradas e nuvens paradas — continuam lá, só não se mexem. */
+  .bz-estrela,
+  .bz-nuvem {
+    animation: none !important;
+  }
   /* A troca de tema fica instantânea, sem o astro nascendo. O
      ThemeToggle nem chega a marcar data-trocando, mas a regra fica aqui
      como rede de segurança. */
@@ -478,6 +488,75 @@ textarea::placeholder {
 [data-theme="dark"] .bz-estrelas {
   opacity: 1;
   transition: opacity 0.8s ease 1.05s !important;
+}
+
+/**
+ * A CINTILAÇÃO.
+ *
+ * Mesma ideia das janelas dos prédios, em outra escala: lá são 2,6s
+ * indo até 0,1 de opacidade, um pisca-pisca que se vê. Aqui são 6,5s
+ * entre 0,8 e 0,55 — devagar e de leve, para o céu respirar sem chamar
+ * atenção. O astro é o assunto da cena; as estrelas são o fundo.
+ *
+ * A opacidade é do CÍRCULO, e a do fade de entrada é do GRUPO. As duas
+ * se multiplicam, então uma não atropela a outra: durante o 1,05s de
+ * espera o grupo está em zero e não importa em que ponto do ciclo cada
+ * estrela esteja.
+ */
+@keyframes bzCintila {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.bz-estrela {
+  animation: bzCintila 6.5s ease-in-out infinite;
+}
+
+/**
+ * AS NUVENS — o contrapeso do dia.
+ *
+ * Atravessam o quadro inteiro em minutos, não em segundos. É lento de
+ * propósito: ninguém deve conseguir apontar que "a nuvem está andando",
+ * só sentir que o céu não é uma foto parada. As três velocidades
+ * diferentes dão a profundidade — a de cima, menor e mais distante,
+ * anda mais devagar.
+ *
+ * Some no escuro pela cor (--nuvem: transparent) e não por display,
+ * para a troca de tema poder interpolar em vez de estalar.
+ */
+@keyframes bzNuvemAnda {
+  from {
+    transform: translateX(-320px);
+  }
+  to {
+    transform: translateX(1320px);
+  }
+}
+.bz-nuvem {
+  animation: bzNuvemAnda linear infinite;
+  will-change: transform;
+}
+/* No escuro elas são transparentes, mas o navegador continuaria
+   compondo o movimento a cada quadro por nada. Pausadas, retomam de
+   onde pararam quando o dia volta. */
+[data-theme="dark"] .bz-nuvem {
+  animation-play-state: paused;
+}
+.bz-nuvem-a {
+  animation-duration: 150s;
+  animation-delay: -40s;
+}
+.bz-nuvem-b {
+  animation-duration: 190s;
+  animation-delay: -44s;
+}
+.bz-nuvem-c {
+  animation-duration: 230s;
+  animation-delay: -69s;
 }
 
 /* E no logotipo: a versão de fundo escuro tem o marinho trocado por
