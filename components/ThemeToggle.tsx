@@ -3,8 +3,15 @@
 import { useEffect, useRef } from "react";
 import { Moon, Sun } from "lucide-react";
 
-/** Quanto dura a coreografia da troca (igual ao CSS, em globals.css). */
-const DURACAO_MS = 1500;
+/**
+ * Quanto o atributo `data-trocando` fica no <html>.
+ *
+ * Tem que ser MAIOR que a mais longa das duas animações do CSS (ver
+ * globals.css): o astro leva 1,05s e as cores 1,15s. Se sair antes, a
+ * transição de cor é cortada no meio e a tela dá um salto — que é
+ * exatamente o piscar que se está tentando evitar.
+ */
+const DURACAO_MS = 1200;
 
 /**
  * Botão de modo claro/escuro.

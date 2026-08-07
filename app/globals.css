@@ -111,9 +111,13 @@
      interpolar cor ao mesmo tempo era a origem do engasgo. As cores da
      cena trocam de uma vez — o movimento do astro é o que sustenta a
      troca, e o olho não acompanha as duas coisas ao mesmo tempo. */
-  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  /* 1,15s com curva SIMÉTRICA (easeInOutCubic). A anterior, de 0,8s
+     com 0.4/0/0.2/1, começava rápido: a maior parte da mudança
+     acontecia nos primeiros 300ms e o olho lia aquilo como um piscar.
+     Entrando e saindo devagar, a tela "amanhece" em vez de trocar. */
+  transition: background-color 1.15s cubic-bezier(0.65, 0, 0.35, 1),
+    color 1.15s cubic-bezier(0.65, 0, 0.35, 1),
+    border-color 1.15s cubic-bezier(0.65, 0, 0.35, 1) !important;
 }
 
 /* O ARCO DO ASTRO.
@@ -130,18 +134,26 @@
  * então ele some por oclusão, como sumiria de verdade.
  */
 @keyframes bzNasce {
-  0%   { transform: translate3d(calc(var(--arco-x) * -1),    var(--arco-y),        0); }
-  25%  { transform: translate3d(calc(var(--arco-x) * -0.72), calc(var(--arco-y) * 0.63), 0); }
-  55%  { transform: translate3d(calc(var(--arco-x) * -0.42), calc(var(--arco-y) * 0.29), 0); }
-  80%  { transform: translate3d(calc(var(--arco-x) * -0.19), calc(var(--arco-y) * 0.09), 0); }
-  100% { transform: translate3d(0, 0, 0); }
+    0% { transform: translate3d(calc(var(--arco-x) * -1.000), calc(var(--arco-y) * 1.000), 0); }
+   12% { transform: translate3d(calc(var(--arco-x) * -0.875), calc(var(--arco-y) * 0.766), 0); }
+   25% { transform: translate3d(calc(var(--arco-x) * -0.750), calc(var(--arco-y) * 0.562), 0); }
+   38% { transform: translate3d(calc(var(--arco-x) * -0.625), calc(var(--arco-y) * 0.391), 0); }
+   50% { transform: translate3d(calc(var(--arco-x) * -0.500), calc(var(--arco-y) * 0.250), 0); }
+   62% { transform: translate3d(calc(var(--arco-x) * -0.375), calc(var(--arco-y) * 0.141), 0); }
+   75% { transform: translate3d(calc(var(--arco-x) * -0.250), calc(var(--arco-y) * 0.062), 0); }
+   88% { transform: translate3d(calc(var(--arco-x) * -0.125), calc(var(--arco-y) * 0.016), 0); }
+  100% { transform: translate3d(calc(var(--arco-x) * -0.000), calc(var(--arco-y) * 0.000), 0); }
 }
 @keyframes bzSePoe {
-  0%   { transform: translate3d(0, 0, 0); }
-  20%  { transform: translate3d(calc(var(--arco-x) * 0.19), calc(var(--arco-y) * 0.09), 0); }
-  45%  { transform: translate3d(calc(var(--arco-x) * 0.42), calc(var(--arco-y) * 0.29), 0); }
-  75%  { transform: translate3d(calc(var(--arco-x) * 0.72), calc(var(--arco-y) * 0.63), 0); }
-  100% { transform: translate3d(var(--arco-x), var(--arco-y), 0); }
+    0% { transform: translate3d(calc(var(--arco-x) * 0.000), calc(var(--arco-y) * 0.000), 0); }
+   12% { transform: translate3d(calc(var(--arco-x) * 0.125), calc(var(--arco-y) * 0.016), 0); }
+   25% { transform: translate3d(calc(var(--arco-x) * 0.250), calc(var(--arco-y) * 0.062), 0); }
+   38% { transform: translate3d(calc(var(--arco-x) * 0.375), calc(var(--arco-y) * 0.141), 0); }
+   50% { transform: translate3d(calc(var(--arco-x) * 0.500), calc(var(--arco-y) * 0.250), 0); }
+   62% { transform: translate3d(calc(var(--arco-x) * 0.625), calc(var(--arco-y) * 0.391), 0); }
+   75% { transform: translate3d(calc(var(--arco-x) * 0.750), calc(var(--arco-y) * 0.562), 0); }
+   88% { transform: translate3d(calc(var(--arco-x) * 0.875), calc(var(--arco-y) * 0.766), 0); }
+  100% { transform: translate3d(calc(var(--arco-x) * 1.000), calc(var(--arco-y) * 1.000), 0); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -404,16 +416,27 @@ textarea::placeholder {
   opacity: 1;
   will-change: transform;
 }
+/* Enquanto o astro cruza, a emenda desliga o desfoque. Um
+   backdrop-filter é recalculado a cada quadro por tudo que se mexe
+   atrás dele — e o astro passa bem por ali. O degradê continua e
+   ninguém percebe a falta do blur em 1 segundo. */
+[data-trocando] .bz-media-wrap::after {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
 [data-trocando][data-theme="dark"] .bz-lua,
 [data-trocando][data-theme="light"] .bz-sol {
   /* Curva quase linear: astro no céu não desacelera ao chegar. O
      ease-out forte de antes fazia o movimento "frear" no fim, que era
      parte do que tirava a naturalidade. */
-  animation: bzNasce 1.5s cubic-bezier(0.33, 0, 0.5, 1) both;
+  /* linear de propósito: o arco já é uma parábola amostrada em nove
+     paradas iguais. Somar easing por cima trocava a velocidade dentro
+     de cada trecho e era metade da sensação de "engasgo". */
+  animation: bzNasce 1.05s linear both;
 }
 [data-trocando][data-theme="dark"] .bz-sol,
 [data-trocando][data-theme="light"] .bz-lua {
-  animation: bzSePoe 1.5s cubic-bezier(0.5, 0, 0.67, 1) both;
+  animation: bzSePoe 1.05s linear both;
 }
 
 /* Mesma ideia no botão de tema: os dois ícones existem, o CSS escolhe.
