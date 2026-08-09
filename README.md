@@ -51,8 +51,13 @@ cp .env.example .env
 ```bash
 npm install
 npm run db:push   # cria as tabelas
-npm run db:seed   # cria o admin + 3 imóveis de exemplo
+npm run db:demo   # cria o admin + 3 imóveis de exemplo
 ```
+
+> **Por que `db:demo` e não `db:seed`?** O `db:seed` cria **só o
+> administrador** — é ele que roda em produção, e o catálogo de uma
+> imobiliária de verdade tem que nascer vazio. Os três imóveis de
+> exemplo são de desenvolvimento e ficam atrás do `db:demo`.
 
 > **Atalho:** `npm run up` sobe o banco, espera ele ficar pronto, roda
 > `db:push`/`db:seed` na primeira vez e abre o site — tudo em ordem, num
@@ -62,7 +67,12 @@ npm run db:seed   # cria o admin + 3 imóveis de exemplo
 > (binários em node_modules, dados em `.pgdata/`) na porta 5502 — o `.env`
 > de exemplo já aponta para ele. Deixe rodando em um terminal separado.
 
-(`npm run db:reset` zera o banco e roda o seed de novo.)
+(`npm run db:reset` zera o banco e recria os imóveis de exemplo.)
+
+> **"Can't reach database server"?** O Postgres local caiu. Suba de novo
+> com `npm run db:local`. Se ele reclamar que a porta 5502 está ocupada,
+> sobrou um processo morto de uma sessão anterior — mate com
+> `Get-Process postgres* | Stop-Process -Force` e tente outra vez.
 
 ### 5. Rodar
 

@@ -192,6 +192,31 @@ async function main() {
 
 main()
   .catch((e) => {
+    // Banco fora do ar é DE LONGE o erro mais comum aqui, e o que o
+    // Prisma cospe é um stack trace com o código P1001 no meio. Quem
+    // está só tentando popular o banco não tem por que decifrar isso.
+    const semBanco =
+      e?.errorCode === "P1001" ||
+      /Can't reach database server/i.test(String(e?.message ?? ""));
+
+    if (semBanco) {
+      console.error(
+        [
+          "",
+          "✖ O banco não respondeu.",
+          "",
+          "  Suba o Postgres local numa outra janela e deixe rodando:",
+          "      npm run db:local",
+          "",
+          "  Se ele disser que a porta está ocupada, sobrou um postgres",
+          "  morto de uma sessão anterior:",
+          "      Get-Process postgres* | Stop-Process -Force",
+          "",
+        ].join("\n")
+      );
+      process.exit(1);
+    }
+
     console.error(e);
     process.exit(1);
   })

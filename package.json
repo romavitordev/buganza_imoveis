@@ -13,7 +13,8 @@
     "db:local": "node scripts/local-db.mjs",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
-    "db:reset": "prisma db push --force-reset && prisma db seed"
+    "db:reset": "prisma db push --force-reset && node scripts/seed-demo.mjs",
+    "db:demo": "node scripts/seed-demo.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

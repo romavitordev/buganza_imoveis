@@ -4,7 +4,7 @@
  *   1. Inicia o Postgres portátil (mesmo do db:local) e ESPERA a porta
  *      5502 aceitar conexão — passo que, feito à mão, costuma ser pulado
  *      e gera "Can't reach database server".
- *   2. Na primeira vez (banco ainda sem tabelas), roda db:push + db:seed.
+ *   2. Na primeira vez (banco ainda sem tabelas), roda db:push + db:demo.
  *   3. Sobe o Next em modo desenvolvimento (next dev).
  *
  * Ctrl+C encerra tudo (banco e site) de uma vez.
@@ -96,7 +96,10 @@ async function main() {
   if (bancoNovo) {
     console.log("▶ 2/3 — primeira execução: criando tabelas e dados…\n");
     await rodarNpm("db:push");
-    await rodarNpm("db:seed");
+    // db:demo e não db:seed: quem roda `npm run up` está montando o
+    // ambiente de desenvolvimento e espera ver imóveis na tela. O
+    // db:seed puro cria só o admin, porque é o que vai para produção.
+    await rodarNpm("db:demo");
     console.log("\n✔ Banco preparado.\n");
   } else {
     console.log("▶ 2/3 — banco já preparado, pulando push/seed.\n");

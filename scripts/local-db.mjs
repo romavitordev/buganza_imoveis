@@ -18,8 +18,45 @@ import path from "node:path";
 const DATA_DIR = path.resolve(".pgdata");
 const PORT = 5502;
 
-/** true se algo está realmente escutando na porta do Postgres. */
-function portaAtiva() {
+/**
+ * true se um Postgres DE VERDADE atende na porta.
+ *
+ * Aceitar a conexão TCP não basta, e essa foi a origem de um bug chato:
+ * quando o postgres morre sem shutdown limpo (o Windows matando por
+ * falta de memória, por exemplo), o socket pode continuar preso à porta
+ * com o dono já morto. O `connect` ia em frente, este script anunciava
+ * "já está rodando, nada a fazer" e saía — e todo `db:seed` seguinte
+ * respondia "Can't reach database server", sem porta livre e sem
+ * servidor, para sempre.
+ *
+ * Então aqui se faz o aperto de mão: manda-se um SSLRequest (os 8 bytes
+ * que todo cliente Postgres manda primeiro) e espera-se a resposta, que
+ * é um único byte, 'S' ou 'N'. Socket zumbi não responde nada.
+ */
+function postgresResponde() {
+  return new Promise((resolve) => {
+    const socket = net.connect({ port: PORT, host: "127.0.0.1" });
+    const encerrar = (valor) => {
+      socket.destroy();
+      resolve(valor);
+    };
+    socket.once("connect", () => {
+      const sslRequest = Buffer.alloc(8);
+      sslRequest.writeInt32BE(8, 0);
+      sslRequest.writeInt32BE(80877103, 4);
+      socket.write(sslRequest);
+    });
+    socket.once("data", (dados) => {
+      const r = dados[0];
+      encerrar(r === 0x53 || r === 0x4e); // 'S' ou 'N'
+    });
+    socket.once("error", () => resolve(false));
+    socket.setTimeout(2000, () => encerrar(false));
+  });
+}
+
+/** true se ALGO ocupa a porta, respondendo Postgres ou não. */
+function portaOcupada() {
   return new Promise((resolve) => {
     const socket = net.connect({ port: PORT, host: "127.0.0.1" });
     socket.once("connect", () => {
@@ -34,11 +71,28 @@ function portaAtiva() {
   });
 }
 
+/** Porta presa por processo morto: explica o que fazer e sai. */
+async function abortarSePortaPresa() {
+  if (!(await portaOcupada())) return;
+  console.error(
+    [
+      "",
+      `✖ A porta ${PORT} está ocupada, mas quem responde ali não é um Postgres.`,
+      "  Normalmente é um postgres que morreu sem fechar o socket.",
+      "",
+      "  Windows:  Get-Process postgres* | Stop-Process -Force",
+      "  Depois:   npm run db:local",
+      "",
+    ].join("\n")
+  );
+  process.exit(1);
+}
+
 // Lock obsoleto: postmaster.pid existe mas nenhum servidor responde
 // (acontece quando o processo é morto sem shutdown limpo).
 const pidFile = path.join(DATA_DIR, "postmaster.pid");
 if (existsSync(pidFile)) {
-  if (await portaAtiva()) {
+  if (await postgresResponde()) {
     console.log(
       `✔ O Postgres local já está rodando na porta ${PORT}. Nada a fazer.`
     );
@@ -46,7 +100,12 @@ if (existsSync(pidFile)) {
   }
   console.log("Removendo lock obsoleto (postmaster.pid sem servidor ativo)…");
   rmSync(pidFile, { force: true });
+  await abortarSePortaPresa();
 }
+
+// Sem postmaster.pid, mas com a porta ocupada por um zumbi: mesma
+// história, e sem esta checagem o erro que aparece é um EADDRINUSE cru.
+await abortarSePortaPresa();
 
 const pg = new EmbeddedPostgres({
   databaseDir: DATA_DIR,
