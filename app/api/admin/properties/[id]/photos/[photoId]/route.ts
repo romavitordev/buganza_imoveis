@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deletePropertyPhoto } from "@/lib/storage";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +16,9 @@ interface Params {
  * Body: { capa: true } OU { mover: "cima" | "baixo" }
  */
 export async function PATCH(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const foto = await prisma.propertyPhoto.findFirst({
     where: { id: params.photoId, propertyId: params.id },
     include: { property: { select: { slug: true } } },
@@ -103,6 +107,9 @@ export async function PATCH(request: Request, { params }: Params) {
 
 /** DELETE — remove a foto do banco e do storage (via storageKey). */
 export async function DELETE(_request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const foto = await prisma.propertyPhoto.findFirst({
     where: { id: params.photoId, propertyId: params.id },
     include: { property: { select: { slug: true } } },

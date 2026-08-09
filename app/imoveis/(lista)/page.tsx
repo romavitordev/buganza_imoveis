@@ -259,6 +259,13 @@ export default async function ImoveisPage({
         {/* Resultados */}
         {imoveis.length > 0 ? (
           <>
+            {/* Título só para leitor de tela. O h1 é "Imóveis" e o título
+                de cada card é h3 — sem este h2 o sumário da página pula
+                de 1 para 3, e quem navega por títulos (o atalho mais
+                usado com leitor de tela) perde a noção de onde começa a
+                lista. Na home o mesmo card fica sob "Em destaque", que
+                já é h2, e por isso lá o problema não existia. */}
+            <h2 className="sr-only">Resultados da busca</h2>
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
               {imoveis.map((imovel, i) => (
                 <PropertyCard

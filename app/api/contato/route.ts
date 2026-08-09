@@ -7,6 +7,7 @@ import {
   mensagemImovel,
 } from "@/lib/whatsapp-server";
 import { registrarEventoUnico, origemDoReferer } from "@/lib/analytics";
+import { limitar, ipDaRequisicao } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,6 +23,19 @@ export const dynamic = "force-dynamic";
  * o beacon do cliente), com a mesma deduplicação por dispositivo/dia.
  */
 export async function GET(request: Request) {
+  // Cada chamada com ctx=imovel faz uma consulta e grava um evento. Sem
+  // teto, um laço simples enche a tabela de analytics e suja a métrica
+  // de cliques que os donos usam para decidir o que anunciar. O limite é
+  // FOLGADO de propósito: é um clique de humano querendo conversar, e
+  // ninguém legítimo abre 30 conversas por minuto.
+  const limite = await limitar(`contato:${ipDaRequisicao(request)}`, 30, 60_000);
+  if (!limite.permitido) {
+    return NextResponse.json(
+      { erro: "Muitas tentativas. Tente novamente em instantes." },
+      { status: 429, headers: { "Retry-After": String(limite.liberaEmSegundos) } }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const ctx = searchParams.get("ctx") ?? "geral";
   const slug = searchParams.get("slug");

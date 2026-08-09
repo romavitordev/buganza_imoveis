@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentSession } from "@/lib/session";
+import { barrarSemSessao, getCurrentSession } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,6 +13,9 @@ export const dynamic = "force-dynamic";
  * continua servindo de termômetro.
  */
 export async function PATCH(request: Request) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const sessao = await getCurrentSession();
   if (!sessao) {
     return NextResponse.json({ erro: "Não autenticado." }, { status: 401 });

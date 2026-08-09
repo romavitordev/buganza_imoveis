@@ -3,6 +3,7 @@ import type { PropertyPhoto } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { uploadPropertyPhoto } from "@/lib/storage";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +20,9 @@ interface Params {
  * os ids das fotos do imóvel, na nova ordem.
  */
 export async function PATCH(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     select: { id: true, slug: true },
@@ -98,6 +102,9 @@ export async function PATCH(request: Request, { params }: Params) {
 
 /** POST — upload de uma ou mais fotos (multipart/form-data, campo "fotos"). */
 export async function POST(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     include: { fotos: { orderBy: { ordem: "desc" }, take: 1 } },

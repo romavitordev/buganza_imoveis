@@ -8,14 +8,36 @@ anterior. Os detalhes técnicos de cada item estão no **DEPLOY.md**.
 
 ---
 
+## O que falta, em uma olhada
+
+**O código está pronto.** Nada na lista abaixo é programação — é
+decisão, conta em plataforma e texto que só os donos podem escrever.
+
+| bloqueia | o quê | quem |
+| --- | --- | --- |
+| 🔴 tudo | domínio + e-mail real (Fase 0) | você |
+| 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
+| 🟠 ir ao ar | depoimentos reais — os 7 do site são inventados (2.3) | donos |
+| 🟠 ir ao ar | história do Quem Somos e o número "+400 imóveis" | donos |
+| 🟡 estética | logotipo oficial em `public/logo.svg` | donos |
+| 🟢 depois | Search Console, Sentry, ensinar o chatbot | você |
+
+Os dois 🟠 são de **conteúdo falso no ar**, não de bug: depoimento
+inventado no site de uma imobiliária de verdade é propaganda enganosa.
+O catálogo já foi resolvido — nasce vazio e não tem como publicar imóvel
+de demonstração por descuido.
+
+---
+
 ## Fase 0 — Decisões que só você pode tomar
 
 Estas travam o resto. Resolva antes de mexer em plataforma.
 
-- [ ] **0.1 — Definir o nome definitivo da imobiliária**
-      Hoje o site usa "Imóveis Buganza". Se for mudar, decida agora: o
-      nome entra no domínio, no e-mail e no cadastro do Registro.br.
-      → Trocar no código é rápido: veja a Fase 5.
+- [ ] **0.1 — Confirmar o nome da imobiliária**
+      Hoje o site usa **"Marcelo Imóveis"** (em `lib/marca.ts`). Se for
+      mudar, decida agora: o nome entra no domínio, no e-mail e no
+      cadastro do Registro.br.
+      → Trocar no código é uma linha: veja a Fase 5.
 
 - [ ] **0.2 — Criar um e-mail de verdade**
       O `imoveisbuganza@gmail.com` de hoje é fictício. Você vai precisar
@@ -115,6 +137,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       | `SUPABASE_URL` | Supabase (1.3) |
       | `SUPABASE_SERVICE_ROLE_KEY` | Supabase (1.3) — **secreta** |
       | `WHATSAPP_NUMBER` | `5515998296767` (só dígitos) |
+      | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | só na hora do seed (3.4), não precisa ficar salvo |
       | `NEXT_PUBLIC_SITE_URL` | `https://www.seudominio.com.br` |
       | `RESEND_API_KEY` | Resend (1.4) |
       | `LEAD_NOTIFY_EMAIL` | o e-mail da 0.2 |
@@ -133,9 +156,9 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       ```bash
       DATABASE_URL="<url do Neon>" ADMIN_EMAIL="<seu e-mail>" ADMIN_PASSWORD="<sua senha forte>" npm run db:seed
       ```
-      > **O catálogo nasce vazio.** O seed cria só o administrador — os
-      > três imóveis de demonstração ficam atrás de `SEED_DEMO=1` e são
-      > para desenvolvimento. Se eles fossem para produção, o site de uma
+      > **O catálogo nasce vazio.** O `db:seed` cria só o administrador
+      > — os três imóveis de demonstração vivem no `npm run db:demo`, que
+      > é comando de desenvolvimento e **não deve ser rodado aqui**. Se eles fossem para produção, o site de uma
       > imobiliária de verdade estrearia com anúncio inventado.
       >
       > Enquanto o primeiro imóvel real não entra, o catálogo mostra
@@ -200,6 +223,10 @@ marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
 **Ainda precisa mexer à mão em:**
 - [ ] `app/icon.svg` — o favicon (desenho próprio, marinho + dourado)
 - [ ] `components/QuemSomos.tsx` — o texto da história
+- [ ] `lib/depoimentos.ts` — os 7 depoimentos são inventados. **Aviso:
+      apagar o conteúdo do arquivo NÃO esconde a seção** — ela fica na
+      home vazia, porque não existe guarda de lista vazia. Se for tirar
+      antes de ter os reais, peça o ajuste junto.
 - [ ] **Os três números do Quem Somos.** Hoje estão **+400 imóveis
       negociados · +15 anos de mercado · 100% acompanhamento pessoal**.
       Os 15 anos vieram dos donos; o **+400 é projeção** feita a partir
@@ -215,3 +242,21 @@ marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
 - [ ] Ensinar o chatbot em `/admin/suporte` conforme as perguntas chegam
 - [ ] Monitoramento de erro (**Sentry**, plano grátis) — hoje, se quebrar
       de madrugada, você só descobre pelo cliente reclamando
+- [ ] Backup do banco. O Neon no plano grátis guarda histórico curto; um
+      `pg_dump` mensal guardado fora dali custa nada e é a diferença
+      entre um susto e perder o catálogo inteiro.
+
+---
+
+## O que já está resolvido (para não refazer)
+
+- Catálogo nasce vazio; imóveis de demonstração só com `npm run db:demo`
+- `precoInterno` e endereço exato nunca saem em resposta pública
+      (allowlist em `lib/dto.ts`, com teste)
+- Painel com duas camadas de proteção: middleware **e** checagem em cada
+      rota (testado com o middleware desligado)
+- CSP e cabeçalhos de segurança, rate limit nos endpoints que escrevem
+- 2FA opcional (TOTP) no login do admin
+- Acessibilidade: sem imagem sem `alt`, sem campo sem rótulo, sem salto
+      de título, contraste conferido nos dois temas
+- 116 testes, lint e build de produção passando

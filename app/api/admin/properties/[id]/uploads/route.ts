@@ -9,6 +9,7 @@ import {
   urlPublicaDaChave,
 } from "@/lib/storage";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,6 +32,9 @@ interface Params {
  * cliente usa as rotas multipart de sempre (que gravam em public/uploads).
  */
 export async function POST(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     select: { id: true },
@@ -127,6 +131,9 @@ export async function POST(request: Request, { params }: Params) {
 
 /** PUT — confirma upload(s) direto(s) e registra no banco. */
 export async function PUT(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     select: { id: true, slug: true, videoStorageKey: true },

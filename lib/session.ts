@@ -84,3 +84,34 @@ export async function exigirSessao(): Promise<SessionPayload> {
   if (!sessao) redirect("/admin/login");
   return sessao;
 }
+
+/**
+ * Guarda das ROTAS DE API do admin. Devolve `null` quando há sessão, ou
+ * a resposta 401 já pronta para o handler entregar:
+ *
+ *     const barrado = await barrarSemSessao();
+ *     if (barrado) return barrado;
+ *
+ * É o equivalente do `exigirSessao` para APIs — lá o redirect resolve,
+ * aqui a resposta precisa ser JSON com status.
+ *
+ * POR QUE EXISTE, se o middleware.ts já protege /api/admin: porque o
+ * middleware é UMA linha de defesa, e frágil por natureza. Ela vive num
+ * `matcher` de string — basta mover uma rota para fora de /api/admin,
+ * editar o matcher sem perceber, ou o framework mudar de comportamento,
+ * e a proteção some sem erro nenhum aparecer. A rota simplesmente passa
+ * a responder para qualquer um. O próprio Next já teve CVE de bypass de
+ * middleware (o 14.2.35 daqui está corrigido, mas o histórico é o
+ * argumento).
+ *
+ * Com a checagem também no handler, perder o middleware vira um
+ * inconveniente em vez de vazar o painel inteiro.
+ */
+export async function barrarSemSessao(): Promise<Response | null> {
+  const sessao = await getCurrentSession();
+  if (sessao) return null;
+  return Response.json(
+    { erro: "Não autenticado. Faça login para continuar." },
+    { status: 401 }
+  );
+}

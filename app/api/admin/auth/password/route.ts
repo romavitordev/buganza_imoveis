@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { getCurrentSession } from "@/lib/session";
+import { barrarSemSessao, getCurrentSession } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** POST — troca a senha do admin logado (exige a senha atual). */
 export async function POST(request: Request) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const sessao = await getCurrentSession();
   if (!sessao) {
     return NextResponse.json({ erro: "Sessão expirada." }, { status: 401 });

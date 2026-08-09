@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentSession } from "@/lib/session";
+import { barrarSemSessao, getCurrentSession } from "@/lib/session";
 import {
   cifrarSegredo,
   decifrarSegredo,
@@ -24,6 +24,9 @@ export const dynamic = "force-dynamic";
  * O segredo só transita na ativação (QR); depois, jamais sai do servidor.
  */
 export async function POST(request: Request) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const sessao = await getCurrentSession();
   if (!sessao) {
     return NextResponse.json({ erro: "Não autenticado." }, { status: 401 });

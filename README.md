@@ -1,6 +1,10 @@
-# Buganza Imóveis
+# Marcelo Imóveis
 
-Catálogo imobiliário completo da **Imóveis Buganza** (Sorocaba/SP · CRECI 118400), construído com Next.js 14 (App Router), TypeScript, Tailwind CSS e Prisma.
+Catálogo imobiliário completo da **Marcelo Imóveis** (Sorocaba/SP · CRECI 118400), construído com Next.js 14 (App Router), TypeScript, Tailwind CSS e Prisma.
+
+> O nome da marca mora em [lib/marca.ts](lib/marca.ts) e o site inteiro
+> lê de lá — inclusive títulos, e-mails e o emissor do QR da 2FA. Os
+> repositórios ainda se chamam `buganza_*` por herança; é cosmético.
 
 **Preços:** os campos públicos `precoVenda` e `precoLocacao` aparecem nos cards e no detalhe (ausentes = "Sob consulta"). Já o `precoInterno` existe apenas para organização dos corretores e é visível somente no admin — a rota pública usa um DTO com allowlist explícita ([lib/dto.ts](lib/dto.ts)) que jamais serializa esse campo. Toda conversão acontece via WhatsApp com mensagem pré-preenchida.
 
@@ -86,10 +90,44 @@ npm run dev
 ## Qualidade
 
 ```bash
-npm test       # testes unitários (Vitest) — inclui o teste que garante
-               # que precoInterno NUNCA vaza no DTO público
+npm test       # testes unitários (Vitest)
 npm run lint   # ESLint (next/core-web-vitals)
+npx tsc --noEmit   # tipos
 ```
+
+Dois testes existem para travar regra de negócio, não comportamento de
+código — são os que doem se quebrarem:
+
+| teste | o que impede |
+| --- | --- |
+| `tests/dto.test.ts` | `precoInterno` vazar numa resposta pública |
+| `tests/admin-guard.test.ts` | uma rota nova do painel nascer sem checagem de sessão |
+
+## Segurança
+
+O painel tem **duas camadas independentes**, e isso é proposital:
+
+1. **[middleware.ts](middleware.ts)** — barra `/admin` e `/api/admin` na
+   borda, antes de chegar na rota.
+2. **No próprio handler** — toda rota do painel começa com
+   `barrarSemSessao()` ([lib/session.ts](lib/session.ts)), e toda página
+   com `exigirSessao()`.
+
+A segunda existe porque a primeira é frágil por natureza: ela vive num
+`matcher` de string. Basta mover uma rota para fora de `/api/admin`,
+editar o matcher sem perceber ou o framework mudar de comportamento, e a
+proteção some **sem erro nenhum aparecer** — a rota simplesmente passa a
+responder para qualquer um. O próprio Next já teve CVE de bypass de
+middleware (CVE-2025-29927; a versão daqui está corrigida).
+
+Verificado na prática: removendo o `middleware.ts` e reconstruindo, as 23
+rotas do painel continuam devolvendo 401 e `/admin` continua
+redirecionando para o login.
+
+Outras defesas: CSP e cabeçalhos de segurança em
+[next.config.mjs](next.config.mjs); rate limit nos endpoints públicos que
+escrevem no banco (leads, contato, chatbot, tracking); 2FA opcional
+(TOTP); sessão em cookie httpOnly assinado.
 
 ## Como o conteúdo chega ao visitante (cache)
 
@@ -117,6 +155,8 @@ no upload via servidor para `public/uploads`.
    DATABASE_URL="<url do Neon>" npm run db:push
    DATABASE_URL="<url do Neon>" ADMIN_EMAIL=... ADMIN_PASSWORD=... npm run db:seed
    ```
+   > Em produção use `db:seed`, nunca `db:demo`: o catálogo tem que
+   > nascer vazio. Ver [CHECKLIST-DEPLOY.md](CHECKLIST-DEPLOY.md).
 
 ## Estrutura
 
@@ -127,10 +167,12 @@ app/
   imoveis/[slug]/          # Detalhe com galeria + CTA WhatsApp
   admin/                   # Painel protegido (login, dashboard, CRUD)
   api/
-    properties/            # PÚBLICA — só ATIVOS, via DTO (sem preço)
-    admin/                 # CRUD completo + auth (protegidas por middleware)
+    properties/            # PÚBLICA — só ATIVOS, via DTO (sem preço interno)
+    admin/                 # CRUD + auth (middleware E guarda no handler)
 components/                # Hero, cena SVG, cards, galeria, admin
 lib/                       # prisma, session (jose), dto, storage, whatsapp…
 prisma/                    # schema + seed
-middleware.ts              # protege /admin e /api/admin
+middleware.ts              # 1ª camada: protege /admin e /api/admin
+tests/                     # Vitest — inclui as duas regras de negócio
+scripts/                   # banco local, seed de demonstração, limpeza
 ```

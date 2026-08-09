@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentSession } from "@/lib/session";
+import { barrarSemSessao } from "@/lib/session";
 import { palavrasChaveDe } from "@/lib/chatbot-aprendizado";
 
 export const runtime = "nodejs";
@@ -8,22 +8,17 @@ export const dynamic = "force-dynamic";
 
 /**
  * Gestão da base aprendida do chatbot (/admin/suporte). Protegida pelo
- * middleware (/api/admin) + checagem de sessão aqui (defense in depth).
+ * middleware (/api/admin) + barrarSemSessao em cada handler, como todas
+ * as rotas do painel (defense in depth — ver lib/session.ts).
  *
  * POST   — cria uma resposta (e marca a pergunta de origem como RESPONDIDA)
  * PATCH  — edita ou (des)ativa uma resposta existente
  * DELETE — remove uma resposta
  */
 
-async function exigirAdmin() {
-  const sessao = await getCurrentSession();
-  return Boolean(sessao);
-}
-
 export async function POST(request: Request) {
-  if (!(await exigirAdmin())) {
-    return NextResponse.json({ erro: "Não autenticado." }, { status: 401 });
-  }
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
 
   let body: unknown;
   try {
@@ -94,9 +89,9 @@ export async function POST(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  if (!(await exigirAdmin())) {
-    return NextResponse.json({ erro: "Não autenticado." }, { status: 401 });
-  }
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   let body: unknown;
   try {
     body = await request.json();
@@ -144,9 +139,9 @@ export async function PATCH(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!(await exigirAdmin())) {
-    return NextResponse.json({ erro: "Não autenticado." }, { status: 401 });
-  }
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const id = new URL(request.url).searchParams.get("id");
   if (!id) {
     return NextResponse.json({ erro: "Informe o id." }, { status: 400 });

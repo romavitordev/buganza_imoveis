@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { proximoCodigo } from "@/lib/codigo";
 import { uniqueSlug } from "@/lib/slug";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,6 +17,9 @@ interface Params {
  * ajusta o que muda e publica quando estiver pronta.
  */
 export async function POST(_request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const original = await prisma.property.findUnique({
     where: { id: params.id },
   });

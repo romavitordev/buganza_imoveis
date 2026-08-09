@@ -8,6 +8,7 @@ import {
   isValidationError,
 } from "@/lib/property-input";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,6 +19,9 @@ interface Params {
 
 /** PATCH — edita um imóvel. Aceita payload completo ou só { destaque } / { status }. */
 export async function PATCH(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   let payload: unknown;
   try {
     payload = await request.json();
@@ -134,6 +138,9 @@ export async function PATCH(request: Request, { params }: Params) {
 
 /** DELETE — exclui o imóvel, as fotos do banco (cascade) e do storage. */
 export async function DELETE(_request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     include: { fotos: true },

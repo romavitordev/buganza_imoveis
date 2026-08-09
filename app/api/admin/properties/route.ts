@@ -7,12 +7,16 @@ import {
   isValidationError,
 } from "@/lib/property-input";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /** GET — lista todos os imóveis (todos os status) para o dashboard. */
 export async function GET() {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   try {
     const properties = await prisma.property.findMany({
       orderBy: { atualizadoEm: "desc" },
@@ -30,6 +34,9 @@ export async function GET() {
 
 /** POST — cria um imóvel com código sequencial e slug único. */
 export async function POST(request: Request) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   let payload: unknown;
   try {
     payload = await request.json();

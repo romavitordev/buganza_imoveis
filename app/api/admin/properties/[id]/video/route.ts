@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { uploadPropertyVideo, deletePropertyVideo } from "@/lib/storage";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
 import { idDoYoutube, urlAssistirYoutube } from "@/lib/youtube";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -19,6 +20,9 @@ interface Params {
  * de detalhe — nunca como capa do card ou nos destaques.
  */
 export async function POST(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     select: { id: true, videoStorageKey: true, slug: true },
@@ -95,6 +99,9 @@ export async function POST(request: Request, { params }: Params) {
  * (e apaga do storage) um vídeo enviado por upload, se houver.
  */
 export async function PATCH(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     select: { id: true, videoStorageKey: true, slug: true },
@@ -154,6 +161,9 @@ export async function PATCH(request: Request, { params }: Params) {
 
 /** DELETE — remove o vídeo do imóvel (banco e storage). */
 export async function DELETE(_request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   const property = await prisma.property.findUnique({
     where: { id: params.id },
     select: { id: true, videoStorageKey: true, slug: true },

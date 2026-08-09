@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { StatusLead } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { barrarSemSessao } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,6 +12,9 @@ interface Params {
 
 /** PATCH — muda o status do lead (NOVO/CONTATADO/DESCARTADO). */
 export async function PATCH(request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   let body: unknown;
   try {
     body = await request.json();
@@ -49,6 +53,9 @@ export async function PATCH(request: Request, { params }: Params) {
 
 /** DELETE — remove o lead definitivamente (LGPD: direito de exclusão). */
 export async function DELETE(_request: Request, { params }: Params) {
+  const barrado = await barrarSemSessao();
+  if (barrado) return barrado;
+
   try {
     await prisma.lead.delete({ where: { id: params.id } });
     return NextResponse.json({ ok: true });
