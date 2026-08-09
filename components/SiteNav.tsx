@@ -14,6 +14,7 @@ import { Building2, Headset, Heart, Home, MessageCircle, Users } from "lucide-re
 import { CORES, MARCA } from "@/lib/marca";
 import { abrirSuporte } from "@/lib/suporte";
 import ThemeToggle from "@/components/ThemeToggle";
+import NavBusca from "@/components/NavBusca";
 
 interface SiteNavProps {
   whatsappHref: string;
@@ -336,10 +337,16 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
           </span>
         </Link>
 
+{/* Bloco central: links + busca.
+            A navbar é `justify-between` com três blocos, e entre eles
+            sobravam duas faixas largas de nada num monitor de 1440px. A
+            busca ocupa uma delas em vez de criar um quarto bloco, que
+            desequilibraria a distribuição. */}
+        <div className="hidden items-center gap-2 md:flex">
         {/* Links inline — só desktop; no mobile a navegação fica na barra inferior */}
         <div
           ref={desktopRef}
-          className="relative hidden items-center gap-1 rounded-pill bg-white/85 p-1 shadow-[0_2px_16px_rgba(0,0,0,0.06)] backdrop-blur md:flex"
+          className="relative flex items-center gap-1 rounded-pill bg-white/85 p-1 shadow-[0_2px_16px_rgba(0,0,0,0.06)] backdrop-blur"
         >
           <span
             aria-hidden="true"
@@ -369,6 +376,11 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
               </Link>
             );
           })}
+          </div>
+
+          {/* Só na home: no catálogo já existe busca dentro dos filtros,
+              e dois campos na mesma tela confundem. */}
+          {naHome && <NavBusca />}
         </div>
 
         {/* HIERARQUIA DOS TRÊS BOTÕES.

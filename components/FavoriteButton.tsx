@@ -32,10 +32,25 @@ export default function FavoriteButton({ id, titulo }: FavoriteButtonProps) {
     };
   }, [id]);
 
+  // Só para a animação de "salvo" — some sozinho quando o keyframe acaba.
+  const [batendo, setBatendo] = useState(false);
+
   return (
     <button
       type="button"
-      onClick={() => setFavorito(alternarFavorito(id))}
+      onClick={() => {
+        const agora = alternarFavorito(id);
+        setFavorito(agora);
+        // A batida acontece só ao SALVAR. Ao remover, animar seria
+        // comemorar o que a pessoa acabou de desfazer.
+        if (agora) {
+          setBatendo(false);
+          // Reinicia a animação mesmo em cliques seguidos: sem o quadro
+          // no meio, o React reaproveita o mesmo nó e o CSS não
+          // recomeça um keyframe que já está no fim.
+          requestAnimationFrame(() => setBatendo(true));
+        }
+      }}
       aria-pressed={favorito}
       aria-label={
         favorito
@@ -51,9 +66,10 @@ export default function FavoriteButton({ id, titulo }: FavoriteButtonProps) {
         // Preenchido em dourado: o estado "salvo" é o único do card que
         // precisa saltar, e o dourado como preenchimento (não como texto)
         // é exatamente o uso permitido da cor sobre fundo claro.
+        onAnimationEnd={() => setBatendo(false)}
         className={`transition-colors duration-200 ${
           favorito ? "fill-dourado text-dourado" : "text-secundario"
-        }`}
+        } ${batendo ? "bz-favorito-bate" : ""}`}
       />
     </button>
   );

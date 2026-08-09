@@ -234,6 +234,29 @@ textarea::placeholder {
 
 .bz-lit { animation: bzGlow 2.6s ease-in-out infinite; }
 
+/**
+ * A BATIDA DO CORAÇÃO ao salvar um favorito.
+ *
+ * Antes, salvar só trocava a cor do ícone — a ação acontecia e nada
+ * confirmava que tinha acontecido. É o momento em que a microinteração
+ * mais importa: o retorno de que deu certo.
+ *
+ * Duas batidas, e a segunda menor que a primeira, como um coração de
+ * verdade. Uma batida só lê como "glitch"; três já viram desenho
+ * animado. Roda uma vez e some (o React tira a classe no
+ * animationend).
+ */
+@keyframes bzFavoritoBate {
+  0%   { transform: scale(1); }
+  22%  { transform: scale(1.32); }
+  42%  { transform: scale(0.94); }
+  62%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+.bz-favorito-bate {
+  animation: bzFavoritoBate 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* animação de entrada para seções abaixo do hero */
 @keyframes bzFadeUp {
   from { opacity: 0; transform: translateY(24px); }
@@ -251,6 +274,8 @@ textarea::placeholder {
     transform: none;
   }
   .bz-lit { animation: none; }
+  /* Sem a batida: a cor do ícone já diz que salvou. */
+  .bz-favorito-bate { animation: none !important; }
   /* Estrelas paradas e nuvens paradas — continuam lá, só não se mexem. */
   .bz-estrela,
   .bz-nuvem {
