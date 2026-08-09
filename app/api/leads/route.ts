@@ -7,8 +7,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * ROTA PÚBLICA — recebe o formulário "Tenho interesse" do detalhe do
- * imóvel. Proteções: honeypot (campo "site" precisa vir vazio), limite
+ * ROTA PÚBLICA — recebe o contato deixado dentro do chat de
+ * atendimento (ChatWidget). Proteções: honeypot (campo "site" precisa vir vazio), limite
  * de 5 envios por IP por hora (durável com Upstash — lib/ratelimit) e
  * validação estrita dos campos.
  *

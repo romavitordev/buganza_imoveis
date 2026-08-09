@@ -90,11 +90,11 @@ export default function PrivacidadePage() {
               id="pp-leads"
               className="mb-2 text-xl font-medium tracking-tight text-black"
             >
-              Formulário “Tenho interesse”
+              Contato deixado no atendimento
             </h2>
             <p>
-              Se você optar por deixar seu contato no formulário de um imóvel,
-              guardamos{" "}
+              Se você optar por deixar seu contato durante a conversa com o
+              nosso atendimento, guardamos{" "}
               <strong className="font-medium text-black">
                 nome, WhatsApp e a mensagem
               </strong>{" "}

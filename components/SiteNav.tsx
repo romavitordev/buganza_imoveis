@@ -309,7 +309,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
   /**
    * Na página de um imóvel a bottom nav não aparece no mobile.
    *
-   * Lá já existe o CTA fixo "Tenho interesse — chamar no WhatsApp", e as
+   * Lá já existe o CTA fixo "Agendar uma visita", e as
    * duas barras somadas à navbar comiam 207px de 812 (25% da tela) —
    * com redundância, porque a bottom nav também tem um item WhatsApp
    * colado embaixo do CTA. O CTA passa a SER a barra inferior; para

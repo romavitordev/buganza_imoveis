@@ -117,9 +117,22 @@ export default async function ImovelPage({ params }: PageProps) {
   const precoVenda = formatarPreco(imovel.precoVenda);
   const precoLocacao = precoLocacaoFormatado(imovel);
   const temPreco = Boolean(precoVenda) || Boolean(precoLocacao);
-  const rotuloCta = temPreco
-    ? "Tenho interesse — chamar no WhatsApp"
-    : "Consultar valor no WhatsApp";
+  /**
+   * O CTA sobe um degrau em relação ao card do catálogo.
+   *
+   * Lá o botão é "Falar sobre este imóvel" — compromisso baixo, serve
+   * para trazer a pessoa até aqui. Quem chegou nesta página já viu
+   * fotos, preço e ficha; o próximo passo real dela é ver o imóvel.
+   *
+   * "Tenho interesse — chamar no WhatsApp" era fraco por três motivos:
+   * descrevia um sentimento em vez de uma ação, repetia no texto o
+   * canal que o ícone já mostra, e as duas orações quebravam o botão em
+   * duas linhas dentro da coluna lateral.
+   *
+   * Sem preço o convite continua sendo outro: ali o que trava a pessoa
+   * é não saber quanto custa, e visita é uma pergunta pra depois.
+   */
+  const rotuloCta = temPreco ? "Agendar uma visita" : "Consultar valor";
 
   // Custos recorrentes ficam junto do preço (é a conta que o comprador faz)
   const custos = [
@@ -339,8 +352,13 @@ export default async function ImovelPage({ params }: PageProps) {
               />
               {rotuloCta}
             </WhatsAppLink>
+            {/* "Sem compromisso" primeiro, de propósito: é a objeção
+                que "agendar" levanta. Um CTA mais forte precisa da
+                microcópia que tira o peso dele. */}
             <p className="mt-2 text-center text-[12px] md:text-[11px] text-secundario">
-              Resposta rápida · atendimento direto com os corretores
+              {temPreco
+                ? "Sem compromisso · resposta rápida no WhatsApp"
+                : "Resposta rápida · atendimento direto com os corretores"}
             </p>
 
             {/* Ficha de características no próprio card — preenche a coluna

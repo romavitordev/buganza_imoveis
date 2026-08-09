@@ -28,8 +28,32 @@ export const MENSAGEM_GERAL =
 export const MENSAGEM_ANUNCIAR =
   `Olá! Tenho um imóvel e gostaria de anunciá-lo com a ${MARCA.nome}. Podemos conversar?`;
 
+/**
+ * Mensagem pré-preenchida do botão da página do imóvel.
+ *
+ * Acompanha o rótulo do CTA, e isso não é detalhe: o botão diz "Agendar
+ * uma visita", então a mensagem tem que PEDIR a visita. Se chegasse como
+ * "tenho interesse, me passe informações", o corretor receberia um
+ * pedido diferente do que a pessoa achou que estava fazendo — e perderia
+ * a chance de já responder oferecendo horário.
+ *
+ * O código vai junto porque é por ele que o corretor acha o anúncio no
+ * painel sem ter que perguntar de qual imóvel se trata.
+ */
 export function mensagemImovel(titulo: string, codigo: string): string {
-  return `Olá! Tenho interesse no imóvel "${titulo}" (cód. ${codigo}). Poderia me passar mais informações e valores?`;
+  return `Olá! Vi o imóvel "${titulo}" (cód. ${codigo}) no site e gostaria de agendar uma visita.`;
+}
+
+/**
+ * Variante para imóvel SEM preço público, onde o CTA é "Consultar
+ * valor": ali o que trava a conversa é não saber quanto custa, e visita
+ * é assunto de depois.
+ */
+export function mensagemImovelSemPreco(
+  titulo: string,
+  codigo: string
+): string {
+  return `Olá! Vi o imóvel "${titulo}" (cód. ${codigo}) no site e gostaria de saber o valor.`;
 }
 
 export function whatsappUrl(mensagem: string): string {

@@ -5,6 +5,7 @@ import {
   MENSAGEM_GERAL,
   MENSAGEM_ANUNCIAR,
   mensagemImovel,
+  mensagemImovelSemPreco,
 } from "@/lib/whatsapp-server";
 import { registrarEventoUnico, origemDoReferer } from "@/lib/analytics";
 import { limitar, ipDaRequisicao } from "@/lib/ratelimit";
@@ -48,10 +49,25 @@ export async function GET(request: Request) {
     try {
       const imovel = await prisma.property.findUnique({
         where: { slug },
-        select: { id: true, titulo: true, codigo: true, status: true },
+        select: {
+          id: true,
+          titulo: true,
+          codigo: true,
+          status: true,
+          // Só para escolher a mensagem: com preço na tela o botão diz
+          // "Agendar uma visita"; sem preço, "Consultar valor". O texto
+          // que chega ao corretor tem que ser o mesmo pedido que a
+          // pessoa achou que estava fazendo.
+          precoVenda: true,
+          precoLocacao: true,
+        },
       });
       if (imovel && imovel.status === "ATIVO") {
-        mensagem = mensagemImovel(imovel.titulo, imovel.codigo);
+        const temPreco =
+          imovel.precoVenda !== null || imovel.precoLocacao !== null;
+        mensagem = temPreco
+          ? mensagemImovel(imovel.titulo, imovel.codigo)
+          : mensagemImovelSemPreco(imovel.titulo, imovel.codigo);
         await registrarEventoUnico(
           request,
           imovel.id,
