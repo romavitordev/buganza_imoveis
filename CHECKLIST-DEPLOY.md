@@ -19,6 +19,8 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 | 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
 | 🟠 ir ao ar | depoimentos reais — os 7 do site são inventados (2.3) | donos |
 | 🟠 ir ao ar | história do Quem Somos e o número "+400 imóveis" | donos |
+| 🔴 legal | razão social, CNPJ, endereço e encarregado (LGPD) | donos |
+| 🟠 legal | revisão da política de privacidade por advogado | você |
 | 🟡 estética | logotipo oficial em `public/logo.svg` | donos |
 | 🟢 depois | Search Console, Sentry, ensinar o chatbot | você |
 
@@ -118,6 +120,28 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 - [ ] **2.5 — Conferir o CRECI**
       Hoje é `118400`, em `lib/marca.ts`. Confirme que é o número certo.
+
+- [ ] **2.6 — Preencher os dados do controlador (LGPD)** 🔴
+      Em `lib/marca.ts`, na constante `CONTROLADOR`: razão social, CNPJ,
+      endereço da sede e o **encarregado pela proteção de dados** (nome e
+      e-mail). A LGPD exige os dois: identificar quem trata os dados
+      (art. 9º, I) e indicar um encarregado com contato público (art. 41).
+
+      Enquanto estiver vazio, a página `/privacidade` mostra um aviso
+      dourado dizendo que não está pronta — de propósito, para ninguém
+      publicar sem preencher.
+
+      > O encarregado **não precisa ser advogado** nem funcionário
+      > dedicado. Numa imobiliária pequena costuma ser um dos sócios. O
+      > que a lei exige é que exista alguém identificado e um canal que
+      > funcione.
+
+- [ ] **2.7 — Mandar a política de privacidade para um advogado**
+      O texto em `/privacidade` foi escrito a partir do que o sistema de
+      fato faz, cobrindo bases legais, prazos, transferência
+      internacional e os nove direitos do titular. **Isso não substitui
+      revisão jurídica** — peça a leitura de um advogado, principalmente
+      das bases legais e do trecho de transferência internacional.
 
 ---
 
@@ -245,6 +269,16 @@ marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
 - [ ] Backup do banco. O Neon no plano grátis guarda histórico curto; um
       `pg_dump` mensal guardado fora dali custa nada e é a diferença
       entre um susto e perder o catálogo inteiro.
+- [ ] **Agendar a limpeza de retenção (LGPD)** — uma vez por mês:
+      ```bash
+      npm run db:retencao            # só mostra o que apagaria
+      node scripts/retencao.mjs --aplicar
+      ```
+      Apaga o que passou dos prazos declarados na política: audiência e
+      perguntas com mais de 12 meses, contatos com mais de 24. **Prazo
+      escrito na política sem nada que o cumpra é promessa falsa** — e um
+      banco que só cresce descumpre a política do próprio site.
+      Na Vercel dá para automatizar com um *Cron Job*.
 
 ---
 

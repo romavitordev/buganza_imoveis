@@ -44,6 +44,45 @@ export const MARCA = {
 export const CIDADE_UF = `${MARCA.cidade}/${MARCA.uf}` as const;
 
 /**
+ * IDENTIFICAÇÃO DO CONTROLADOR — exigida pela LGPD.
+ *
+ * O art. 9º, I da Lei 13.709/2018 obriga a informar QUEM trata os dados,
+ * e o art. 41 obriga a indicar um ENCARREGADO com contato divulgado
+ * publicamente. Não dá para inventar: são o CNPJ e o endereço reais da
+ * empresa, e a pessoa que de fato vai responder aos pedidos.
+ *
+ * Enquanto estiverem vazios, a política mostra um aviso no lugar — feio
+ * de propósito, para ninguém publicar sem preencher. Ver a Fase 2 do
+ * CHECKLIST-DEPLOY.md.
+ *
+ * O encarregado NÃO precisa ser advogado nem funcionário dedicado: numa
+ * imobiliária pequena costuma ser um dos sócios. O que a lei exige é que
+ * exista alguém identificado e um canal que funcione.
+ */
+export const CONTROLADOR = {
+  /** Razão social completa, como no cartão CNPJ. */
+  razaoSocial: "",
+  /** Só dígitos ou formatado — entra na página como está. */
+  cnpj: "",
+  /** Endereço da sede, com CEP. */
+  endereco: "",
+  encarregado: {
+    nome: "",
+    /** Pode ser o mesmo e-mail de contato, se for lido de verdade. */
+    email: "",
+  },
+} as const;
+
+/** true quando dá para publicar a política sem lacuna legal. */
+export const CONTROLADOR_COMPLETO = Boolean(
+  CONTROLADOR.razaoSocial &&
+    CONTROLADOR.cnpj &&
+    CONTROLADOR.endereco &&
+    CONTROLADOR.encarregado.nome &&
+    CONTROLADOR.encarregado.email
+);
+
+/**
  * Cores da marca, tiradas do logotipo.
  *
  * REGRA DE CONTRASTE (não quebre): o dourado sobre branco dá apenas
