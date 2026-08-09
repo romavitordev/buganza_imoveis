@@ -18,49 +18,41 @@ import {
  * do que acontece é pior que nenhuma, porque cria uma promessa que o
  * site não cumpre.
  *
- * O que a lei exige e está coberto aqui:
- *  - art. 9º, I    — identificação do controlador
- *  - art. 9º, II   — finalidade específica de cada tratamento
- *  - art. 7º       — base legal de cada tratamento (a coluna que mais
- *                    falta nas políticas de PME)
- *  - art. 9º, V    — com quem os dados são compartilhados
- *  - art. 33       — transferência internacional (todos os nossos
- *                    fornecedores de infraestrutura ficam fora do país)
- *  - art. 15/16    — por quanto tempo cada dado fica
- *  - art. 18       — os nove direitos do titular, um a um
- *  - art. 18, §1º  — ANPD como canal de reclamação
- *  - art. 41       — encarregado, com contato público
- *  - art. 46       — medidas de segurança
- *  - art. 48       — comunicação de incidente
- *  - art. 14       — dados de crianças e adolescentes
+ * ESCRITA PARA O VISITANTE, e não para o revisor. As citações de artigo
+ * ficam aqui no código, onde servem à revisão jurídica, em vez de pesar
+ * no texto de quem só quer saber o que acontece com o WhatsApp dele. O
+ * conteúdo obrigatório continua todo lá.
  *
- * Também o Marco Civil da Internet (Lei 12.965/2014, art. 15), que
- * OBRIGA a guardar registros de acesso por 6 meses — é por isso que essa
- * retenção aparece como obrigação legal, e não como escolha nossa.
+ * Cobertura, por artigo:
+ *  - art. 9º        — finalidade, forma, duração, controlador,
+ *                     compartilhamento e direitos (o dever de informar)
+ *  - art. 7º        — base legal de cada tratamento (a tabela)
+ *  - art. 33        — transferência internacional: todos os
+ *                     fornecedores de infraestrutura ficam fora do país
+ *  - art. 15 e 16   — prazos de guarda, cumpridos por scripts/retencao.mjs
+ *  - art. 18        — direitos do titular, e a ANPD no §1º
+ *  - art. 13        — o dedupeHash é pseudonimização, NÃO anonimização
+ *  - art. 46 e 48   — segurança e comunicação de incidente
  *
- * ISTO NÃO SUBSTITUI REVISÃO JURÍDICA. Um advogado precisa ler antes de
- * publicar, principalmente as bases legais e a transferência
- * internacional.
+ * PORTE DA EMPRESA: a Resolução CD/ANPD nº 2/2022 dá tratamento
+ * diferenciado ao "agente de tratamento de pequeno porte", que é o caso
+ * de uma imobiliária deste tamanho. A principal consequência aqui: NÃO
+ * é obrigatório nomear um encarregado formal, basta manter um canal de
+ * comunicação com o titular. É por isso que a seção de contato fala em
+ * canal, e não em cargo.
+ *
+ * Marco Civil (Lei 12.965/2014, art. 15): a guarda de registros de
+ * acesso por 6 meses é OBRIGAÇÃO LEGAL, não escolha nossa.
+ *
+ * ISTO NÃO SUBSTITUI REVISÃO JURÍDICA.
  */
 
 export const metadata: Metadata = {
   title: "Política de Privacidade",
-  description: `Como a ${MARCA.nome} trata dados pessoais: bases legais, prazos, compartilhamento e os direitos do titular, conforme a LGPD (Lei 13.709/2018).`,
+  description: `Como a ${MARCA.nome} trata dados pessoais: o que coletamos, por quê, por quanto tempo e quais são os seus direitos, conforme a LGPD.`,
 };
 
 const ATUALIZADO_EM = "9 de agosto de 2026";
-
-/** Cabeçalho de seção — mesma tipografia em todas. */
-function Titulo({ id, children }: { id: string; children: React.ReactNode }) {
-  return (
-    <h2
-      id={id}
-      className="mb-2 text-xl font-medium tracking-tight text-black"
-    >
-      {children}
-    </h2>
-  );
-}
 
 function Secao({
   id,
@@ -73,7 +65,12 @@ function Secao({
 }) {
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3">
-      <Titulo id={id}>{titulo}</Titulo>
+      <h2
+        id={id}
+        className="mb-1 text-xl font-medium tracking-tight text-black"
+      >
+        {titulo}
+      </h2>
       {children}
     </section>
   );
@@ -83,7 +80,7 @@ const Forte = ({ children }: { children: React.ReactNode }) => (
   <strong className="font-medium text-black">{children}</strong>
 );
 
-/** Linha de tabela responsiva: vira bloco empilhado no celular. */
+/** Linha da tabela de tratamentos: empilha no celular, alinha no desktop. */
 function Linha({
   dado,
   finalidade,
@@ -96,7 +93,7 @@ function Linha({
   prazo: string;
 }) {
   return (
-    <div className="grid gap-1 border-t border-black/10 py-3 md:grid-cols-4 md:gap-4">
+    <div className="grid gap-1 border-t border-black/10 py-3 md:grid-cols-[1.1fr_1.4fr_0.9fr_0.8fr] md:gap-4">
       <div className="text-black">{dado}</div>
       <div>{finalidade}</div>
       <div>{base}</div>
@@ -106,6 +103,8 @@ function Linha({
 }
 
 export default function PrivacidadePage() {
+  const canal = CONTROLADOR.encarregado.email || MARCA.email;
+
   return (
     <>
       <SiteNav whatsappHref={linkWhatsAppGeral()} />
@@ -125,272 +124,167 @@ export default function PrivacidadePage() {
         </header>
 
         <div className="flex flex-col gap-8 text-[15px] leading-relaxed text-secundario">
-          {/* Aviso de publicação incompleta. Some sozinho quando os dados
-              da empresa forem preenchidos em lib/marca.ts. É deliberadamente
-              chamativo: publicar sem identificar o controlador é descumprir
-              o art. 9º, I. */}
-          {!CONTROLADOR_COMPLETO && (
-            <div className="rounded-xl border-2 border-dourado bg-dourado/10 p-4 text-[14px] text-black">
-              <Forte>Esta política ainda não está pronta para publicação.</Forte>{" "}
-              Faltam a razão social, o CNPJ, o endereço e o encarregado pela
-              proteção de dados — informações que a LGPD exige (arts. 9º, I e
-              41) e que só a imobiliária pode fornecer. Preencha em{" "}
-              <code className="rounded bg-black/5 px-1">lib/marca.ts</code> e
-              peça a revisão de um advogado antes de publicar.
-            </div>
-          )}
-
-          <Secao id="pp-resumo" titulo="Resumo">
+          <Secao id="pp-resumo" titulo="O essencial">
             <p>
-              Você <Forte>não precisa criar cadastro</Forte> para usar este
-              site. Não usamos cookies de publicidade, não fazemos perfil
-              comportamental para anúncios e{" "}
-              <Forte>não vendemos nem alugamos dados a ninguém</Forte>.
+              Você não precisa criar cadastro para usar este site. Não usamos
+              cookies de publicidade, não montamos perfil para anúncios e{" "}
+              <Forte>não vendemos nem cedemos dados a ninguém</Forte>.
             </p>
             <p>
-              Coletamos duas coisas: o contato que{" "}
-              <Forte>você mesmo decide deixar</Forte> quando quer falar sobre
-              um imóvel, e uma medição de audiência com identificador
-              pseudonimizado, para saber quais imóveis despertam mais
-              interesse. Os detalhes de cada uma estão abaixo.
+              Guardamos duas coisas: o contato que{" "}
+              <Forte>você decide deixar</Forte> para falar sobre um imóvel, e
+              uma contagem de visitas que não identifica você pelo nome.
             </p>
           </Secao>
 
-          <Secao id="pp-controlador" titulo="Quem é o controlador">
+          <Secao id="pp-controlador" titulo="Quem é o responsável">
+            {/* Sem os dados da empresa, a página NÃO mostra colchete de
+                "preencher" — isso é bilhete interno vazando para o
+                visitante. Ela cai para a identificação pelo nome
+                fantasia e CRECI, que é verdadeira e publicável. Falta o
+                CNPJ para ficar completa aos olhos da LGPD, e quem cobra
+                isso é o CHECKLIST-DEPLOY (2.6) e o aviso no build. */}
             <p>
-              O controlador dos dados tratados neste site é{" "}
-              <Forte>
-                {CONTROLADOR.razaoSocial || "[razão social a preencher]"}
-              </Forte>
-              {CONTROLADOR.cnpj ? `, CNPJ ${CONTROLADOR.cnpj}` : ", CNPJ [a preencher]"}
-              {CONTROLADOR.endereco ? `, com sede em ${CONTROLADOR.endereco}` : ", endereço [a preencher]"}
-              , que atua no mercado imobiliário sob o nome{" "}
-              {MARCA.nome} — CRECI {MARCA.creci} — em {CIDADE_UF}.
+              {CONTROLADOR_COMPLETO ? (
+                <>
+                  <Forte>{CONTROLADOR.razaoSocial}</Forte>, CNPJ{" "}
+                  {CONTROLADOR.cnpj}, {CONTROLADOR.endereco} — atua como{" "}
+                  {MARCA.nome}, CRECI {MARCA.creci}, em {CIDADE_UF}.
+                </>
+              ) : (
+                <>
+                  <Forte>{MARCA.nome}</Forte> — CRECI {MARCA.creci}, em{" "}
+                  {CIDADE_UF}.
+                </>
+              )}
             </p>
             <p>
-              <Forte>Encarregado pela proteção de dados</Forte> (art. 41 da
-              LGPD):{" "}
-              {CONTROLADOR.encarregado.nome || "[nome a preencher]"} —{" "}
+              Para qualquer assunto sobre seus dados, incluindo os pedidos
+              descritos mais abaixo, escreva para{" "}
               <a
-                href={`mailto:${CONTROLADOR.encarregado.email || MARCA.email}`}
+                href={`mailto:${canal}`}
                 className="underline decoration-black/30 underline-offset-2 hover:decoration-black"
               >
-                {CONTROLADOR.encarregado.email || MARCA.email}
+                {canal}
               </a>
-              . É esse o canal para exercer os direitos descritos mais
-              adiante.
+              .
             </p>
           </Secao>
 
-          <Secao
-            id="pp-tratamentos"
-            titulo="O que tratamos, por quê, com que base e por quanto tempo"
-          >
-            <p>
-              A LGPD exige uma <Forte>base legal</Forte> para cada tratamento
-              (art. 7º). Esta é a lista completa — não há tratamento fora
-              dela:
-            </p>
-
-            <div className="mt-2 text-[14px]">
-              <div className="hidden grid-cols-4 gap-4 pb-2 text-[12px] font-medium uppercase tracking-wide text-secundario md:grid">
+          <Secao id="pp-tratamentos" titulo="O que guardamos e por quanto tempo">
+            <div className="mt-1 text-[14px]">
+              <div className="hidden grid-cols-[1.1fr_1.4fr_0.9fr_0.8fr] gap-4 pb-2 text-[12px] font-medium uppercase tracking-wide text-secundario md:grid">
                 <div>Dado</div>
-                <div>Finalidade</div>
+                <div>Para quê</div>
                 <div>Base legal</div>
                 <div>Prazo</div>
               </div>
 
               <Linha
-                dado="Nome e WhatsApp que você deixa no atendimento"
+                dado="Nome e WhatsApp que você deixa"
                 finalidade="Retornar o contato sobre o imóvel que você perguntou"
-                base="Consentimento (art. 7º, I)"
-                prazo="24 meses, ou antes disso se você pedir a exclusão"
+                base="Seu consentimento"
+                prazo="24 meses"
               />
               <Linha
-                dado="Mensagem que você escreve no chat"
+                dado="A mensagem que você escreve"
                 finalidade="Entender o que você procura e responder"
-                base="Consentimento (art. 7º, I)"
-                prazo="24 meses, junto com o contato"
+                base="Seu consentimento"
+                prazo="24 meses"
               />
               <Linha
-                dado="Identificador pseudonimizado do dispositivo"
-                finalidade="Contar visitas e cliques sem contar a mesma pessoa duas vezes no dia"
-                base="Legítimo interesse (art. 7º, IX)"
+                dado="Um código do seu aparelho, sem seu nome"
+                finalidade="Contar visitas sem contar a mesma pessoa duas vezes no dia"
+                base="Legítimo interesse"
                 prazo="12 meses"
               />
               <Linha
-                dado="Tipo de aparelho e origem do acesso"
-                finalidade="Saber se o site é mais usado no celular e de onde vêm as visitas"
-                base="Legítimo interesse (art. 7º, IX)"
+                dado="Tipo de aparelho e de onde veio a visita"
+                finalidade="Saber se o site é mais usado no celular e o que traz gente"
+                base="Legítimo interesse"
                 prazo="12 meses"
               />
               <Linha
-                dado="Endereço IP nos registros de acesso"
-                finalidade="Segurança, prevenção a abuso e cumprimento do Marco Civil"
-                base="Obrigação legal (art. 7º, II) — Lei 12.965/2014, art. 15"
+                dado="Seu IP nos registros de acesso"
+                finalidade="Segurança e cumprimento do Marco Civil da Internet"
+                base="Obrigação legal"
                 prazo="6 meses"
-              />
-              <Linha
-                dado="Perguntas sem resposta feitas ao atendimento"
-                finalidade="Melhorar as respostas do atendimento automático"
-                base="Legítimo interesse (art. 7º, IX)"
-                prazo="12 meses"
               />
             </div>
 
             <p className="mt-3">
-              <Forte>Sobre o identificador pseudonimizado:</Forte> não gravamos
-              seu endereço IP na medição de audiência. Ele é combinado ao
-              navegador e ao imóvel visitado e transformado num código
-              irreversível na prática para nós, que só serve para não contar a
-              mesma visita duas vezes no mesmo dia. Ainda assim,{" "}
-              <Forte>a LGPD trata isso como dado pessoal pseudonimizado</Forte>{" "}
-              (art. 13), e não como dado anônimo — por isso ele aparece nesta
-              lista, com base legal e prazo, como qualquer outro.
+              Não guardamos seu IP junto com a contagem de visitas: ele vira um
+              código embaralhado que só serve para não contar a mesma visita
+              duas vezes no dia. Ainda assim a lei considera isso dado pessoal,
+              e por isso ele está na tabela com prazo como os outros.
             </p>
             <p>
-              <Forte>Não tratamos dados sensíveis</Forte> (art. 5º, II) e{" "}
-              <Forte>não tomamos decisões automatizadas</Forte> que afetem
-              seus interesses. O atendimento automático responde dúvidas sobre
-              os imóveis; ele não avalia, classifica nem aprova ninguém.
+              Não tratamos dados sensíveis, não tomamos nenhuma decisão
+              automática sobre você e o site não é destinado a menores de 18
+              anos.
             </p>
           </Secao>
 
-          <Secao id="pp-cookies" titulo="Cookies e armazenamento local">
+          <Secao id="pp-cookies" titulo="Cookies">
             <p>
-              Este site <Forte>não usa cookies em nenhuma página pública</Forte>
-              . Não há cookie de publicidade, de rede social nem de medição de
-              audiência de terceiros — e é por isso que você não vê um banner
-              de consentimento pedindo permissão: não há nada a permitir.
+              <Forte>Nenhuma página pública deste site usa cookies.</Forte> É
+              por isso que você não vê banner pedindo permissão — não há nada a
+              permitir.
             </p>
             <p>
-              Duas informações ficam guardadas <Forte>no seu navegador</Forte>{" "}
-              e nunca são enviadas para nós: os imóveis que você marca como
-              favoritos e a sua preferência de tema (claro ou escuro). Limpar
-              os dados do site no navegador apaga as duas.
-            </p>
-            <p>
-              Existe um único cookie no sistema — <code>bz_admin</code> —, e
-              ele só é criado quando um corretor faz login no painel
-              administrativo. Ele é estritamente necessário para manter a
-              sessão e não acompanha visitantes.
+              Seus imóveis favoritos e a preferência de tema ficam guardados{" "}
+              <Forte>no seu próprio navegador</Forte> e nunca chegam até nós.
+              Limpar os dados do site apaga os dois.
             </p>
           </Secao>
 
           <Secao id="pp-compartilhamento" titulo="Com quem compartilhamos">
             <p>
-              Não vendemos, não alugamos e não cedemos dados para fins
-              publicitários. Compartilhamos apenas com os fornecedores de
-              infraestrutura necessários para o site funcionar, que atuam como{" "}
-              <Forte>operadores</Forte> (art. 5º, VII) e só podem tratar os
-              dados conforme nossas instruções:
-            </p>
-            <ul className="ml-4 list-disc space-y-1">
-              <li>
-                <Forte>Vercel</Forte> — hospedagem do site e registros de
-                acesso
-              </li>
-              <li>
-                <Forte>Neon</Forte> — banco de dados onde ficam os imóveis e
-                os contatos deixados
-              </li>
-              <li>
-                <Forte>Supabase</Forte> — armazenamento das fotos e vídeos dos
-                imóveis
-              </li>
-              <li>
-                <Forte>Resend</Forte> — envio do aviso por e-mail quando você
-                deixa um contato
-              </li>
-              <li>
-                <Forte>Upstash</Forte> — controle de excesso de requisições
-                (proteção contra abuso)
-              </li>
-            </ul>
-            <p>
-              Além deles, duas páginas embutem conteúdo de terceiros:{" "}
-              <Forte>Google Maps</Forte>, que mostra a região do imóvel, e{" "}
-              <Forte>YouTube</Forte> em modo sem cookies, quando o anúncio tem
-              vídeo. Ao carregar esses trechos, o seu navegador se comunica
-              diretamente com essas empresas, que passam a ter acesso ao seu
-              IP e seguem as políticas de privacidade delas.
+              Com ninguém para fins de publicidade. Apenas com as empresas que
+              fazem o site funcionar, e só no que elas precisam:{" "}
+              <Forte>Vercel</Forte> (hospedagem), <Forte>Neon</Forte> (banco de
+              dados), <Forte>Supabase</Forte> (fotos e vídeos),{" "}
+              <Forte>Resend</Forte> (aviso por e-mail quando você deixa contato)
+              e <Forte>Upstash</Forte> (proteção contra abuso).{" "}
+              <Forte>Essas empresas mantêm servidores fora do Brasil</Forte>,
+              então seus dados podem ser processados no exterior com as
+              garantias contratuais exigidas pela lei.
             </p>
             <p>
-              Se você clicar em um botão de WhatsApp, a conversa passa a
-              ocorrer dentro do aplicativo e é regida pela política de
-              privacidade da <Forte>Meta</Forte>.
-            </p>
-          </Secao>
-
-          <Secao
-            id="pp-internacional"
-            titulo="Transferência internacional de dados"
-          >
-            <p>
-              Os fornecedores listados acima{" "}
-              <Forte>mantêm servidores fora do Brasil</Forte>, principalmente
-              nos Estados Unidos e na União Europeia. Isso significa que seus
-              dados podem ser armazenados e processados no exterior, hipótese
-              prevista no art. 33 da LGPD.
-            </p>
-            <p>
-              Essas transferências ocorrem porque são necessárias para
-              executar o serviço que você solicitou e para o cumprimento de
-              nossas obrigações, e todos os fornecedores oferecem cláusulas
-              contratuais de proteção de dados equivalentes às exigidas pela
-              legislação brasileira.
+              O mapa da página do imóvel vem do <Forte>Google</Forte> e os
+              vídeos do <Forte>YouTube</Forte> em modo sem cookies: ao carregar,
+              seu navegador fala direto com eles. E ao clicar em um botão de
+              WhatsApp, a conversa passa a ser regida pela política da{" "}
+              <Forte>Meta</Forte>.
             </p>
           </Secao>
 
           <Secao id="pp-direitos" titulo="Seus direitos">
             <p>
-              O art. 18 da LGPD garante a você, a qualquer momento e{" "}
-              <Forte>sem custo</Forte>:
-            </p>
-            <ul className="ml-4 list-disc space-y-1">
-              <li>confirmação de que tratamos dados seus;</li>
-              <li>acesso aos dados que temos sobre você;</li>
-              <li>correção de dados incompletos, inexatos ou desatualizados;</li>
-              <li>
-                anonimização, bloqueio ou eliminação de dados desnecessários,
-                excessivos ou tratados em desconformidade com a lei;
-              </li>
-              <li>
-                portabilidade a outro fornecedor, mediante requisição
-                expressa;
-              </li>
-              <li>
-                eliminação dos dados tratados com o seu consentimento;
-              </li>
-              <li>
-                informação sobre com quem compartilhamos seus dados;
-              </li>
-              <li>
-                informação sobre a possibilidade de não consentir e as
-                consequências disso;
-              </li>
-              <li>revogação do consentimento, a qualquer momento.</li>
-            </ul>
-            <p>
-              Para exercer qualquer um deles, escreva para o encarregado no
-              e-mail indicado no início desta página. Respondemos em até{" "}
-              <Forte>15 dias</Forte>. Podemos pedir uma confirmação de
-              identidade antes de atender — é uma proteção sua, para que
-              ninguém peça seus dados no seu lugar.
-            </p>
-            <p>
-              Alguns dados podem ser mantidos mesmo após um pedido de
-              exclusão, quando houver obrigação legal de guarda (art. 16, I) —
-              é o caso dos registros de acesso exigidos pelo Marco Civil da
-              Internet.
-            </p>
-            <p>
-              Se você não ficar satisfeito com a nossa resposta, tem o direito
-              de reclamar à{" "}
+              A qualquer momento e sem custo, você pode pedir para{" "}
               <Forte>
-                ANPD — Autoridade Nacional de Proteção de Dados
+                saber quais dados temos, corrigi-los, apagá-los, recebê-los em
+                arquivo, saber com quem foram compartilhados
               </Forte>{" "}
-              (art. 18, §1º), em{" "}
+              ou <Forte>retirar seu consentimento</Forte>. É só escrever para{" "}
+              <a
+                href={`mailto:${canal}`}
+                className="underline decoration-black/30 underline-offset-2 hover:decoration-black"
+              >
+                {canal}
+              </a>
+              . Respondemos em até 15 dias e podemos confirmar sua identidade
+              antes — é uma proteção sua.
+            </p>
+            <p>
+              Alguns registros continuam guardados mesmo após um pedido de
+              exclusão, quando a lei obriga: é o caso dos registros de acesso
+              exigidos pelo Marco Civil da Internet.
+            </p>
+            <p>
+              Se a nossa resposta não resolver, você pode reclamar à{" "}
+              <Forte>ANPD</Forte>, a autoridade nacional de proteção de dados,
+              em{" "}
               <a
                 href="https://www.gov.br/anpd"
                 target="_blank"
@@ -403,52 +297,16 @@ export default function PrivacidadePage() {
             </p>
           </Secao>
 
-          <Secao id="pp-seguranca" titulo="Segurança">
+          <Secao id="pp-seguranca" titulo="Segurança e mudanças">
             <p>
-              Adotamos as medidas técnicas exigidas pelo art. 46 da LGPD:
-              tráfego criptografado (HTTPS), acesso ao painel protegido por
-              senha com verificação em duas etapas disponível, senhas
-              guardadas apenas como hash, limite de requisições contra abuso e
-              acesso aos dados restrito a quem precisa deles para atender
-              você.
+              O site usa conexão criptografada, o painel dos corretores exige
+              senha com verificação em duas etapas disponível, e o acesso aos
+              contatos é restrito a quem precisa atender você. Se acontecer um
+              incidente que traga risco relevante, avisaremos você e a ANPD.
             </p>
             <p>
-              Nenhum sistema é infalível. Se ocorrer um incidente de segurança
-              que possa acarretar risco relevante aos seus direitos,
-              comunicaremos você e a ANPD em prazo razoável, como determina o
-              art. 48.
-            </p>
-          </Secao>
-
-          <Secao id="pp-criancas" titulo="Crianças e adolescentes">
-            <p>
-              Este site é destinado a maiores de 18 anos e não coletamos
-              intencionalmente dados de crianças ou adolescentes. Se
-              identificarmos que um contato foi deixado por menor de idade sem
-              o consentimento específico de um dos pais ou responsável (art.
-              14 da LGPD), excluiremos o registro.
-            </p>
-          </Secao>
-
-          <Secao id="pp-alteracoes" titulo="Alterações nesta política">
-            <p>
-              Podemos atualizar este texto quando mudarmos algo no site ou na
-              forma como tratamos dados. A data de atualização no topo sempre
-              indica a versão vigente. Mudanças relevantes serão sinalizadas
-              na página inicial.
-            </p>
-          </Secao>
-
-          <Secao id="pp-contato" titulo="Fale com a gente">
-            <p>
-              Dúvidas sobre esta política ou sobre seus dados:{" "}
-              <a
-                href={`mailto:${CONTROLADOR.encarregado.email || MARCA.email}`}
-                className="underline decoration-black/30 underline-offset-2 hover:decoration-black"
-              >
-                {CONTROLADOR.encarregado.email || MARCA.email}
-              </a>{" "}
-              · {MARCA.nome} · CRECI {MARCA.creci} · {CIDADE_UF}.
+              Se mudarmos algo nesta política, a data no topo muda junto —
+              ela sempre indica a versão vigente.
             </p>
           </Secao>
 

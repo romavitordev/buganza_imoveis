@@ -46,10 +46,15 @@ export const CIDADE_UF = `${MARCA.cidade}/${MARCA.uf}` as const;
 /**
  * IDENTIFICAÇÃO DO CONTROLADOR — exigida pela LGPD.
  *
- * O art. 9º, I da Lei 13.709/2018 obriga a informar QUEM trata os dados,
- * e o art. 41 obriga a indicar um ENCARREGADO com contato divulgado
- * publicamente. Não dá para inventar: são o CNPJ e o endereço reais da
- * empresa, e a pessoa que de fato vai responder aos pedidos.
+ * O art. 9º da Lei 13.709/2018 obriga a informar QUEM trata os dados.
+ * Não dá para inventar: são o CNPJ e o endereço reais da empresa.
+ *
+ * SOBRE O ENCARREGADO: a Resolução CD/ANPD nº 2/2022 dispensa o "agente
+ * de tratamento de pequeno porte" — que é o caso de uma imobiliária
+ * deste tamanho — de NOMEAR um encarregado formal; basta manter um canal
+ * de comunicação com o titular. Por isso o campo abaixo é opcional: se
+ * ficar vazio, a página usa o e-mail de contato da marca. Preencha se
+ * um dia houver alguém formalmente designado.
  *
  * Enquanto estiverem vazios, a política mostra um aviso no lugar — feio
  * de propósito, para ninguém publicar sem preencher. Ver a Fase 2 do
@@ -68,19 +73,54 @@ export const CONTROLADOR = {
   endereco: "",
   encarregado: {
     nome: "",
-    /** Pode ser o mesmo e-mail de contato, se for lido de verdade. */
+    /** Vazio = a política usa MARCA.email como canal. */
     email: "",
   },
 } as const;
 
-/** true quando dá para publicar a política sem lacuna legal. */
+/**
+ * true quando dá para publicar a política sem lacuna legal.
+ *
+ * Só os três dados da EMPRESA entram na conta. O encarregado ficou de
+ * fora de propósito: pelo porte, ele não é obrigatório (ver acima), e
+ * exigi-lo aqui deixaria o aviso de "não publique" na tela para sempre,
+ * até quem estivesse em dia com a lei.
+ */
 export const CONTROLADOR_COMPLETO = Boolean(
-  CONTROLADOR.razaoSocial &&
-    CONTROLADOR.cnpj &&
-    CONTROLADOR.endereco &&
-    CONTROLADOR.encarregado.nome &&
-    CONTROLADOR.encarregado.email
+  CONTROLADOR.razaoSocial && CONTROLADOR.cnpj && CONTROLADOR.endereco
 );
+
+/**
+ * Cobrança dos dados da empresa — no BUILD, não na tela.
+ *
+ * A página de privacidade não mostra mais colchete de "preencher": um
+ * bilhete interno no meio do texto é pior para o visitante do que a
+ * lacuna que ele denuncia. Sem os dados, ela identifica a imobiliária
+ * pelo nome fantasia e CRECI, que é verdade e é publicável.
+ *
+ * Só que ficar em silêncio faria a pendência sumir de vista. Então ela
+ * aparece aqui, uma vez, quando alguém constrói para produção — que é
+ * exatamente o momento anterior a publicar.
+ *
+ * `typeof window === "undefined"` garante que isto nunca roda no
+ * navegador do visitante: é recado para quem faz o deploy.
+ */
+if (
+  typeof window === "undefined" &&
+  process.env.NODE_ENV === "production" &&
+  !CONTROLADOR_COMPLETO
+) {
+  console.warn(
+    [
+      "",
+      "⚠  LGPD: a política de privacidade está sem os dados da empresa.",
+      "   Faltam razão social, CNPJ e endereço em lib/marca.ts (CONTROLADOR).",
+      "   A página está no ar identificando só o nome fantasia e o CRECI.",
+      "   Ver CHECKLIST-DEPLOY.md, item 2.6.",
+      "",
+    ].join("\n")
+  );
+}
 
 /**
  * Cores da marca, tiradas do logotipo.

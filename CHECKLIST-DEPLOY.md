@@ -19,7 +19,7 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 | 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
 | 🟠 ir ao ar | depoimentos reais — os 7 do site são inventados (2.3) | donos |
 | 🟠 ir ao ar | história do Quem Somos e o número "+400 imóveis" | donos |
-| 🔴 legal | razão social, CNPJ, endereço e encarregado (LGPD) | donos |
+| 🔴 legal | razão social, CNPJ e endereço na política (LGPD) | donos |
 | 🟠 legal | revisão da política de privacidade por advogado | você |
 | 🟡 estética | logotipo oficial em `public/logo.svg` | donos |
 | 🟢 depois | Search Console, Sentry, ensinar o chatbot | você |
@@ -121,20 +121,25 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 - [ ] **2.5 — Conferir o CRECI**
       Hoje é `118400`, em `lib/marca.ts`. Confirme que é o número certo.
 
-- [ ] **2.6 — Preencher os dados do controlador (LGPD)** 🔴
-      Em `lib/marca.ts`, na constante `CONTROLADOR`: razão social, CNPJ,
-      endereço da sede e o **encarregado pela proteção de dados** (nome e
-      e-mail). A LGPD exige os dois: identificar quem trata os dados
-      (art. 9º, I) e indicar um encarregado com contato público (art. 41).
+- [ ] **2.6 — Preencher os dados da empresa na política (LGPD)** 🔴
+      Em `lib/marca.ts`, na constante `CONTROLADOR`: **razão social, CNPJ
+      e endereço**. A LGPD exige que quem trata os dados esteja
+      identificado (art. 9º).
 
-      Enquanto estiver vazio, a página `/privacidade` mostra um aviso
-      dourado dizendo que não está pronta — de propósito, para ninguém
-      publicar sem preencher.
+      Enquanto estiver vazio, a página **não fica quebrada nem mostra
+      colchete de "preencher"** — bilhete interno no meio do texto é pior
+      para o visitante do que a lacuna que ele denuncia. Ela identifica a
+      imobiliária pelo nome fantasia e pelo CRECI, que é verdade e é
+      publicável; falta só o CNPJ para ficar completa.
 
-      > O encarregado **não precisa ser advogado** nem funcionário
-      > dedicado. Numa imobiliária pequena costuma ser um dos sócios. O
-      > que a lei exige é que exista alguém identificado e um canal que
-      > funcione.
+      Quem cobra a pendência é o `npm run build`, que imprime um aviso no
+      terminal — o visitante nunca vê.
+
+      > **Encarregado (DPO) não é obrigatório no seu caso.** A Resolução
+      > ANPD nº 2/2022 dispensa o "agente de tratamento de pequeno porte"
+      > de nomear um; basta ter um canal de atendimento ao titular, que é
+      > o e-mail já publicado na página. O campo existe em `CONTROLADOR`
+      > para o dia em que houver alguém designado, e pode ficar vazio.
 
 - [ ] **2.7 — Mandar a política de privacidade para um advogado**
       O texto em `/privacidade` foi escrito a partir do que o sistema de
