@@ -10,7 +10,7 @@ import {
   useState,
   type MouseEvent,
 } from "react";
-import { Building2, Headset, Heart, Home, MessageCircle, Users } from "lucide-react";
+import { Building2, Headset, Heart, Home, MessageCircle, Search, Users, X } from "lucide-react";
 import { CORES, MARCA } from "@/lib/marca";
 import { abrirSuporte } from "@/lib/suporte";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -193,6 +193,26 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
   const pathname = usePathname();
   const naHome = pathname === "/";
 
+  /**
+   * Busca do mobile: fechada, é só uma lupa; aberta, toma a navbar
+   * inteira. É o padrão do YouTube e de quase todo app de celular, e
+   * existe por um motivo simples — na largura de um telefone não há
+   * espaço para um campo de texto permanente que não atrapalhe outra
+   * coisa.
+   *
+   * A tentativa anterior era uma barra fixa no hero. Funcionava, mas
+   * ficava órfã: separada da navbar por um vão, colada por cima da
+   * ilustração e cortando a torre no meio. Parecia adesivo, não
+   * interface.
+   */
+  const [buscaAberta, setBuscaAberta] = useState(false);
+
+  // Trocar de página fecha a busca — senão ela fica aberta por cima do
+  // resultado que a pessoa acabou de pedir.
+  useEffect(() => {
+    setBuscaAberta(false);
+  }, [pathname]);
+
   // Estado "scrolled": a barra ganha fundo/borda ao rolar, para o logo e o
   // CTA não flutuarem soltos sobre o conteúdo
   const [rolou, setRolou] = useState(false);
@@ -327,7 +347,9 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         aria-label="Principal"
       >
         <Link
-          className="flex items-center gap-2"
+          className={`items-center gap-2 ${
+            buscaAberta ? "hidden md:flex" : "flex"
+          }`}
           href="/"
           aria-label={`${MARCA.nome} — início`}
         >
@@ -389,7 +411,39 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
             — mantém o disco marinho preenchido. Tema e atendimento viram
             ícones "fantasma", sem disco, com a mesma área de toque
             (44px) garantida por padding, e não por tamanho aparente. */}
-        <div className="flex items-center gap-0.5 md:gap-1.5">
+        {/* Busca aberta: toma a largura toda da navbar no mobile. No
+            desktop este bloco não existe — lá a busca fica sempre
+            visível ao lado dos links. */}
+        {buscaAberta && (
+          <div className="flex flex-1 items-center gap-1 md:hidden">
+            <NavBusca variante="mobile" autoFoco />
+            <button
+              type="button"
+              onClick={() => setBuscaAberta(false)}
+              aria-label="Fechar busca"
+              className="bz-icon-btn shrink-0"
+            >
+              <X size={19} strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
+        <div
+          className={`items-center gap-0.5 md:gap-1.5 ${
+            buscaAberta ? "hidden md:flex" : "flex"
+          }`}
+        >
+          {/* Lupa — só mobile. No desktop a busca já está na barra. */}
+          <button
+            type="button"
+            onClick={() => setBuscaAberta(true)}
+            aria-label="Buscar imóveis"
+            aria-expanded={buscaAberta}
+            className="bz-icon-btn md:hidden"
+          >
+            <Search size={19} strokeWidth={2} aria-hidden="true" />
+          </button>
+
           <ThemeToggle />
 
           {/* Atendimento — só no mobile. No desktop quem abre o chat é o

@@ -34,8 +34,11 @@ import { Search, X } from "lucide-react";
  */
 export default function NavBusca({
   variante = "navbar",
+  autoFoco = false,
 }: {
   variante?: "navbar" | "mobile";
+  /** Abre já com o teclado — quem tocou na lupa quer digitar. */
+  autoFoco?: boolean;
 }) {
   const ehMobile = variante === "mobile";
   const campoId = ehMobile ? "busca-mobile" : "busca-nav";
@@ -52,6 +55,12 @@ export default function NavBusca({
    * dentro de qualquer outro campo — ou no chat do suporte — roubaria o
    * cursor no meio da frase.
    */
+  // Foco ao montar: a busca do mobile só existe depois do toque na
+  // lupa, então quem chegou aqui quer digitar. Um passo a menos.
+  useEffect(() => {
+    if (autoFoco) inputRef.current?.focus();
+  }, [autoFoco]);
+
   useEffect(() => {
     // Só a variante do desktop escuta. As duas coexistem no DOM (o CSS
     // é que esconde uma), então sem esta guarda o atalho seria
@@ -92,7 +101,7 @@ export default function NavBusca({
       action="/imoveis"
       method="get"
       role="search"
-      className={ehMobile ? "block px-4 lg:hidden" : "hidden lg:block"}
+      className={ehMobile ? "min-w-0 flex-1 md:hidden" : "hidden lg:block"}
     >
       <label htmlFor={campoId} className="sr-only">
         Buscar imóveis por bairro, código ou tipo
