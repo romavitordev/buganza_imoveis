@@ -75,7 +75,20 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 - [ ] **1.1 — Registro.br** → registrar o domínio · **R$ 40/ano**
       Exige CPF/CNPJ. Pague o boleto/PIX; a liberação leva algumas horas.
 - [ ] **1.2 — Neon** (<https://neon.tech>) → banco Postgres · grátis
-      Crie o projeto e **copie a connection string**.
+      Crie o projeto e copie **as DUAS connection strings** que ele
+      mostra:
+
+      | Variável | Qual copiar |
+      |---|---|
+      | `DATABASE_URL` | a **pooled** — tem `-pooler` no host |
+      | `DIRECT_URL` | a **direta** — sem `-pooler` |
+
+      > ⚠️ **Não use a direta nas duas.** Cada função da Vercel abre o
+      > próprio pool de conexões; sem o PgBouncer na frente, alguns
+      > acessos ao mesmo tempo estouram o limite do Neon e o site passa a
+      > responder erro. Com você sozinho testando, a URL direta funciona
+      > — é por isso que essa falha só aparece no dia em que o site tem
+      > movimento. A direta é usada só pelo `db:push` e pelas migrações.
 - [ ] **1.3 — Supabase** (<https://supabase.com>) → fotos e vídeos · grátis
       Crie o projeto → **Storage** → bucket **público** chamado `imoveis`.
       Em *Project Settings → API*, copie a `URL` e a `service_role key`.
@@ -161,7 +174,8 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
       | Variável | De onde vem |
       |---|---|
-      | `DATABASE_URL` | Neon (1.2) |
+      | `DATABASE_URL` | Neon (1.2) — a **pooled**, com `-pooler` |
+      | `DIRECT_URL` | Neon (1.2) — a **direta**, sem `-pooler` |
       | `AUTH_SECRET` | gere: `openssl rand -base64 32` |
       | `SUPABASE_URL` | Supabase (1.3) |
       | `SUPABASE_SERVICE_ROLE_KEY` | Supabase (1.3) — **secreta** |

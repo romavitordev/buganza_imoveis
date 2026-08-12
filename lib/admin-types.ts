@@ -18,6 +18,37 @@ export interface AdminPhoto {
   capa: boolean;
 }
 
+/**
+ * A LISTA do painel — só o que a tabela desenha.
+ *
+ * Existe separado de AdminProperty porque a tabela é a única tela que
+ * carrega TODOS os imóveis de uma vez, e mandar o registro inteiro
+ * multiplica esse peso por linha. Medido com 303 imóveis e 8 fotos
+ * cada: 886 KB no formato completo contra 31 KB assim — e 228 KB do
+ * total eram descrições que a tabela nunca mostra.
+ *
+ * Quem edita um imóvel continua recebendo o AdminProperty inteiro:
+ * ali é UM registro, e o formulário precisa de todos os campos.
+ */
+export interface AdminPropertyResumo {
+  id: string;
+  codigo: string;
+  slug: string;
+  titulo: string;
+  tipo: TipoImovel;
+  transacao: Transacao;
+  status: StatusImovel;
+  destaque: boolean;
+  cidade: string;
+  bairro: string;
+  atualizadoEm: string;
+  criadoEm: string;
+  /** Só a capa — é a única que a linha desenha. */
+  fotos: AdminPhoto[];
+  visualizacoes: number;
+  cliquesWhatsApp: number;
+}
+
 export interface AdminProperty {
   id: string;
   codigo: string;

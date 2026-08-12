@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { exigirSessao } from "@/lib/session";
-import type { AdminProperty } from "@/lib/admin-types";
+import type { AdminPropertyResumo } from "@/lib/admin-types";
 import DashboardTable from "@/components/admin/DashboardTable";
 import { MARCA } from "@/lib/marca";
 
@@ -24,9 +24,25 @@ export default async function AdminDashboardPage() {
     origens7d,
     eventos30d,
   ] = await Promise.all([
+      // `select` em vez de trazer a linha inteira: esta é a única tela
+      // que carrega TODOS os imóveis, então cada campo a mais é
+      // multiplicado por imóvel. A descrição sozinha respondia por um
+      // quarto do peso e a tabela nem a mostra.
       prisma.property.findMany({
         orderBy: { atualizadoEm: "desc" },
-        include: { fotos: { orderBy: { ordem: "asc" } } },
+        select: {
+          id: true, codigo: true, slug: true, titulo: true,
+          tipo: true, transacao: true, status: true, destaque: true,
+          cidade: true, bairro: true,
+          atualizadoEm: true, criadoEm: true,
+          // Só a capa. A linha desenha uma miniatura; as outras sete
+          // fotos de cada imóvel viajavam à toa.
+          fotos: {
+            where: { capa: true },
+            take: 1,
+            select: { id: true, url: true, storageKey: true, ordem: true, capa: true },
+          },
+        },
       }),
       prisma.propertyEvent.groupBy({
         by: ["propertyId", "tipo"],
@@ -99,41 +115,20 @@ export default async function AdminDashboardPage() {
     contagem.set(evento.propertyId, atual);
   }
 
-  const serializadas: AdminProperty[] = properties.map((p) => ({
+  const serializadas: AdminPropertyResumo[] = properties.map((p) => ({
     id: p.id,
     codigo: p.codigo,
     slug: p.slug,
     titulo: p.titulo,
-    descricao: p.descricao,
     tipo: p.tipo,
-    subtipo: p.subtipo,
     transacao: p.transacao,
     status: p.status,
     destaque: p.destaque,
     cidade: p.cidade,
     bairro: p.bairro,
-    enderecoMapa: p.enderecoMapa,
-    quartos: p.quartos,
-    suites: p.suites,
-    banheiros: p.banheiros,
-    vagas: p.vagas,
-    areaM2: p.areaM2,
-    areaTerrenoM2: p.areaTerrenoM2,
-    precoVenda: p.precoVenda?.toString() ?? null,
-    precoLocacao: p.precoLocacao?.toString() ?? null,
-    precoInterno: p.precoInterno?.toString() ?? null,
-    condominioMensal: p.condominioMensal?.toString() ?? null,
-    iptuAnual: p.iptuAnual?.toString() ?? null,
-    comodidades: p.comodidades,
-    videoUrl: p.videoUrl,
     atualizadoEm: p.atualizadoEm.toISOString(),
-    fotos: p.fotos.map((f) => ({
-      id: f.id,
-      url: f.url,
-      storageKey: f.storageKey,
-      ordem: f.ordem,
-      capa: f.capa,
-    })),
+    criadoEm: p.criadoEm.toISOString(),
+    fotos: p.fotos,
     visualizacoes: contagem.get(p.id)?.views ?? 0,
     cliquesWhatsApp: contagem.get(p.id)?.cliques ?? 0,
   }));

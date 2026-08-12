@@ -18,7 +18,25 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+
+  // DUAS URLs, e a diferença entre elas decide se o site aguenta o dia
+  // do lançamento.
+  //
+  // `url` é a conexão POOLED (no Neon, o host termina em "-pooler").
+  // Cada função serverless da Vercel abre o próprio pool do Prisma; sem
+  // um PgBouncer na frente, um punhado de acessos simultâneos estoura o
+  // limite de conexões do Neon e as requisições passam a falhar com
+  // "too many connections". O problema não aparece em teste — com um
+  // usuário só, a URL direta funciona perfeitamente.
+  //
+  // `directUrl` é a conexão DIRETA, usada só por `prisma db push` e
+  // pelas migrações: elas precisam de uma sessão real, que o PgBouncer
+  // em modo transaction não oferece.
+  //
+  // Em desenvolvimento as duas apontam para o mesmo Postgres local e
+  // nada muda.
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum TipoImovel {

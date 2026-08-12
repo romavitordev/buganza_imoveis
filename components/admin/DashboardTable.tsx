@@ -23,12 +23,12 @@ import {
   Trash2,
   UserRound,
 } from "lucide-react";
-import type { AdminProperty } from "@/lib/admin-types";
+import type { AdminPropertyResumo } from "@/lib/admin-types";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import TrafficChart, { type DiaTrafego } from "@/components/admin/TrafficChart";
 import { STATUS_LABEL, TIPO_LABEL, TRANSACAO_LABEL } from "@/lib/labels";
 
-const STATUS_ESTILO: Record<AdminProperty["status"], string> = {
+const STATUS_ESTILO: Record<AdminPropertyResumo["status"], string> = {
   ATIVO: "bg-black text-white",
   PAUSADO: "bg-mist text-secundario",
   VENDIDO: "border border-black/20 text-secundario",
@@ -50,8 +50,8 @@ interface Ordenacao {
 }
 
 function compararPor(
-  a: AdminProperty,
-  b: AdminProperty,
+  a: AdminPropertyResumo,
+  b: AdminPropertyResumo,
   campo: CampoOrdenavel
 ): number {
   switch (campo) {
@@ -131,7 +131,7 @@ export default function DashboardTable({
   leadsNovos,
   perguntasChat = [],
 }: {
-  propertiesIniciais: AdminProperty[];
+  propertiesIniciais: AdminPropertyResumo[];
   resumo7d: Resumo7d;
   serie30d: DiaTrafego[];
   leadsNovos: number;
@@ -148,7 +148,7 @@ export default function DashboardTable({
   });
   const [pagina, setPagina] = useState(1);
   const [filtroStatus, setFiltroStatus] = useState<
-    AdminProperty["status"] | "TODOS"
+    AdminPropertyResumo["status"] | "TODOS"
   >("TODOS");
 
   function ordenarPor(campo: CampoOrdenavel) {
@@ -169,7 +169,7 @@ export default function DashboardTable({
   }, [properties]);
 
   const contagemStatus = useMemo(() => {
-    const contagem = new Map<AdminProperty["status"], number>();
+    const contagem = new Map<AdminPropertyResumo["status"], number>();
     for (const p of properties) {
       contagem.set(p.status, (contagem.get(p.status) ?? 0) + 1);
     }
@@ -203,7 +203,7 @@ export default function DashboardTable({
     paginaAtual * POR_PAGINA
   );
 
-  async function toggleDestaque(property: AdminProperty) {
+  async function toggleDestaque(property: AdminPropertyResumo) {
     setOcupadoId(property.id);
     setErro(null);
     try {
@@ -231,8 +231,8 @@ export default function DashboardTable({
   }
 
   async function mudarStatus(
-    property: AdminProperty,
-    novo: AdminProperty["status"]
+    property: AdminPropertyResumo,
+    novo: AdminPropertyResumo["status"]
   ) {
     if (novo === property.status) return;
     setOcupadoId(property.id);
@@ -259,7 +259,7 @@ export default function DashboardTable({
     }
   }
 
-  async function duplicar(property: AdminProperty) {
+  async function duplicar(property: AdminPropertyResumo) {
     setOcupadoId(property.id);
     setErro(null);
     try {
@@ -283,9 +283,9 @@ export default function DashboardTable({
   }
 
   // Imóvel aguardando confirmação de exclusão no modal
-  const [paraExcluir, setParaExcluir] = useState<AdminProperty | null>(null);
+  const [paraExcluir, setParaExcluir] = useState<AdminPropertyResumo | null>(null);
 
-  async function excluir(property: AdminProperty) {
+  async function excluir(property: AdminPropertyResumo) {
     setParaExcluir(null);
     setOcupadoId(property.id);
     setErro(null);
@@ -508,7 +508,7 @@ export default function DashboardTable({
         >
           {(
             ["TODOS", ...Object.keys(STATUS_LABEL)] as (
-              | AdminProperty["status"]
+              | AdminPropertyResumo["status"]
               | "TODOS"
             )[]
           ).map((valor) => {
@@ -652,7 +652,7 @@ export default function DashboardTable({
                         onChange={(e) =>
                           mudarStatus(
                             p,
-                            e.target.value as AdminProperty["status"]
+                            e.target.value as AdminPropertyResumo["status"]
                           )
                         }
                         aria-label={`Status de ${p.codigo}`}
