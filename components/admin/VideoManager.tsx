@@ -173,10 +173,66 @@ export default function VideoManager({
 
   return (
     <section aria-labelledby="video-titulo" className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="video-titulo" className="text-xl tracking-tight">
-          Vídeo do imóvel
-        </h2>
+      <h2 id="video-titulo" className="text-xl tracking-tight">
+        Vídeo do imóvel
+      </h2>
+
+      {/* YOUTUBE PRIMEIRO, e não por gosto.
+       *
+       * Vídeo servido pelo Supabase é transferido INTEIRO a cada
+       * visitante que aperta play. Com os 4 vídeos que a imobiliária
+       * pretende ter e 50 MB cada, cem pessoas assistindo no mês dão
+       * ~19,5 GB de banda — acima do que o plano gratuito oferece. Os
+       * mesmos 4 vídeos no YouTube custam zero de armazenamento e zero
+       * de banda.
+       *
+       * A ordem da tela é o que decide isso na prática: o caminho caro
+       * estava em cima, com botão, e o barato embaixo, como observação.
+       * Quem preenche de cima para baixo escolhia o mais caro sem saber
+       * que havia escolha. */}
+      <p className="text-[12px] text-secundario">
+        O vídeo aparece na galeria do anúncio — a capa continua sendo uma
+        foto. <b>Suba no YouTube como “não listado”</b> e cole o link: o
+        vídeo não fica visível nas buscas do YouTube, não gasta
+        armazenamento e carrega bem mais rápido para quem abre o anúncio.
+      </p>
+
+      <form onSubmit={salvarLinkYoutube} className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Link2
+            size={14}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-secundario"
+            aria-hidden="true"
+          />
+          <input
+            type="url"
+            value={linkYoutube}
+            onChange={(e) => setLinkYoutube(e.target.value)}
+            placeholder="Cole o link do YouTube (youtube.com/watch?v=… ou youtu.be/…)"
+            aria-label="Link do vídeo no YouTube"
+            className="w-full rounded-pill border border-black/15 py-2.5 pl-10 pr-4 text-[13px] outline-none transition-colors focus:border-black"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={enviando || !linkYoutube.trim()}
+          className="rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-opacity disabled:opacity-50"
+        >
+          Salvar link
+        </button>
+      </form>
+
+      <details className="text-[12px] text-secundario">
+        <summary className="cursor-pointer select-none">
+          Prefere enviar o arquivo do vídeo?
+        </summary>
+        <p className="mt-2">
+          Funciona (MP4, WebM ou MOV até 50 MB), mas o arquivo é
+          transferido inteiro a cada pessoa que assiste — é o que mais
+          consome a franquia de banda do site. Use quando o vídeo não
+          puder ir para o YouTube.
+        </p>
+        <div className="mt-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -215,40 +271,8 @@ export default function VideoManager({
           onChange={onSelecionar}
           aria-label="Selecionar vídeo para enviar"
         />
-      </div>
-
-      <p className="text-[12px] text-secundario">
-        O vídeo aparece na galeria do anúncio — a capa continua sendo uma
-        foto. <b>Recomendado:</b> suba o vídeo no YouTube como{" "}
-        <b>não listado</b> e cole o link abaixo (não gasta armazenamento e
-        carrega mais rápido). O upload direto (MP4/WebM/MOV até 50 MB)
-        segue disponível.
-      </p>
-
-      <form onSubmit={salvarLinkYoutube} className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <Link2
-            size={14}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-secundario"
-            aria-hidden="true"
-          />
-          <input
-            type="url"
-            value={linkYoutube}
-            onChange={(e) => setLinkYoutube(e.target.value)}
-            placeholder="Cole o link do YouTube (youtube.com/watch?v=… ou youtu.be/…)"
-            aria-label="Link do vídeo no YouTube"
-            className="w-full rounded-pill border border-black/15 py-2.5 pl-10 pr-4 text-[13px] outline-none transition-colors focus:border-black"
-          />
         </div>
-        <button
-          type="submit"
-          disabled={enviando || !linkYoutube.trim()}
-          className="rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white transition-opacity disabled:opacity-50"
-        >
-          Salvar link
-        </button>
-      </form>
+      </details>
 
       {erro && (
         <p
