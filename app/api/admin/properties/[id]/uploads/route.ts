@@ -5,17 +5,23 @@ import {
   chaveNovaFoto,
   chaveNovoVideo,
   criarUploadAssinado,
+  deletePropertyPhotos,
   deletePropertyVideo,
   urlPublicaDaChave,
 } from "@/lib/storage";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
 import { barrarSemSessao } from "@/lib/session";
+import {
+  MAX_FOTO_BYTES,
+  MAX_FOTOS_POR_IMOVEL,
+  MAX_VIDEO_BYTES,
+  erroLimiteFotos,
+} from "@/lib/limites-midia";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_FOTO_BYTES = 5 * 1024 * 1024; // 5 MB
-const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50 MB
+
 
 interface Params {
   params: { id: string };
@@ -211,6 +217,20 @@ export async function PUT(request: Request, { params }: Params) {
         select: { ordem: true },
       }),
     ]);
+    // Mesmo teto do caminho via servidor, conferido aqui na
+    // CONFIRMAÇÃO: a URL assinada é emitida antes do arquivo subir, e
+    // quando esta rota é chamada ele já está no Supabase. Por isso não
+    // basta recusar o registro — sem apagar, o arquivo ficaria pago e
+    // invisível no bucket para sempre, sem nenhuma rotina que o
+    // recolhesse depois.
+    if (totalExistente + chaves.length > MAX_FOTOS_POR_IMOVEL) {
+      await deletePropertyPhotos(chaves);
+      return NextResponse.json(
+        { erro: erroLimiteFotos(totalExistente) },
+        { status: 400 }
+      );
+    }
+
     let proximaOrdem = ultima ? ultima.ordem + 1 : 0;
 
     const criadas: PropertyPhoto[] = [];

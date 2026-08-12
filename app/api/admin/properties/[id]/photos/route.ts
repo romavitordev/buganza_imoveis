@@ -4,11 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { uploadPropertyPhoto } from "@/lib/storage";
 import { revalidarPaginasPublicas } from "@/lib/revalidate";
 import { barrarSemSessao } from "@/lib/session";
+import {
+  MAX_FOTO_BYTES,
+  MAX_FOTOS_POR_IMOVEL,
+  erroLimiteFotos,
+} from "@/lib/limites-midia";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_TAMANHO_BYTES = 5 * 1024 * 1024; // 5 MB
+
 
 interface Params {
   params: { id: string };
@@ -146,7 +151,7 @@ export async function POST(request: Request, { params }: Params) {
         { status: 400 }
       );
     }
-    if (arquivo.size > MAX_TAMANHO_BYTES) {
+    if (arquivo.size > MAX_FOTO_BYTES) {
       return NextResponse.json(
         { erro: `"${arquivo.name}" excede o limite de 5 MB.` },
         { status: 400 }
@@ -158,6 +163,16 @@ export async function POST(request: Request, { params }: Params) {
     const totalExistente = await prisma.propertyPhoto.count({
       where: { propertyId: property.id },
     });
+
+    // O teto é conferido AQUI, contra o banco, e não no navegador: o
+    // formulário também checa, mas quem chama a rota direto passaria
+    // por cima.
+    if (totalExistente + arquivos.length > MAX_FOTOS_POR_IMOVEL) {
+      return NextResponse.json(
+        { erro: erroLimiteFotos(totalExistente) },
+        { status: 400 }
+      );
+    }
     let proximaOrdem =
       property.fotos.length > 0 ? property.fotos[0].ordem + 1 : 0;
 

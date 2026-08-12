@@ -68,6 +68,25 @@ const nextConfig = {
     ? { experimental: { workerThreads: false, cpus: 1 } }
     : {}),
   images: {
+    /**
+     * LARGURAS QUE O OTIMIZADOR PODE GERAR.
+     *
+     * O padrão do Next é [640,750,828,1080,1200,1920,2048,3840] +
+     * [16,32,48,64,96,128,256,384] — dezesseis larguras por foto,
+     * oferecidas até nas miniaturas de 120px. Na Vercel cada
+     * combinação (foto, largura, qualidade) é uma transformação
+     * cobrada, então esse leque multiplica a conta sem devolver nada.
+     *
+     * O teto é 1920 porque é onde o UPLOAD comprime (LADO_MAX em
+     * lib/comprimir-imagem.ts). Pedir 2048 ou 3840 de uma foto que tem
+     * 1920 gera uma transformação para devolver a mesma imagem.
+     *
+     * As larguras que sobraram cobrem os usos reais: 1920 na foto
+     * principal da galeria, 828/1080 nos cards, 128/256 nas
+     * miniaturas.
+     */
+    deviceSizes: [640, 828, 1080, 1920],
+    imageSizes: [64, 128, 256, 384],
     remotePatterns: [
       {
         protocol: "https",
