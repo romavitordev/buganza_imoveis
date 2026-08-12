@@ -14,14 +14,31 @@ import { Search, X } from "lucide-react";
  * que quer ("Campolim", "BZ-0003") tinha que ir ao catálogo primeiro e
  * só então procurar.
  *
- * POR QUE SÓ NO DESKTOP: no mobile a navbar é um logo e um botão, e a
- * navegação mora na barra de baixo. Um campo de texto ali comeria a
- * primeira dobra inteira, que é onde o título e os CTAs precisam estar.
+ * DUAS VARIANTES, uma por tamanho de tela:
+ *
+ *  - "navbar" (desktop): pílula compacta ao lado dos links, ocupando o
+ *    vazio que sobrava entre o logo e as ações num monitor largo.
+ *
+ *  - "mobile": barra de largura inteira logo abaixo da navbar, na faixa
+ *    de céu vazio do hero. Ali ela não disputa espaço com nada — o
+ *    título e os CTAs ficam ancorados embaixo — e está visível assim que
+ *    a pessoa abre o site, sem precisar tocar em nada para revelar.
+ *
+ * Eu tinha deixado o mobile de fora com o argumento de que um campo de
+ * texto comeria a primeira dobra. Estava errado: o campo não precisava
+ * ficar JUNTO do título, e a maior parte do tráfego de imobiliária vem
+ * do celular — era justamente lá que a busca mais fazia falta.
  *
  * É um <form> de verdade, com method GET para /imoveis: funciona antes
  * de o JavaScript carregar e o Enter faz o que se espera.
  */
-export default function NavBusca() {
+export default function NavBusca({
+  variante = "navbar",
+}: {
+  variante?: "navbar" | "mobile";
+}) {
+  const ehMobile = variante === "mobile";
+  const campoId = ehMobile ? "busca-mobile" : "busca-nav";
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [valor, setValor] = useState("");
@@ -36,6 +53,11 @@ export default function NavBusca() {
    * cursor no meio da frase.
    */
   useEffect(() => {
+    // Só a variante do desktop escuta. As duas coexistem no DOM (o CSS
+    // é que esconde uma), então sem esta guarda o atalho seria
+    // registrado duas vezes e o Escape brigaria consigo mesmo.
+    if (ehMobile) return;
+
     function aoTeclar(e: KeyboardEvent) {
       const alvo = e.target as HTMLElement | null;
       const digitando =
@@ -54,7 +76,7 @@ export default function NavBusca() {
     }
     window.addEventListener("keydown", aoTeclar);
     return () => window.removeEventListener("keydown", aoTeclar);
-  }, []);
+  }, [ehMobile]);
 
   function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -70,17 +92,27 @@ export default function NavBusca() {
       action="/imoveis"
       method="get"
       role="search"
-      className="hidden lg:block"
+      className={ehMobile ? "block px-4 lg:hidden" : "hidden lg:block"}
     >
-      <label htmlFor="busca-nav" className="sr-only">
+      <label htmlFor={campoId} className="sr-only">
         Buscar imóveis por bairro, código ou tipo
       </label>
 
       <div
         className={`flex items-center gap-2 rounded-pill border bg-white/85 pl-3.5 pr-1.5 backdrop-blur transition-all duration-300 ease-premium ${
-          focado
-            ? "w-[300px] border-black/15 shadow-[0_4px_20px_rgba(20,38,74,0.10)]"
-            : "w-[228px] border-transparent shadow-[0_2px_16px_rgba(0,0,0,0.06)]"
+          ehMobile
+            ? /* Largura inteira: no celular não há espaço lateral para
+                 ganhar, e campo estreito com dedo grande é fonte de erro
+                 de toque. A sombra é mais marcada porque aqui ele flutua
+                 sobre a cena, e não sobre superfície branca. */
+              `w-full ${
+                focado
+                  ? "border-black/15 shadow-[0_6px_24px_rgba(20,38,74,0.14)]"
+                  : "border-black/8 shadow-[0_3px_18px_rgba(20,38,74,0.10)]"
+              }`
+            : focado
+              ? "w-[300px] border-black/15 shadow-[0_4px_20px_rgba(20,38,74,0.10)]"
+              : "w-[228px] border-transparent shadow-[0_2px_16px_rgba(0,0,0,0.06)]"
         }`}
       >
         <Search
@@ -94,7 +126,7 @@ export default function NavBusca() {
 
         <input
           ref={inputRef}
-          id="busca-nav"
+          id={campoId}
           name="q"
           type="search"
           value={valor}
@@ -104,7 +136,13 @@ export default function NavBusca() {
           placeholder="Bairro, código ou tipo"
           /* appearance-none tira o "x" nativo do type=search no WebKit,
              que aparece fora do ritmo do resto e não segue o tema. */
-          className="h-9 w-full appearance-none bg-transparent text-[13px] text-black outline-none placeholder:text-secundario [&::-webkit-search-cancel-button]:appearance-none"
+          className={`w-full appearance-none bg-transparent text-black outline-none placeholder:text-secundario [&::-webkit-search-cancel-button]:appearance-none ${
+            /* 44px é o alvo de toque mínimo confortável; 16px de fonte
+               impede o iOS de dar zoom no campo ao focar, que é o
+               comportamento padrão dele abaixo disso e joga o layout
+               todo para o lado. */
+            ehMobile ? "h-11 text-[16px]" : "h-9 text-[13px]"
+          }`}
         />
 
         {valor ? (
@@ -123,6 +161,7 @@ export default function NavBusca() {
           /* A dica da tecla só aparece com o campo vazio e sem foco:
              depois que a pessoa começou a digitar ela já sabe onde está,
              e o atalho vira ruído em cima do texto. */
+          !ehMobile && (
           <kbd
             aria-hidden="true"
             className={`hidden shrink-0 rounded border border-black/10 px-1.5 py-0.5 font-sans text-[10px] text-secundario transition-opacity duration-300 xl:block ${
@@ -131,6 +170,7 @@ export default function NavBusca() {
           >
             /
           </kbd>
+          )
         )}
       </div>
     </form>
