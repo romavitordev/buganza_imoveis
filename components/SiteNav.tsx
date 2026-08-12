@@ -192,6 +192,16 @@ function prefereMenosMovimento(): boolean {
 export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
   const pathname = usePathname();
   const naHome = pathname === "/";
+  /**
+   * O catálogo já tem busca própria, dentro da barra de filtros — e lá
+   * ela vem acompanhada dos filtros, que é o que a pessoa quer usar
+   * junto. Uma segunda lupa na navbar, sem os filtros do lado, só faria
+   * o visitante escolher a errada.
+   *
+   * Vale só para a LISTA. Na página de um imóvel não há busca nenhuma,
+   * então lá a lupa continua fazendo falta.
+   */
+  const noCatalogo = pathname === "/imoveis";
 
   /**
    * Busca do mobile: fechada, é só uma lupa; aberta, toma a navbar
@@ -433,16 +443,19 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
             buscaAberta ? "hidden md:flex" : "flex"
           }`}
         >
-          {/* Lupa — só mobile. No desktop a busca já está na barra. */}
-          <button
-            type="button"
-            onClick={() => setBuscaAberta(true)}
-            aria-label="Buscar imóveis"
-            aria-expanded={buscaAberta}
-            className="bz-icon-btn md:hidden"
-          >
-            <Search size={19} strokeWidth={2} aria-hidden="true" />
-          </button>
+          {/* Lupa — só mobile, e fora do catálogo (ver noCatalogo). No
+              desktop a busca já está na barra. */}
+          {!noCatalogo && (
+            <button
+              type="button"
+              onClick={() => setBuscaAberta(true)}
+              aria-label="Buscar imóveis"
+              aria-expanded={buscaAberta}
+              className="bz-icon-btn md:hidden"
+            >
+              <Search size={19} strokeWidth={2} aria-hidden="true" />
+            </button>
+          )}
 
           <ThemeToggle />
 
