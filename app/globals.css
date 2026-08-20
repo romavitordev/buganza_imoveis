@@ -235,6 +235,38 @@ textarea::placeholder {
 .bz-lit { animation: bzGlow 2.6s ease-in-out infinite; }
 
 /**
+ * "DIGITANDO" — três bolinhas subindo e descendo.
+ *
+ * O atraso entre elas (0 / 0,16s / 0,32s) é o que faz a onda: as três
+ * no mesmo tempo pulariam juntas, que lê como um piscar, e não como
+ * alguém escrevendo.
+ *
+ * Sobe 5px e volta. Mais que isso vira pipoca e chama mais atenção que
+ * a conversa; menos, e o movimento some no balão pequeno.
+ */
+@keyframes bzDigitando {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+.bz-digitando span {
+  animation: bzDigitando 1.2s ease-in-out infinite;
+}
+.bz-digitando span:nth-child(2) {
+  animation-delay: 0.16s;
+}
+.bz-digitando span:nth-child(3) {
+  animation-delay: 0.32s;
+}
+
+/**
  * A BATIDA DO CORAÇÃO ao salvar um favorito.
  *
  * Antes, salvar só trocava a cor do ícone — a ação acontecia e nada
@@ -274,6 +306,12 @@ textarea::placeholder {
     transform: none;
   }
   .bz-lit { animation: none; }
+  /* As bolinhas param, mas continuam visíveis: elas são o SINAL de que
+     a resposta está vindo, e some-lo deixaria o balão vazio. */
+  .bz-digitando span {
+    animation: none !important;
+    opacity: 0.6;
+  }
   /* Sem a batida: a cor do ícone já diz que salvou. */
   .bz-favorito-bate { animation: none !important; }
   /* Estrelas paradas e nuvens paradas — continuam lá, só não se mexem. */

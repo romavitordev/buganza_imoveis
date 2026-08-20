@@ -203,13 +203,34 @@ const SAUDACOES = [
 ];
 
 /**
+ * Cumprimentos que pedem resposta ESPELHADA.
+ *
+ * Responder "Olá!" a quem escreveu "boa noite" é o detalhe que denuncia
+ * o robô: qualquer atendente humano devolveria o mesmo cumprimento. O
+ * resto ("oi", "opa", "tudo bem") não tem espelho natural e cai no
+ * "Olá!" genérico.
+ */
+const ESPELHO: Record<string, string> = {
+  "bom dia": "Bom dia",
+  "boa tarde": "Boa tarde",
+  "boa noite": "Boa noite",
+};
+
+/**
  * Curta pelo mesmo motivo da saudação de abertura: os CHIPS de assunto
  * aparecem logo abaixo desta resposta, então listar no texto o que dá
  * para perguntar é repetir em palavras o que já está em botões — e
  * transforma um "oi" numa parede.
  */
-const RESPOSTA_SAUDACAO =
-  "Olá! 👋 Me diga o que procura, ou escolha um assunto abaixo.";
+function respostaSaudacao(alvo: string): string {
+  // O mais longo primeiro: "boa noite" antes de "boa", e assim por
+  // diante, para "bom dia" não casar dentro de outra frase.
+  const usado = Object.keys(ESPELHO)
+    .sort((a, b) => b.length - a.length)
+    .find((chave) => alvo.includes(chave));
+  const abertura = usado ? ESPELHO[usado] : "Olá";
+  return `${abertura}! 👋 Me diga o que procura, ou escolha um assunto abaixo.`;
+}
 
 /**
  * O texto é só um cumprimento? Evita que "oi"/"olá" caia no fallback e
@@ -274,7 +295,11 @@ export function responder(
   const alvo = normalizar(texto);
   if (!alvo.trim()) return { encontrou: false, texto: FALLBACK };
   if (ehSaudacao(alvo)) {
-    return { encontrou: true, texto: RESPOSTA_SAUDACAO, topicoId: "saudacao" };
+    return {
+      encontrou: true,
+      texto: respostaSaudacao(alvo),
+      topicoId: "saudacao",
+    };
   }
   const tokens = alvo.split(/[^a-z0-9$]+/).filter(Boolean);
 

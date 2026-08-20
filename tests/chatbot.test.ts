@@ -125,3 +125,30 @@ describe("saudações", () => {
     }
   );
 });
+
+/**
+ * SAUDAÇÃO ESPELHADA.
+ *
+ * Responder "Olá!" a quem escreveu "boa noite" é o detalhe que denuncia
+ * o robô — qualquer atendente devolve o mesmo cumprimento. Os três
+ * períodos do dia têm espelho; o resto ("oi", "opa", "tudo bem") não tem
+ * equivalente natural e cai no "Olá!".
+ */
+describe("saudação espelhada", () => {
+  const espelhados: [string, string][] = [
+    ["bom dia", "Bom dia!"],
+    ["Bom dia!", "Bom dia!"],
+    ["boa tarde", "Boa tarde!"],
+    ["Boa noite", "Boa noite!"],
+    ["boa noite, tudo bem?", "Boa noite!"],
+    ["oi bom dia", "Bom dia!"],
+  ];
+  it.each(espelhados)("%s → começa com %s", (entrada, inicio) => {
+    expect(responder(entrada).texto.startsWith(inicio)).toBe(true);
+  });
+
+  const genericos = ["oi", "olá", "opa", "e aí", "tudo bem?", "oii"];
+  it.each(genericos)("%s → começa com Olá!", (entrada) => {
+    expect(responder(entrada).texto.startsWith("Olá!")).toBe(true);
+  });
+});

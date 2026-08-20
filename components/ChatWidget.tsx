@@ -97,6 +97,9 @@ export default function ChatWidget() {
     { de: "bot", texto: SAUDACAO },
   ]);
   const [entrada, setEntrada] = useState("");
+  /** Bolha de "digitando" no lugar da resposta que ainda vai chegar. */
+  const [digitando, setDigitando] = useState(false);
+  const esperaRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Modo "deixar contato": troca o input livre pelo mini-formulário de lead
   const [modoContato, setModoContato] = useState(false);
   const [enviado, setEnviado] = useState(false);
@@ -201,10 +204,22 @@ export default function ChatWidget() {
       });
   }, [aberto]);
 
-  // Rola para a última mensagem a cada atualização
+  // Rola para a última mensagem a cada atualização. `digitando` entra na
+  // lista: a bolha das bolinhas também empurra a conversa, e sem isto
+  // ela nasceria fora da área visível justamente quando é o único sinal
+  // de que algo está acontecendo.
   useEffect(() => {
     if (aberto) fimRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [mensagens, aberto, modoContato]);
+  }, [mensagens, aberto, modoContato, digitando]);
+
+  // Timer pendente não pode sobreviver ao componente: sem isto, fechar a
+  // aba no meio de uma resposta tenta atualizar estado de algo que já
+  // não existe.
+  useEffect(() => {
+    return () => {
+      if (esperaRef.current) clearTimeout(esperaRef.current);
+    };
+  }, []);
 
   // Esc fecha o painel
   useEffect(() => {
@@ -218,6 +233,31 @@ export default function ChatWidget() {
 
   function empurrar(bolha: Bolha) {
     setMensagens((atual) => [...atual, bolha]);
+  }
+
+  /**
+   * Resposta do bot com pausa de "digitando".
+   *
+   * Resposta instantânea entrega que é robô: ninguém lê a pergunta,
+   * pensa e escreve em zero segundo. A pausa não é enfeite — ela dá ao
+   * visitante o tempo de LER a própria mensagem antes de a resposta
+   * empurrar a conversa para cima.
+   *
+   * O tempo varia de propósito. Fixo em 1s, o padrão fica audível na
+   * terceira mensagem e volta a parecer máquina.
+   */
+  function empurrarBot(bolha: Bolha) {
+    if (esperaRef.current) clearTimeout(esperaRef.current);
+    setDigitando(true);
+    // 0,7s a 1,6s. Textos longos ganham um pouco mais, como alguém que
+    // digita mais tempo para escrever mais.
+    const tamanho = typeof bolha.texto === "string" ? bolha.texto.length : 90;
+    const espera = 700 + Math.random() * 500 + Math.min(tamanho * 4, 400);
+    esperaRef.current = setTimeout(() => {
+      setDigitando(false);
+      empurrar(bolha);
+      esperaRef.current = null;
+    }, espera);
   }
 
   // Saudação contextual: quando os dados do imóvel chegam e a conversa
@@ -351,7 +391,7 @@ export default function ChatWidget() {
     const nivel: Nivel = topico
       ? { tipo: "topicos", categoria: topico.categoria }
       : { tipo: "categorias" };
-    empurrar({
+    empurrarBot({
       de: "bot",
       texto: (
         <>
@@ -364,7 +404,7 @@ export default function ChatWidget() {
 
   /** Volta do nível 2 (assuntos) para o nível 1 (categorias). */
   function voltarAosAssuntos() {
-    empurrar({
+    empurrarBot({
       de: "bot",
       texto: (
         <>
@@ -380,7 +420,7 @@ export default function ChatWidget() {
     if (id.startsWith(PREFIXO_CATEGORIA)) {
       const categoria = id.slice(PREFIXO_CATEGORIA.length) as Categoria;
       empurrar({ de: "user", texto: categoria });
-      empurrar({
+      empurrarBot({
         de: "bot",
         texto: (
           <>
@@ -470,6 +510,9 @@ export default function ChatWidget() {
   async function buscarImoveis(texto: string, intencao: IntencaoBusca) {
     ultimaBuscaRef.current = intencao;
     empurrar({ de: "user", texto });
+    // Imediato, e não via empurrarBot: esta bolha JÁ É o indicador de
+    // espera da busca. Precedê-la de "digitando" seria fazer o
+    // visitante esperar duas vezes para ler "aguarde".
     empurrar({
       de: "bot",
       texto: (
@@ -484,7 +527,7 @@ export default function ChatWidget() {
     const urlCatalogo = urlCatalogoDaBusca(intencao);
 
     if (resultados.length > 0) {
-      empurrar({
+      empurrarBot({
         de: "bot",
         texto: (
           <>
@@ -523,7 +566,7 @@ export default function ChatWidget() {
       }
     }
 
-    empurrar({
+    empurrarBot({
       de: "bot",
       texto:
         alternativas.length > 0 ? (
@@ -628,7 +671,7 @@ export default function ChatWidget() {
 
   function iniciarContato() {
     setModoContato(true);
-    empurrar({
+    empurrarBot({
       de: "bot",
       texto:
         "Perfeito! Deixe seu nome e WhatsApp que um corretor retorna — normalmente no mesmo dia.",
@@ -731,6 +774,22 @@ export default function ChatWidget() {
               </div>
             ))}
 
+            {/* Bolha de "digitando".
+             *
+             * aria-hidden de propósito: para quem usa leitor de tela, o
+             * que importa é a RESPOSTA quando ela chega — anunciar
+             * "digitando" a cada pergunta viraria ruído repetido, sem
+             * acrescentar nada que o silêncio já não diga. */}
+            {digitando && (
+              <div className="flex justify-start" aria-hidden="true">
+                <div className="bz-digitando flex items-center gap-1 rounded-2xl bg-mist px-3.5 py-3">
+                  <span className="block h-1.5 w-1.5 rounded-full bg-black/45" />
+                  <span className="block h-1.5 w-1.5 rounded-full bg-black/45" />
+                  <span className="block h-1.5 w-1.5 rounded-full bg-black/45" />
+                </div>
+              </div>
+            )}
+
             {/* Abertura enxuta: nada de parede de opções. Na página de um
                 anúncio ficam só os 3 atalhos do imóvel; o resto dos
                 assuntos aparece depois da primeira mensagem. */}
@@ -753,7 +812,7 @@ export default function ChatWidget() {
                 <button
                   type="button"
                   onClick={() =>
-                    empurrar({
+                    empurrarBot({
                       de: "bot",
                       texto: (
                         <>
@@ -775,7 +834,7 @@ export default function ChatWidget() {
                 slug={slugImovel}
                 onEnviado={() => {
                   setEnviado(true);
-                  empurrar({
+                  empurrarBot({
                     de: "bot",
                     texto:
                       "Recebemos seu contato! Um corretor vai te chamar no WhatsApp em breve. 🙌",
