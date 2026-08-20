@@ -79,6 +79,16 @@ export default function QuemSomos() {
             São 15 anos de experiência, relacionamento e compromisso, sempre
             colocando as pessoas em primeiro lugar.
           </p>
+          {/* Este parágrafo quase se perdeu: no documento, eles NÃO
+              reescreveram a frase inteira — mantiveram a primeira metade
+              (que era minha, em preto) e trocaram só o final, em
+              vermelho. Ao substituir o bloco antigo pela história nova,
+              a metade preservada foi junto. Só apareceu ao ler o
+              documento por COR, e não por texto. */}
+          <p className="text-[15px] leading-relaxed text-secundario">
+            Trabalhamos com um catálogo enxuto e escolhido a dedo, buscamos
+            entender a real necessidade do cliente para melhor atendê-lo.
+          </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <a
               href={linkWhatsAppGeral()}

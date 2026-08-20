@@ -104,7 +104,7 @@ export const TOPICOS: TopicoChat[] = [
       // avaliação de um inventário de graça citando o site. Gratuita é a
       // MERCADOLÓGICA, e só quando o imóvel entra para venda ou locação
       // com eles. Com laudo é serviço cobrado por tabela do CRECI-SP.
-      "Fazemos a avaliação mercadológica do seu imóvel sem custo quando ele entra para venda ou locação conosco: comparamos com as vendas recentes da região e indicamos o preço que vende sem 'queimar' o imóvel. Avaliação com laudo — para inventário, partilha ou processo — é um serviço à parte, cobrado pela tabela do CRECI-SP. Chame no WhatsApp e agende com um corretor.",
+      "Fazemos a avaliação mercadológica do seu imóvel sem custo quando ele entra para venda ou locação conosco: comparamos com as vendas recentes da região e indicamos o preço que vende. Avaliação com laudo — para inventário, partilha ou processo — é um serviço à parte, cobrado pela tabela do CRECI-SP. Chame no WhatsApp e agende com um corretor.",
   },
   {
     id: "cidades",
