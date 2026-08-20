@@ -64,6 +64,21 @@ export default function Depoimentos() {
     }
   }
 
+  /**
+   * SEM DEPOIMENTO, SEM SEÇÃO.
+   *
+   * Faltava esta guarda, e a falta era perigosa: esvaziar
+   * lib/depoimentos.ts deixava um "Quem já fechou negócio" com carrossel
+   * vazio na home, em vez de esconder o bloco. Como o jeito certo de
+   * tirar depoimento inventado do ar É esvaziar o arquivo, a única saída
+   * segura acabava sendo mexer no componente — que ninguém lembraria de
+   * fazer.
+   *
+   * Agora a seção aparece sozinha quando o primeiro depoimento real
+   * entrar, e some sozinha se todos saírem.
+   */
+  if (DEPOIMENTOS.length === 0) return null;
+
   return (
     <section
       id="depoimentos"

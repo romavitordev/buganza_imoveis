@@ -36,7 +36,7 @@ export const TOPICOS: TopicoChat[] = [
     titulo: "Agendar uma visita",
     chaves: ["visita", "visitar", "agendar", "agendamento", "conhecer", "ver o imovel"],
     resposta:
-      "Para agendar uma visita é rapidinho: escolha o imóvel, toque em “Falar no WhatsApp” e a gente combina o melhor dia e horário — fazemos visitas inclusive aos sábados. Quer que eu te leve ao WhatsApp agora?",
+      "Para agendar uma visita é rapidinho: escolha o imóvel, toque em “Falar no WhatsApp” e a gente combina o melhor dia e horário — fazemos visitas inclusive aos sábados. Em condomínio, o horário segue as regras do regimento de cada prédio. Quer que eu te leve ao WhatsApp agora?",
   },
   {
     id: "precos",
@@ -84,7 +84,7 @@ export const TOPICOS: TopicoChat[] = [
     titulo: "Aceita permuta / troca?",
     chaves: ["permuta", "troca", "trocar", "dacao", "dação", "dar meu imovel", "entrada com imovel", "entrada com carro"],
     resposta:
-      "Depende do proprietário: alguns aceitam outro imóvel ou veículo como parte do pagamento. Conte pro corretor o que você tem para oferecer — a gente apresenta a proposta e negocia por você.",
+      "Depende do proprietário: alguns aceitam outro imóvel ou veículo como parte do pagamento. Conte para o corretor o que você tem para oferecer — cada negociação é única, com ofertas e permutas, e a gente apresenta a proposta e negocia por você.",
   },
   {
     id: "anunciar",
@@ -92,7 +92,7 @@ export const TOPICOS: TopicoChat[] = [
     titulo: "Como anunciar meu imóvel",
     chaves: ["anunciar", "anuncio", "anúncio", "vender", "vender meu", "colocar a venda", "colocar à venda", "comissao", "comissão", "taxa", "custo para anunciar"],
     resposta:
-      `Anunciar com a ${MARCA.nomeCurto} é sem taxa, sem mensalidade e sem exclusividade forçada — você só paga a comissão de corretagem quando o negócio fecha. Cuidamos das fotos, do anúncio e da divulgação. Chame no WhatsApp que fazemos uma avaliação do seu imóvel.`,
+      `Anunciar com a ${MARCA.nomeCurto} é sem taxa, sem mensalidade e sem exclusividade forçada — você só paga a comissão de corretagem quando o negócio fecha. Cuidamos das fotos, do anúncio e da divulgação, e a avaliação mercadológica do imóvel vem junto, sem custo. Chame no WhatsApp.`,
   },
   {
     id: "avaliacao",
@@ -100,7 +100,11 @@ export const TOPICOS: TopicoChat[] = [
     titulo: "Quanto vale meu imóvel?",
     chaves: ["avaliacao", "avaliação", "avaliar", "quanto vale", "precificar", "valor do meu imovel", "valor do meu imóvel"],
     resposta:
-      "Fazemos a avaliação do seu imóvel sem custo: comparamos com as vendas recentes da região e indicamos o preço que vende sem 'queimar' o imóvel. É rápido — chame no WhatsApp e agende com um corretor.",
+      // A ressalva NÃO é detalhe jurídico: sem ela, alguém pede a
+      // avaliação de um inventário de graça citando o site. Gratuita é a
+      // MERCADOLÓGICA, e só quando o imóvel entra para venda ou locação
+      // com eles. Com laudo é serviço cobrado por tabela do CRECI-SP.
+      "Fazemos a avaliação mercadológica do seu imóvel sem custo quando ele entra para venda ou locação conosco: comparamos com as vendas recentes da região e indicamos o preço que vende sem 'queimar' o imóvel. Avaliação com laudo — para inventário, partilha ou processo — é um serviço à parte, cobrado pela tabela do CRECI-SP. Chame no WhatsApp e agende com um corretor.",
   },
   {
     id: "cidades",
@@ -116,7 +120,7 @@ export const TOPICOS: TopicoChat[] = [
     titulo: "Horário de atendimento",
     chaves: ["horario", "horário", "atendimento", "funciona", "aberto", "sabado", "sábado", "domingo", "quando"],
     resposta:
-      "Atendemos de segunda a sábado, com flexibilidade para agendar visitas no horário que for melhor para você. Pelo WhatsApp costumamos responder no mesmo dia.",
+      "Atendemos de segunda a sábado, das 9h às 18h, e agendamos a visita no horário que for melhor para você. Pelo WhatsApp costumamos responder no mesmo dia.",
   },
 ];
 

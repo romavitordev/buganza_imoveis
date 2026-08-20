@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Instagram, Mail, MessageCircle } from "lucide-react";
+import { Facebook, Instagram, Mail, MessageCircle } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 import { linkWhatsAppGeral, linkWhatsAppAnunciar } from "@/lib/whatsapp";
 import { CIDADE_UF, MARCA } from "@/lib/marca";
@@ -90,6 +90,25 @@ export default function SiteFooter() {
             <Instagram size={14} strokeWidth={2} aria-hidden="true" />
             @{MARCA.instagram}
           </a>
+          {/* Facebook só entra se houver página cadastrada. A busca por
+              NOME (e não por URL) é proposital: eles informaram "Imóvel
+              Vago Sorocaba", que é o nome da página, não o endereço dela.
+              Link para uma URL inventada levaria o visitante a lugar
+              nenhum — pior do que não ter link. Trocar por permalink
+              assim que souberem qual é. */}
+          {MARCA.facebook && (
+            <a
+              href={`https://www.facebook.com/search/top?q=${encodeURIComponent(
+                MARCA.facebook
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-fit items-center gap-2 text-[13px] text-secundario transition-colors hover:text-black"
+            >
+              <Facebook size={14} strokeWidth={2} aria-hidden="true" />
+              {MARCA.facebook}
+            </a>
+          )}
           <a
             href={`mailto:${MARCA.email}`}
             className="inline-flex w-fit items-center gap-2 text-[13px] text-secundario transition-colors hover:text-black"
@@ -98,7 +117,7 @@ export default function SiteFooter() {
             {MARCA.email}
           </a>
           <p className="mt-1 text-[12px] leading-relaxed text-secundario">
-            Seg. a sáb., 9h às 19h
+            Seg. a sáb., 9h às 18h
             <br />
             {CIDADE_UF} e região
           </p>

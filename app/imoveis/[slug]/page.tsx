@@ -357,7 +357,7 @@ export default async function ImovelPage({ params }: PageProps) {
                 microcópia que tira o peso dele. */}
             <p className="mt-2 text-center text-[12px] md:text-[11px] text-secundario">
               {temPreco
-                ? "Sem compromisso · resposta rápida no WhatsApp"
+                ? "Resposta rápida no WhatsApp"
                 : "Resposta rápida · atendimento direto com os corretores"}
             </p>
 

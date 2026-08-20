@@ -13,7 +13,7 @@ const PILARES = [
     icone: KeyRound,
     titulo: "Atendimento direto",
     texto:
-      "Você fala com quem realmente conhece cada imóvel — sem intermediários, sem telefone que ninguém atende.",
+      "Você fala com quem realmente conhece cada imóvel.",
   },
   {
     icone: Handshake,
@@ -50,15 +50,34 @@ export default function QuemSomos() {
             <br />
             Um jeito mais humano de negociar imóveis.
           </h2>
+          {/* Texto dos donos, palavra por palavra. O que estava aqui antes
+              era exemplo meu — ver RESPOSTAS-CLIENTE.txt. */}
           <p className="text-[15px] leading-relaxed text-secundario">
-            A {MARCA.nome} nasceu em {MARCA.cidade} da parceria de um casal que
-            resolveu fazer diferente: menos vitrine, mais conversa. A gente
-            acompanha cada cliente pessoalmente — do primeiro “oi” no WhatsApp
-            até a entrega das chaves.
+            Há 15 anos, a {MARCA.nome} nasceu com o propósito de transformar a
+            experiência de comprar, vender ou alugar um imóvel em algo mais
+            seguro, transparente e personalizado.
           </p>
           <p className="text-[15px] leading-relaxed text-secundario">
-            Trabalhamos com um catálogo enxuto e escolhido a dedo, porque
-            preferimos conhecer bem cada imóvel a anunciar qualquer um.
+            Escolhemos o mercado imobiliário porque acreditamos que um imóvel
+            não é apenas um patrimônio: é o lugar onde histórias começam,
+            famílias crescem e novos projetos de vida acontecem.
+          </p>
+          <p className="text-[15px] leading-relaxed text-secundario">
+            Ao longo dessa trajetória, construímos nosso trabalho com base em
+            atendimento próximo, confiança e conhecimento do mercado de{" "}
+            {MARCA.cidade}. Aqui, cada cliente é tratado como único, porque
+            entendemos que cada pessoa tem necessidades, sonhos e objetivos
+            diferentes.
+          </p>
+          <p className="text-[15px] leading-relaxed text-secundario">
+            Nosso diferencial está justamente nesse atendimento personalizado:
+            ouvimos, entendemos e buscamos as melhores soluções imobiliárias
+            para cada cliente, acompanhando cada etapa da negociação com
+            dedicação e responsabilidade.
+          </p>
+          <p className="text-[15px] leading-relaxed text-secundario">
+            São 15 anos de experiência, relacionamento e compromisso, sempre
+            colocando as pessoas em primeiro lugar.
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <a
@@ -79,13 +98,16 @@ export default function QuemSomos() {
             </span>
           </div>
 
-          {/* CONFIRMAR COM OS DONOS ANTES DE IR AO AR.
-              Os "+15 anos" vieram deles. O volume de imóveis é uma
-              projeção a partir disso — o +120 antigo era de quando se
-              supunha 5 anos de mercado. Está no CHECKLIST-DEPLOY. */}
-          <dl className="mt-4 grid grid-cols-3 gap-4 border-t border-black/10 pt-6">
+          {/* Eram três números. O "+400 imóveis negociados" saiu porque
+              era projeção minha, e os donos mandaram excluir — número de
+              prova social que ninguém consegue provar é o tipo de coisa
+              que um concorrente cobra depois. Os dois que ficaram vieram
+              deles.
+
+              Duas colunas, e não três com um buraco: grid-cols-2 com o
+              conteúdo à esquerda mantém o alinhamento com o texto acima. */}
+          <dl className="mt-4 grid grid-cols-2 gap-4 border-t border-black/10 pt-6">
             {[
-              { numero: "+400", rotulo: "imóveis negociados" },
               { numero: "+15", rotulo: "anos de mercado" },
               { numero: "100%", rotulo: "acompanhamento pessoal" },
             ].map(({ numero, rotulo }) => (

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: {
     default:
-      `${MARCA.nome} — Especialistas em Imóveis Residenciais e Comerciais`,
+      `${MARCA.nome} — Especialistas em Negociações Imobiliárias`,
     template: `%s · ${MARCA.nome}`,
   },
   description:

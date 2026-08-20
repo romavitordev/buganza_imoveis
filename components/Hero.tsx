@@ -29,7 +29,7 @@ export default function Hero() {
         <div className="bz-footer-left">
           <div className="bz-subtitle bz-anim bz-sub-anim">
             <span className="bz-dot" />
-            Especialistas em imóveis residenciais e comerciais
+            Especialistas em negociações imobiliárias
           </div>
 
           <h1 className="bz-heading">

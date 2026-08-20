@@ -11,8 +11,12 @@
  * (O número de WhatsApp continua server-only, em lib/whatsapp-server.ts.)
  */
 
-const nome = "Marcelo Imóveis";
-/** Forma curta, para frases: "Anunciar com a Marcelo…". */
+const nome = "Marcelo Imóveis Sorocaba";
+/**
+ * Forma curta, para dentro de frases: "Anunciar com a Marcelo Imóveis é
+ * sem taxa…". O nome completo leva a cidade porque identifica a
+ * imobiliária; repetido no meio de cada frase, só alonga.
+ */
 const nomeCurto = "Marcelo Imóveis";
 
 export const MARCA = {
@@ -21,11 +25,11 @@ export const MARCA = {
   /** Assinatura do logotipo — usada no rodapé e na imagem de compartilhamento. */
   tagline: "Conectando pessoas aos melhores lugares.",
   /** Nome do assistente do chat, no site e nos rótulos de acessibilidade. */
-  assistente: "Assistente Marcelo",
+  assistente: "Marcelo",
   /** Como o painel administrativo se identifica nos títulos das abas. */
   painel: "Painel Marcelo Imóveis",
 
-  creci: "118400",
+  creci: "118.400-F",
   cidade: "Sorocaba",
   uf: "SP",
   /** Usado em textos de cobertura: "Atuamos em Sorocaba e região". */
@@ -35,9 +39,16 @@ export const MARCA = {
    * E-mail público de contato (rodapé e política de privacidade).
    * TROQUE quando o endereço definitivo existir.
    */
-  email: "contato@marceloimoveis.com.br",
-  /** Perfil do Instagram, sem o @ — confira antes de publicar. */
-  instagram: "marceloimoveis.sorocaba",
+  email: "marceloimoveissorocaba@gmail.com",
+  /**
+   * Perfil do Instagram, sem o @.
+   *
+   * PROVISÓRIO: é o perfil pessoal, e eles pretendem migrar para um @
+   * da imobiliária. Quando migrarem, trocar aqui — e só aqui.
+   */
+  instagram: "nina_buganza",
+  /** Página no Facebook. Vazio = o link não aparece no rodapé. */
+  facebook: "Imóvel Vago Sorocaba",
 } as const;
 
 /** "Sorocaba/SP" — atalho usado em rodapé, OG image e linha do CRECI. */
@@ -56,21 +67,24 @@ export const CIDADE_UF = `${MARCA.cidade}/${MARCA.uf}` as const;
  * ficar vazio, a página usa o e-mail de contato da marca. Preencha se
  * um dia houver alguém formalmente designado.
  *
- * Enquanto estiverem vazios, a política mostra um aviso no lugar — feio
- * de propósito, para ninguém publicar sem preencher. Ver a Fase 2 do
- * CHECKLIST-DEPLOY.md.
- *
- * O encarregado NÃO precisa ser advogado nem funcionário dedicado: numa
- * imobiliária pequena costuma ser um dos sócios. O que a lei exige é que
- * exista alguém identificado e um canal que funcione.
  */
 export const CONTROLADOR = {
-  /** Razão social completa, como no cartão CNPJ. */
-  razaoSocial: "",
-  /** Só dígitos ou formatado — entra na página como está. */
-  cnpj: "",
-  /** Endereço da sede, com CEP. */
-  endereco: "",
+  /**
+   * Razão social como no cartão CNPJ.
+   *
+   * A empresa está EM PROCESSO de mudança de razão social e informou
+   * esta como a que vale. Se a mudança ainda não tiver saído na Receita
+   * quando o site for ao ar, conferir: a razão social da política tem
+   * que bater com a do CNPJ ao lado.
+   */
+  razaoSocial: "ELODY MULTI SERVICE LTDA ME",
+  cnpj: "05.644.262/0001-02",
+  /**
+   * Sede. NÃO é aberta ao público — os donos confirmaram que não
+   * recebem cliente lá. Por isso o endereço aparece só na política de
+   * privacidade, onde a lei exige, e não no rodapé.
+   */
+  endereco: "Rua Alécio Bragatto, 155, sala 1, Éden, Sorocaba/SP",
   encarregado: {
     nome: "",
     /** Vazio = a política usa MARCA.email como canal. */

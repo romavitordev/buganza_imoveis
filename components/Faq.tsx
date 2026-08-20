@@ -13,17 +13,17 @@ const PERGUNTAS = [
   {
     pergunta: "Como agendo uma visita?",
     resposta:
-      "Pelo WhatsApp mesmo: você escolhe o imóvel, a gente combina o melhor dia e horário e vamos juntos até lá. Fazemos visitas também aos sábados.",
+      "Pelo WhatsApp mesmo: você escolhe o imóvel, a gente combina o melhor dia e horário e vamos juntos até lá. Fazemos visitas também aos sábados — em condomínio, dentro do horário que o regimento do prédio permite.",
   },
   {
     pergunta: "Vocês ajudam com o financiamento?",
     resposta:
-      "Sim. Fazemos a simulação nos principais bancos, orientamos sobre o uso do FGTS e acompanhamos o processo do começo ao fim, sem custo adicional.",
+      "Sim. Através de correspondentes bancários, fazemos a simulação nos principais bancos, orientamos sobre o uso do FGTS e acompanhamos o processo do começo ao fim, sem custo adicional para quem adquire o imóvel conosco.",
   },
   {
     pergunta: "Quais documentos preciso para alugar?",
     resposta:
-      "Em geral: documento com foto, comprovante de renda e de residência. Dependendo do caso, fiador, seguro-fiança ou caução — explicamos as opções e ajudamos a escolher a mais simples para você.",
+      "Em geral: documento com foto, comprovante de renda e comprovante de residência. Como garantia, dependendo do caso: fiador, seguro-fiança, caução ou título de capitalização — explicamos as opções e orientamos durante todo o processo.",
   },
   {
     pergunta: "Em quais cidades vocês atuam?",
