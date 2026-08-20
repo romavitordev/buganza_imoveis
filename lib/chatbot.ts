@@ -199,22 +199,28 @@ export interface TopicoAprendido {
 /** Cumprimentos: têm resposta própria para não virarem "não sei". */
 const SAUDACOES = [
   "ola", "ole", "oi", "oii", "opa", "eai", "e ai", "hey", "hello",
-  "bom dia", "boa tarde", "boa noite", "tudo bem", "tudo bom",
+  "bom dia", "boa tarde", "boa noite",
+  "tudo bem", "tudo bom", "como vai", "como esta", "beleza",
 ];
 
 /**
  * Cumprimentos que pedem resposta ESPELHADA.
  *
  * Responder "Olá!" a quem escreveu "boa noite" é o detalhe que denuncia
- * o robô: qualquer atendente humano devolveria o mesmo cumprimento. O
- * resto ("oi", "opa", "tudo bem") não tem espelho natural e cai no
- * "Olá!" genérico.
+ * o robô: qualquer atendente humano devolveria o mesmo cumprimento.
  */
 const ESPELHO: Record<string, string> = {
   "bom dia": "Bom dia",
   "boa tarde": "Boa tarde",
   "boa noite": "Boa noite",
 };
+
+/**
+ * "Tudo bem?" não é cumprimento — é PERGUNTA, e deixá-la sem resposta é
+ * exatamente o que soa automático. Quem escreve isso espera ouvir que
+ * sim, e ser perguntado de volta.
+ */
+const BEM_ESTAR = ["tudo bem", "tudo bom", "como vai", "como esta", "beleza"];
 
 /**
  * Curta pelo mesmo motivo da saudação de abertura: os CHIPS de assunto
@@ -225,11 +231,25 @@ const ESPELHO: Record<string, string> = {
 function respostaSaudacao(alvo: string): string {
   // O mais longo primeiro: "boa noite" antes de "boa", e assim por
   // diante, para "bom dia" não casar dentro de outra frase.
-  const usado = Object.keys(ESPELHO)
+  const periodo = Object.keys(ESPELHO)
     .sort((a, b) => b.length - a.length)
     .find((chave) => alvo.includes(chave));
-  const abertura = usado ? ESPELHO[usado] : "Olá";
-  return `${abertura}! 👋 Me diga o que procura, ou escolha um assunto abaixo.`;
+  const perguntouComoEstamos = BEM_ESTAR.some((k) => alvo.includes(k));
+
+  // "tudo bem?" sozinho NÃO ganha "Olá!" na frente: ninguém responde
+  // "Olá! Tudo bem sim" a quem só perguntou como você está.
+  const cumprimentou =
+    periodo !== undefined ||
+    ["ola", "ole", "oi", "oii", "opa", "eai", "e ai", "hey", "hello"].some(
+      (k) => alvo.includes(k)
+    );
+  const abertura = periodo ? ESPELHO[periodo] : cumprimentou ? "Olá" : null;
+
+  if (perguntouComoEstamos) {
+    const inicio = abertura ? `${abertura}! ` : "";
+    return `${inicio}Tudo bem sim, e você? 👋 Como posso ajudar?`;
+  }
+  return `${abertura ?? "Olá"}! 👋 Me diga o que procura, ou escolha um assunto abaixo.`;
 }
 
 /**

@@ -147,8 +147,52 @@ describe("saudação espelhada", () => {
     expect(responder(entrada).texto.startsWith(inicio)).toBe(true);
   });
 
-  const genericos = ["oi", "olá", "opa", "e aí", "tudo bem?", "oii"];
+  const genericos = ["oi", "olá", "opa", "e aí", "oii"];
   it.each(genericos)("%s → começa com Olá!", (entrada) => {
     expect(responder(entrada).texto.startsWith("Olá!")).toBe(true);
+  });
+});
+
+/**
+ * "TUDO BEM?" É PERGUNTA, não cumprimento.
+ *
+ * Deixá-la sem resposta é o que soa automático: quem escreve isso espera
+ * ouvir que sim, e ser perguntado de volta. E quando vem junto de um
+ * cumprimento, as duas coisas precisam ser respondidas na ordem certa
+ * ("Boa noite! Tudo bem sim, e você?").
+ */
+describe("pergunta sobre estar bem", () => {
+  const perguntas = ["tudo bem?", "Tudo bem", "tudo bom?", "como vai?", "beleza?"];
+  it.each(perguntas)("%s responde que sim e devolve a pergunta", (entrada) => {
+    const t = responder(entrada).texto;
+    expect(t).toContain("Tudo bem sim, e você?");
+    // Sozinha, NÃO leva "Olá!" na frente — ninguém responde
+    // "Olá! Tudo bem sim" a quem só perguntou como você está.
+    expect(t.startsWith("Tudo bem sim")).toBe(true);
+  });
+
+  const comCumprimento: [string, string][] = [
+    ["oi, tudo bem?", "Olá! Tudo bem sim, e você?"],
+    ["boa noite, tudo bem?", "Boa noite! Tudo bem sim, e você?"],
+    ["bom dia, tudo bem?", "Bom dia! Tudo bem sim, e você?"],
+  ];
+  it.each(comCumprimento)("%s → %s", (entrada, inicio) => {
+    expect(responder(entrada).texto.startsWith(inicio)).toBe(true);
+  });
+
+  /**
+   * As palavras novas ("como", "vai", "beleza") entraram no vocabulário
+   * de saudação — e é justamente aí que uma pergunta de verdade poderia
+   * passar a ser tratada como "oi".
+   */
+  const naoSaoSaudacao: [string, string][] = [
+    ["como vai o financiamento?", "financiamento"],
+    ["como faço para anunciar?", "anunciar"],
+    ["tudo bem, quanto custa anunciar?", "precos"],
+    ["beleza, quais documentos?", "documentos"],
+    ["oi tudo bem? quero agendar visita", "visita"],
+  ];
+  it.each(naoSaoSaudacao)("%s continua indo para %s", (entrada, topico) => {
+    expect(responder(entrada).topicoId).toBe(topico);
   });
 });
