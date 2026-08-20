@@ -120,7 +120,7 @@ export const TOPICOS: TopicoChat[] = [
     titulo: "Horário de atendimento",
     chaves: ["horario", "horário", "atendimento", "funciona", "aberto", "sabado", "sábado", "domingo", "quando"],
     resposta:
-      "Atendemos de segunda a sábado, das 9h às 18h, e agendamos a visita no horário que for melhor para você. Pelo WhatsApp costumamos responder no mesmo dia.",
+      "Atendemos de segunda a sábado, das 9h às 19h, e agendamos a visita no horário que for melhor para você. Pelo WhatsApp costumamos responder no mesmo dia.",
   },
 ];
 

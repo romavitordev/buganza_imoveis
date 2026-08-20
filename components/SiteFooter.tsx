@@ -117,7 +117,7 @@ export default function SiteFooter() {
             {MARCA.email}
           </a>
           <p className="mt-1 text-[12px] leading-relaxed text-secundario">
-            Seg. a sáb., 9h às 18h
+            Seg. a sáb., 9h às 19h
             <br />
             {CIDADE_UF} e região
           </p>

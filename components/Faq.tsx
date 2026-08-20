@@ -69,6 +69,18 @@ export default function Faq() {
           {PERGUNTAS.map(({ pergunta, resposta }, i) => (
             <details
               key={pergunta}
+              /* ACCORDION EXCLUSIVO, sem uma linha de JavaScript.
+               *
+               * `name` igual em vários <details> é HTML nativo: abrir um
+               * fecha os outros, e o navegador ainda entrega de graça o
+               * teclado, o foco e o comportamento de "encontrar na
+               * página" que uma versão feita à mão em React precisaria
+               * reimplementar — e provavelmente reimplementaria pior.
+               *
+               * Em navegador antigo que não conheça o atributo, ele é
+               * ignorado e volta a abrir vários: degrada para o que era
+               * antes, nunca para uma tela quebrada. */
+              name="faq"
               className="bz-fade-up group rounded-2xl border border-black/8 bg-white px-5 transition-colors open:border-black/20 hover:border-black/20"
               style={{ animationDelay: `${0.06 + i * 0.08}s` }}
             >
