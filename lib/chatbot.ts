@@ -202,21 +202,57 @@ const SAUDACOES = [
   "bom dia", "boa tarde", "boa noite", "tudo bem", "tudo bom",
 ];
 
+/**
+ * Curta pelo mesmo motivo da saudação de abertura: os CHIPS de assunto
+ * aparecem logo abaixo desta resposta, então listar no texto o que dá
+ * para perguntar é repetir em palavras o que já está em botões — e
+ * transforma um "oi" numa parede.
+ */
 const RESPOSTA_SAUDACAO =
-  "Olá! 👋 Como posso ajudar? Você pode me perguntar sobre visitas, financiamento, documentos — ou dizer o que procura, tipo “casa 3 quartos até 600 mil”.";
+  "Olá! 👋 Me diga o que procura, ou escolha um assunto abaixo.";
 
 /**
  * O texto é só um cumprimento? Evita que "oi"/"olá" caia no fallback e
  * ainda polua a lista de perguntas sem resposta do painel.
  */
 function ehSaudacao(alvo: string): boolean {
+  let resto = alvo.replace(/[^a-z\s]/g, " ").replace(/\s+/g, " ").trim();
+  if (!resto) return false;
+  // Teto generoso: cumprimentos encadeados ("oi bom dia tudo bem") são
+  // comuns, mas ninguém escreve uma pergunta inteira só de saudação.
+  if (resto.length > 34) return false;
+
+  /**
+   * Uma saudação de verdade quase nunca vem sozinha: "oi, tudo bem?" é
+   * a abertura mais comum que existe, e ela caía no fallback — o robô
+   * respondia "não sei responder" para um "oi", e a pergunta ainda ia
+   * parar na fila do painel.
+   *
+   * A comparação antiga era do texto INTEIRO contra uma saudação só, e
+   * "oi tudo bem" não é igual nem parecido com "tudo bem" (distância 3).
+   * Aqui as saudações são REMOVIDAS uma a uma; se no fim não sobrar
+   * nada, era só cumprimento. Se sobrar palavra ("oi, quanto custa"),
+   * segue para os tópicos normalmente.
+   *
+   * Do mais longo para o mais curto, senão "oi" comeria o "oi" de
+   * "oii" e deixaria um "i" solto.
+   */
+  // Tokeniza e consome: cada palavra tem que pertencer a alguma
+  // saudação. Sem regex montada em runtime — `\b` interpolado num
+  // template já custou uma rodada de depuração aqui.
+  const palavrasDeSaudacao = new Set(
+    SAUDACOES.flatMap((s) => s.split(" ")).concat(["e", "ai", "ae", "entao"])
+  );
+  const sobra = resto
+    .split(" ")
+    .filter((palavra) => palavra && !palavrasDeSaudacao.has(palavra));
+  if (sobra.length === 0) return true;
+
+  // Nada sobrou de significativo? Ainda pode ser um cumprimento com
+  // erro de digitação ("bom diaa"). Aí sim vale a tolerância de 1 letra.
   const limpo = alvo.replace(/[^a-z\s]/g, "").trim();
-  if (limpo.length > 14) return false; // "ola, quanto custa?" não é só saudação
+  if (limpo.length > 14) return false;
   return SAUDACOES.some((s) => {
-    if (limpo === s) return true;
-    // Tolerância própria: o conjunto de saudações é pequeno e fechado,
-    // então 1 letra errada em palavras de 3+ é seguro aqui ("ols" → "ola").
-    // Abaixo disso exige exato, senão "oi" casaria com "ai", "ui"…
     const limite = s.length >= 3 ? 1 : 0;
     return limite > 0 && distancia(limpo, s, limite) <= limite;
   });

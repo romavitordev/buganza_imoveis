@@ -25,7 +25,7 @@ export const MARCA = {
   /** Assinatura do logotipo — usada no rodapé e na imagem de compartilhamento. */
   tagline: "Conectando pessoas aos melhores lugares.",
   /** Nome do assistente do chat, no site e nos rótulos de acessibilidade. */
-  assistente: "Marcelo",
+  assistente: "Assistente Marcelo",
   /** Como o painel administrativo se identifica nos títulos das abas. */
   painel: "Painel Marcelo Imóveis",
 

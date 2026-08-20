@@ -83,3 +83,45 @@ describe("tópicos novos (B3)", () => {
     expect(responder("quanto vale meu imóvel?").topicoId).toBe("avaliacao");
   });
 });
+
+/**
+ * SAUDAÇÕES.
+ *
+ * "oi, tudo bem?" — a abertura mais comum que existe — caía no fallback:
+ * o robô respondia "não sei responder" para um cumprimento, e a frase
+ * ainda entrava na fila de perguntas sem resposta do painel. A checagem
+ * comparava o texto INTEIRO contra uma saudação só, e "oi tudo bem" não
+ * é igual nem parecido com "tudo bem".
+ *
+ * O par de blocos abaixo é o que segura a correção: um cobre o
+ * cumprimento puro, o outro garante que a tolerância não engoliu
+ * pergunta de verdade. Sem o segundo, seria fácil "consertar" aceitando
+ * qualquer frase que comece com "oi".
+ */
+describe("saudações", () => {
+  const soCumprimento = [
+    "Olá", "oi", "Oi!", "opa", "e aí", "bom dia", "Boa tarde", "boa noite",
+    "tudo bem", "tudo bem?", "oi, tudo bem?", "olá, tudo bem?",
+    "oi bom dia tudo bem", "ola", "oii",
+  ];
+  it.each(soCumprimento)("responde a %s sem cair no fallback", (texto) => {
+    const r = responder(texto);
+    expect(r.encontrou).toBe(true);
+    expect(r.topicoId).toBe("saudacao");
+  });
+
+  const temPerguntaDentro: [string, string][] = [
+    ["oi, quanto custa anunciar?", "precos"],
+    ["bom dia, quero agendar visita", "visita"],
+    ["oi tudo bem? queria saber do financiamento", "financiamento"],
+    ["e aí, aceita permuta?", "permuta"],
+    ["boa tarde, quais documentos?", "documentos"],
+  ];
+  it.each(temPerguntaDentro)(
+    "%s vai para o tópico, e não para a saudação",
+    (texto, topico) => {
+      const r = responder(texto);
+      expect(r.topicoId).toBe(topico);
+    }
+  );
+});

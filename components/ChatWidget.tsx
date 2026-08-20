@@ -76,8 +76,19 @@ type Nivel =
 
 const PREFIXO_CATEGORIA = "cat:";
 
-const SAUDACAO =
-  `Olá! Sou o assistente da ${MARCA.nome} 👋 Escreva sua dúvida — ou diga o que procura, como “apartamento de 2 quartos até 500 mil”.`;
+/**
+ * Saudação curta de propósito.
+ *
+ * A anterior explicava dentro do balão o que dá para perguntar e dava um
+ * exemplo de busca — três linhas de texto antes de qualquer conversa
+ * começar, e a quebra fazia o balão parecer uma parede.
+ *
+ * Nada disso se perdeu, só mudou de lugar: os CHIPS de assunto já
+ * aparecem logo abaixo mostrando o que ele responde, e o exemplo de
+ * busca foi para o placeholder do campo — onde ele é lido no momento
+ * exato de digitar, e não antes.
+ */
+const SAUDACAO = `Olá! Sou o ${MARCA.assistente} 👋 Como posso ajudar?`;
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -788,7 +799,7 @@ export default function ChatWidget() {
               <input
                 value={entrada}
                 onChange={(e) => setEntrada(e.target.value)}
-                placeholder="Escreva sua dúvida…"
+                placeholder="Pergunte ou diga o que procura…"
                 aria-label="Sua mensagem"
                 className="flex-1 rounded-pill border border-black/15 bg-white px-4 py-2.5 text-sm text-black outline-none transition-colors focus:border-black"
               />
