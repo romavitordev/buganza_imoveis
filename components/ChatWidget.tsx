@@ -713,7 +713,7 @@ export default function ChatWidget() {
              100dvh (e não 100vh) porque no iOS a barra do navegador
              entra na conta do vh e cortava o campo de digitação.
              No desktop segue como painel flutuante. */
-          className="fixed inset-0 z-[70] flex h-[100dvh] w-full flex-col overflow-hidden border-black/10 bg-white md:inset-auto md:right-6 md:bottom-6 md:h-[560px] md:max-h-[80vh] md:w-[380px] md:rounded-2xl md:border md:shadow-[0_16px_56px_rgba(0,0,0,0.24)]"
+          className="fixed inset-0 z-[70] flex h-[100dvh] w-full flex-col overflow-hidden border-black/10 bg-white md:inset-auto md:right-6 md:bottom-6 md:h-[560px] md:max-h-[80vh] md:w-[420px] md:rounded-2xl md:border md:shadow-[0_16px_56px_rgba(0,0,0,0.24)]"
         >
           {/* Cabeçalho */}
           <header className="flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3">
@@ -763,7 +763,7 @@ export default function ChatWidget() {
                 className={m.de === "user" ? "flex justify-end" : "flex justify-start"}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+                  className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
                     m.de === "user"
                       ? "bg-black text-white"
                       : "bg-mist text-black/80"

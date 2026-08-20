@@ -801,6 +801,9 @@ textarea::placeholder {
   color: rgb(var(--ink));
   font-weight: 500;
   padding-right: 12px;
+  /* "Fale Conosco" quebrava em duas linhas quando a navbar apertava —
+     e um botao com duas alturas empurra os vizinhos. */
+  white-space: nowrap;
 }
 
 /* ---------- conteúdo inferior do hero ---------- */

@@ -200,7 +200,7 @@ export interface TopicoAprendido {
 const SAUDACOES = [
   "ola", "ole", "oi", "oii", "opa", "eai", "e ai", "hey", "hello",
   "bom dia", "boa tarde", "boa noite",
-  "tudo bem", "tudo bom", "como vai", "como esta", "beleza",
+  "tudo bem", "tudo bom",
 ];
 
 /**
@@ -219,8 +219,15 @@ const ESPELHO: Record<string, string> = {
  * "Tudo bem?" não é cumprimento — é PERGUNTA, e deixá-la sem resposta é
  * exatamente o que soa automático. Quem escreve isso espera ouvir que
  * sim, e ser perguntado de volta.
+ *
+ * SÓ ESTAS DUAS. Cheguei a incluir "como vai", "como está" e "beleza",
+ * e elas custavam caro: "como" é a abertura de pergunta mais comum do
+ * português ("como faço para anunciar", "como agendo uma visita"), e
+ * pôr essa palavra no vocabulário de saudação é convidar o robô a
+ * responder "oi" para quem perguntou algo. "tudo bem" e "tudo bom" não
+ * têm esse problema — não começam pergunta sobre imóvel nenhuma.
  */
-const BEM_ESTAR = ["tudo bem", "tudo bom", "como vai", "como esta", "beleza"];
+const BEM_ESTAR = ["tudo bem", "tudo bom"];
 
 /**
  * Curta pelo mesmo motivo da saudação de abertura: os CHIPS de assunto

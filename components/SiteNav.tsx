@@ -364,7 +364,10 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
           aria-label={`${MARCA.nome} — início`}
         >
           <BrandMark />
-          <span className="text-sm font-semibold tracking-tight text-black">
+          {/* nowrap: com "Marcelo Imoveis Sorocaba" o nome passou a
+              quebrar em duas linhas entre 900 e 1024px, e uma navbar de
+              duas alturas desalinha tudo que esta ao lado. */}
+          <span className="whitespace-nowrap text-sm font-semibold tracking-tight text-black">
             {MARCA.nome}
           </span>
         </Link>
@@ -400,7 +403,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
                 }}
                 onClick={(e) => rolarPara(e, secao)}
                 aria-current={ativo ? "page" : undefined}
-                className={`relative z-10 rounded-pill px-4 py-2 text-[12px] font-medium transition-colors duration-300 ${
+                className={`relative z-10 whitespace-nowrap rounded-pill px-4 py-2 text-[12px] font-medium transition-colors duration-300 ${
                   ativo ? "text-white" : "text-secundario hover:text-black"
                 }`}
               >
@@ -425,7 +428,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
             desktop este bloco não existe — lá a busca fica sempre
             visível ao lado dos links. */}
         {buscaAberta && (
-          <div className="flex flex-1 items-center gap-1 md:hidden">
+          <div className="flex flex-1 items-center gap-1 xl:hidden">
             <NavBusca variante="mobile" autoFoco />
             <button
               type="button"
@@ -451,7 +454,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
               onClick={() => setBuscaAberta(true)}
               aria-label="Buscar imóveis"
               aria-expanded={buscaAberta}
-              className="bz-icon-btn md:hidden"
+              className="bz-icon-btn xl:hidden"
             >
               <Search size={19} strokeWidth={2} aria-hidden="true" />
             </button>

@@ -101,7 +101,7 @@ export default function NavBusca({
       action="/imoveis"
       method="get"
       role="search"
-      className={ehMobile ? "min-w-0 flex-1 md:hidden" : "hidden lg:block"}
+      className={ehMobile ? "min-w-0 flex-1 xl:hidden" : "hidden xl:block"}
     >
       <label htmlFor={campoId} className="sr-only">
         Buscar imóveis por bairro, código ou tipo
