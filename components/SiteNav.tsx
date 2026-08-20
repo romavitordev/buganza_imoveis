@@ -357,18 +357,40 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         aria-label="Principal"
       >
         <Link
-          className={`items-center gap-2 ${
+          className={`min-w-0 items-center gap-2 ${
             buscaAberta ? "hidden md:flex" : "flex"
           }`}
           href="/"
           aria-label={`${MARCA.nome} — início`}
         >
           <BrandMark />
-          {/* nowrap: com "Marcelo Imoveis Sorocaba" o nome passou a
-              quebrar em duas linhas entre 900 e 1024px, e uma navbar de
-              duas alturas desalinha tudo que esta ao lado. */}
-          <span className="whitespace-nowrap text-sm font-semibold tracking-tight text-black">
-            {MARCA.nome}
+          {/* DOIS TAMANHOS DE NOME, e não um com nowrap.
+           *
+           * O nowrap sozinho resolveu a quebra em duas linhas do
+           * desktop e criou coisa pior no celular: sem poder quebrar, o
+           * nome completo passou a empurrar os ícones para fora da
+           * barra — a lupa simplesmente sumia.
+           *
+           * A cidade é a parte dispensável. Quem abre o site no celular
+           * já sabe onde está, e o nome completo continua no rodapé, no
+           * título da aba e no rótulo de acessibilidade deste link. */}
+          {/* Abaixo de 360px o texto SOME e fica só o logotipo.
+           *
+           * Num aparelho de 320px não há espaço para nome e quatro
+           * ícones: com nowrap o nome empurrava a lupa para fora da
+           * barra, e com truncate virava "Marcelo …", que parece
+           * defeito. O símbolo sozinho parece decisão — e é o próprio
+           * ativo da marca.
+           *
+           * O nome não se perde para quem não enxerga: o aria-label
+           * deste link carrega o nome completo. */}
+          <span className="hidden truncate whitespace-nowrap text-[13px] font-semibold tracking-tight text-black min-[360px]:block sm:text-sm">
+            {/* O nome completo só a partir de 1024. Em 768 entra a
+                pílula de links no meio da barra, e entre 768 e 1023 ela
+                espremia "Marcelo Imóveis Sorocaba" até virar
+                "Marcelo Imóv…". */}
+            <span className="lg:hidden">{MARCA.nomeCurto}</span>
+            <span className="hidden lg:inline">{MARCA.nome}</span>
           </span>
         </Link>
 
@@ -442,7 +464,7 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
         )}
 
         <div
-          className={`items-center gap-0.5 md:gap-1.5 ${
+          className={`shrink-0 items-center gap-0.5 md:gap-1.5 ${
             buscaAberta ? "hidden md:flex" : "flex"
           }`}
         >
