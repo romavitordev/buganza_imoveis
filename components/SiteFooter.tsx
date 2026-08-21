@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Facebook, Instagram, Mail, MessageCircle } from "lucide-react";
 import { BrandMark } from "@/components/SiteNav";
 import { linkWhatsAppGeral, linkWhatsAppAnunciar } from "@/lib/whatsapp";
-import { CIDADE_UF, MARCA } from "@/lib/marca";
+import { CIDADE_UF, MARCA, CREDITO } from "@/lib/marca";
 
 const NAVEGACAO = [
   { href: "/", rotulo: "Início" },
@@ -155,12 +155,43 @@ export default function SiteFooter() {
             © {new Date().getFullYear()} {MARCA.nome} · CRECI {MARCA.creci} ·{" "}
             {CIDADE_UF}
           </p>
-          <Link
-            href="/privacidade"
-            className="underline decoration-black/20 underline-offset-2 transition-colors hover:text-black"
-          >
-            Política de Privacidade
-          </Link>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link
+              href="/privacidade"
+              className="underline decoration-black/20 underline-offset-2 transition-colors hover:text-black"
+            >
+              Política de Privacidade
+            </Link>
+
+            {/* ASSINATURA DE QUEM FEZ O SITE.
+             *
+             * Discreta de propósito: um crédito de quem constrói não pode
+             * disputar atenção com o CRECI nem com a política, que são o
+             * que o visitante pode precisar. Vem com um ponto separando,
+             * no mesmo tamanho e na mesma cor apagada do resto da linha.
+             *
+             * Some por completo enquanto CREDITO.nome estiver vazio: a
+             * empresa ainda não tem nome, e assinar com um provisório é
+             * pior que não assinar — vai ao ar, é indexado, e passa a ser
+             * o nome pelo qual o trabalho é conhecido. */}
+            {CREDITO.nome && (
+              <span className="text-secundario/70">
+                Site produzido por{" "}
+                {CREDITO.url ? (
+                  <a
+                    href={CREDITO.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-black/15 underline-offset-2 transition-colors hover:text-black"
+                  >
+                    {CREDITO.nome}
+                  </a>
+                ) : (
+                  CREDITO.nome
+                )}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </footer>

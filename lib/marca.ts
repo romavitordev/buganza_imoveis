@@ -51,6 +51,25 @@ export const MARCA = {
   facebook: "Imóvel Vago Sorocaba",
 } as const;
 
+/**
+ * CRÉDITO DE QUEM FEZ O SITE — a assinatura discreta do rodapé.
+ *
+ * Fica VAZIO por enquanto e, vazio, não aparece na tela. A empresa
+ * ainda não tem nome, e uma assinatura com nome provisório é pior que
+ * assinatura nenhuma: ela vai ao ar, é indexada pelo Google e passa a
+ * ser o nome pelo qual o trabalho é conhecido.
+ *
+ * Quando o nome existir, preencher aqui — e só aqui:
+ *
+ *   export const CREDITO = { nome: "Estúdio Tal", url: "https://..." };
+ *
+ * `url` é opcional: sem ela o crédito vira texto simples, sem link.
+ */
+export const CREDITO = {
+  nome: "",
+  url: "",
+} as const;
+
 /** "Sorocaba/SP" — atalho usado em rodapé, OG image e linha do CRECI. */
 export const CIDADE_UF = `${MARCA.cidade}/${MARCA.uf}` as const;
 
