@@ -1,6 +1,6 @@
 # Marcelo Imóveis
 
-Catálogo imobiliário completo da **Marcelo Imóveis** (Sorocaba/SP · CRECI 118400), construído com Next.js 14 (App Router), TypeScript, Tailwind CSS e Prisma.
+Catálogo imobiliário completo da **Marcelo Imóveis** (Sorocaba/SP · CRECI 118.400-F), construído com Next.js 14 (App Router), TypeScript, Tailwind CSS e Prisma.
 
 > O nome da marca mora em [lib/marca.ts](lib/marca.ts) e o site inteiro
 > lê de lá — inclusive títulos, e-mails e o emissor do QR da 2FA. Os

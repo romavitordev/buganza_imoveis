@@ -17,17 +17,16 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 | --- | --- | --- |
 | 🔴 tudo | domínio + e-mail real (Fase 0) | você |
 | 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
-| 🟠 ir ao ar | depoimentos reais — os 7 do site são inventados (2.3) | donos |
-| 🟠 ir ao ar | história do Quem Somos e o número "+400 imóveis" | donos |
-| 🔴 legal | razão social, CNPJ e endereço na política (LGPD) | donos |
+| 🟠 ir ao ar | as falas dos 5 depoimentos já identificados (2.3) | donos |
+| 🟠 legal | confirmar a razão social — está em processo de mudança (2.6) | donos |
 | 🟠 legal | revisão da política de privacidade por advogado | você |
 | 🟡 estética | logotipo oficial em `public/logo.svg` | donos |
 | 🟢 depois | Search Console, Sentry, ensinar o chatbot | você |
 
-Os dois 🟠 são de **conteúdo falso no ar**, não de bug: depoimento
-inventado no site de uma imobiliária de verdade é propaganda enganosa.
-O catálogo já foi resolvido — nasce vazio e não tem como publicar imóvel
-de demonstração por descuido.
+Nada de falso está mais no ar: os depoimentos inventados saíram, a
+seção some sozinha com a lista vazia, o "+400 imóveis" foi removido e o
+catálogo nasce vazio. O que resta é conteúdo que **falta**, não conteúdo
+que **mente** — e faltar não impede o lançamento.
 
 ---
 
@@ -35,21 +34,18 @@ de demonstração por descuido.
 
 Estas travam o resto. Resolva antes de mexer em plataforma.
 
-- [ ] **0.1 — Confirmar o nome da imobiliária**
-      Hoje o site usa **"Marcelo Imóveis"** (em `lib/marca.ts`). Se for
-      mudar, decida agora: o nome entra no domínio, no e-mail e no
-      cadastro do Registro.br.
-      → Trocar no código é uma linha: veja a Fase 5.
+- [x] **0.1 — Nome da imobiliária** ✅ confirmado
+      **"Marcelo Imóveis Sorocaba"**, em `lib/marca.ts`. O domínio
+      escolhido acompanha: `marcelocorretorsorocaba.com.br`.
 
-- [ ] **0.2 — Criar um e-mail de verdade**
-      O `imoveisbuganza@gmail.com` de hoje é fictício. Você vai precisar
-      dele para receber os avisos de lead e para as contas das
-      plataformas.
-      - Provisório e grátis: Gmail (`nomedaempresa@gmail.com`)
-      - Profissional: `contato@seudominio.com.br` (Zoho Mail tem plano
-        grátis para 1 domínio; Google Workspace custa ~R$ 30/mês)
-      - **Sugestão:** crie o Gmail agora para não travar o deploy, e
-        migre para o e-mail do domínio depois.
+- [x] **0.2 — E-mail de verdade** ✅ feito
+      Os donos criaram `marceloimoveissorocaba@gmail.com`, que já está no
+      site (rodapé e política) e no `.env` como login do admin e destino
+      dos avisos de lead.
+
+      > Quando o domínio existir, dá para migrar para
+      > `contato@seudominio.com.br` (Zoho Mail é grátis para 1 domínio).
+      > Não é urgente: o Gmail funciona para tudo.
 
 - [ ] **0.3 — Escolher o domínio**
       Confira disponibilidade em <https://registro.br> antes de fechar o
@@ -119,34 +115,35 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       ```
       Apaga imóveis, fotos e métricas. Admin, leads e a base do chatbot
       ficam de fora.
-- [ ] **2.2 — Revisar os textos institucionais**
-      `components/QuemSomos.tsx` tem a história do casal — hoje é
-      fictícia. Reescreva com a história real.
-- [ ] **2.3 — Revisar os depoimentos**
-      `lib/depoimentos.ts` tem depoimentos inventados. **Publicar
-      depoimento falso é propaganda enganosa** — troque por reais (com
-      autorização de quem falou) ou apague a seção.
+- [x] **2.2 — Textos institucionais** ✅ feito
+      A história real dos donos (5 parágrafos) substituiu o texto de
+      exemplo em `components/QuemSomos.tsx`. O "+400 imóveis negociados",
+      que era projeção minha, foi removido a pedido deles.
+- [ ] **2.3 — Depoimentos reais** 🟠 aguardando os donos
+      Os 7 inventados foram removidos e a seção agora **some sozinha**
+      com a lista vazia — nada falso pode ir ao ar por descuido.
+
+      Cinco clientes já foram identificados (Sr. Alceu, Carolina, Fábio
+      Trix, Érica Fit e Luiz); falta o que cada um FALOU, com
+      autorização. Assim que chegarem em `lib/depoimentos.ts`, a seção
+      reaparece sem mexer em mais nada.
 - [ ] **2.4 — Conferir os endereços cadastrados**
       O endereço completo é **uso interno**: o site mostra só o bairro, e
       o mapa aponta a região (decisão dos donos). Confira que o **bairro**
       de cada imóvel está certo — é o que o visitante vê.
 
-- [ ] **2.5 — Conferir o CRECI**
-      Hoje é `118400`, em `lib/marca.ts`. Confirme que é o número certo.
+- [x] **2.5 — CRECI** ✅ confirmado
+      É `118.400-F`, informado pelos donos, e vive em `lib/marca.ts`.
 
-- [ ] **2.6 — Preencher os dados da empresa na política (LGPD)** 🔴
-      Em `lib/marca.ts`, na constante `CONTROLADOR`: **razão social, CNPJ
-      e endereço**. A LGPD exige que quem trata os dados esteja
-      identificado (art. 9º).
+- [x] **2.6 — Dados da empresa na política (LGPD)** ✅ feito
+      Razão social, CNPJ `05.644.262/0001-02` e a sede na Rua Alécio
+      Bragatto estão em `lib/marca.ts` (`CONTROLADOR`). O aviso que o
+      `npm run build` imprimia sumiu — sinal de que a página está
+      completa aos olhos da LGPD.
 
-      Enquanto estiver vazio, a página **não fica quebrada nem mostra
-      colchete de "preencher"** — bilhete interno no meio do texto é pior
-      para o visitante do que a lacuna que ele denuncia. Ela identifica a
-      imobiliária pelo nome fantasia e pelo CRECI, que é verdade e é
-      publicável; falta só o CNPJ para ficar completa.
-
-      Quem cobra a pendência é o `npm run build`, que imprime um aviso no
-      terminal — o visitante nunca vê.
+      > ⚠️ **Confirmar antes de publicar:** os donos informaram que a
+      > razão social ELODY MULTI SERVICE LTDA ME está **em processo de
+      > mudança**. Ela precisa bater com a do CNPJ ao lado.
 
       > **Encarregado (DPO) não é obrigatório no seu caso.** A Resolução
       > ANPD nº 2/2022 dispensa o "agente de tratamento de pequeno porte"
@@ -179,7 +176,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       | `AUTH_SECRET` | gere: `openssl rand -base64 32` |
       | `SUPABASE_URL` | Supabase (1.3) |
       | `SUPABASE_SERVICE_ROLE_KEY` | Supabase (1.3) — **secreta** |
-      | `WHATSAPP_NUMBER` | `5515998296767` (só dígitos) |
+      | `WHATSAPP_NUMBER` | `5515998036636` (só dígitos) |
       | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | só na hora do seed (3.4), não precisa ficar salvo |
       | `NEXT_PUBLIC_SITE_URL` | `https://www.seudominio.com.br` |
       | `RESEND_API_KEY` | Resend (1.4) |
@@ -266,15 +263,14 @@ marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
 **Ainda precisa mexer à mão em:**
 - [ ] `app/icon.svg` — o favicon (desenho próprio, marinho + dourado)
 - [ ] `components/QuemSomos.tsx` — o texto da história
-- [ ] `lib/depoimentos.ts` — os 7 depoimentos são inventados. **Aviso:
-      apagar o conteúdo do arquivo NÃO esconde a seção** — ela fica na
-      home vazia, porque não existe guarda de lista vazia. Se for tirar
-      antes de ter os reais, peça o ajuste junto.
-- [ ] **Os três números do Quem Somos.** Hoje estão **+400 imóveis
-      negociados · +15 anos de mercado · 100% acompanhamento pessoal**.
-      Os 15 anos vieram dos donos; o **+400 é projeção** feita a partir
-      disso e precisa ser confirmado antes de ir ao ar — número de prova
-      social errado no site é o tipo de coisa que o cliente cobra depois.
+- [ ] `lib/depoimentos.ts` — hoje a lista está **vazia**, e com ela
+      vazia a seção some sozinha da home. Basta acrescentar os
+      depoimentos reais (nome, contexto e texto) para ela reaparecer.
+- [x] **Os números do Quem Somos** ✅ resolvido
+      Sobraram **+15 anos de mercado** e **100% acompanhamento pessoal**,
+      os dois vindos dos donos. O "+400 imóveis negociados" era projeção
+      minha e saiu a pedido deles — prova social inventada é o tipo de
+      número que o cliente cobra depois.
 - [ ] Nome dos repositórios no GitHub (opcional, é cosmético)
 
 ---

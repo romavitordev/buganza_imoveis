@@ -25,7 +25,7 @@ export interface LeadParaNotificar {
   imovel?: { titulo: string; codigo: string; slug: string } | null;
 }
 
-/** (15) 99829-6767 a partir de "5515998296767"/"15998296767". */
+/** Telefone do LEAD, para leitura no e-mail: "5511987654321" → "(11) 98765-4321". */
 function formatarWhats(digitos: string): string {
   const local = digitos.startsWith("55") ? digitos.slice(2) : digitos;
   const ddd = local.slice(0, 2);

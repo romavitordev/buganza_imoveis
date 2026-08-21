@@ -94,7 +94,8 @@ export default function LeadsList({
   }
 
   function formatarWhats(digitos: string): string {
-    // 5515998296767 → wa.me aceita direto; exibição amigável básica
+    // O número é do LEAD, não da imobiliária: chega como "5511987654321"
+    // (wa.me aceita direto) e sai como "(11) 98765-4321" para leitura.
     return digitos.replace(
       /^(\d{2})?(\d{2})(\d{4,5})(\d{4})$/,
       (_, pais, ddd, a, b) => `(${ddd}) ${a}-${b}`

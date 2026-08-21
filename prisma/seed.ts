@@ -22,16 +22,52 @@ async function main() {
 
   const passwordHash = await bcrypt.hash(password, 12);
 
-  await prisma.adminUser.upsert({
-    where: { email },
-    update: { passwordHash },
-    create: {
-      nome: MARCA.nome,
-      email,
-      passwordHash,
-    },
-  });
-  console.log(`✔ Admin criado/atualizado: ${email}`);
+  /**
+   * TROCA DE E-MAIL DO ADMIN: migrar, nunca duplicar.
+   *
+   * Um `upsert` por e-mail parece certo, mas tem uma falha silenciosa:
+   * no dia em que o ADMIN_EMAIL muda, o `where` deixa de casar e o seed
+   * CRIA um segundo admin — deixando o antigo no banco, com a senha
+   * ainda valendo. Vira um login que ninguém lembra que existe e que
+   * nenhuma troca de senha futura alcança.
+   *
+   * Foi exatamente o que aconteceu aqui quando a imobiliária saiu do
+   * e-mail provisório para o definitivo.
+   *
+   * Então: se existe UM admin e o e-mail dele é outro, o que se quer é
+   * renomear aquele admin, não somar mais um. Com dois ou mais, o seed
+   * não adivinha qual migrar e prefere avisar a errar.
+   */
+  const admins = await prisma.adminUser.findMany({ select: { id: true, email: true } });
+  const orfaos = admins.filter((a) => a.email !== email);
+
+  if (admins.length === 1 && orfaos.length === 1) {
+    await prisma.adminUser.update({
+      where: { id: orfaos[0].id },
+      data: { nome: MARCA.nome, email, passwordHash },
+    });
+    console.log(`✔ Admin migrado: ${orfaos[0].email} → ${email}`);
+  } else {
+    await prisma.adminUser.upsert({
+      where: { email },
+      update: { passwordHash },
+      create: { nome: MARCA.nome, email, passwordHash },
+    });
+    console.log(`✔ Admin criado/atualizado: ${email}`);
+
+    if (orfaos.length > 0) {
+      console.warn(
+        [
+          "",
+          `⚠  Existem ${orfaos.length} admin(s) com outro e-mail neste banco:`,
+          ...orfaos.map((a) => `   • ${a.email}`),
+          "   Cada um ainda entra no painel com a senha que tinha.",
+          "   Apague os que não forem mais usados antes de publicar.",
+          "",
+        ].join("\n")
+      );
+    }
+  }
 
   // ---------- Imóveis de exemplo ----------
   //
