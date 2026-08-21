@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ChevronDown, MessageCircle } from "lucide-react";
 import CityScene from "@/components/CityScene";
 import SiteNav from "@/components/SiteNav";
+import { CIDADE_UF, MARCA } from "@/lib/marca";
 import { linkWhatsAppGeral } from "@/lib/whatsapp";
 
 /**
@@ -56,8 +57,15 @@ export default function Hero() {
             </Link>
           </div>
 
+          {/* Vinha ESCRITO À MÃO aqui — "CRECI 118400 · Sorocaba/SP e
+              região" —, então quando o CRECI virou "118.400-F" e o nome
+              ganhou "Sorocaba", a home continuou mostrando o número
+              antigo enquanto o rodapé já mostrava o novo. Dois valores
+              diferentes para o mesmo dado, na mesma página.
+
+              Agora lê de lib/marca.ts, como todo o resto. */}
           <div className="bz-trust bz-anim bz-btns-anim">
-            CRECI 118400 · Sorocaba/SP e região
+            CRECI {MARCA.creci} · {CIDADE_UF} e região
           </div>
         </div>
         {/* O canto inferior direito fica livre de propósito: é onde mora

@@ -66,7 +66,7 @@ export const MARCA = {
  * `url` é opcional: sem ela o crédito vira texto simples, sem link.
  */
 export const CREDITO = {
-  nome: "Roma Buganza Estúdio",
+  nome: "Roma & Buganza Estúdio",
   url: "https://romavitordev.github.io/portfoliorb/",
 } as const;
 
