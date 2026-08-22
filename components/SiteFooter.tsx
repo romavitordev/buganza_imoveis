@@ -170,12 +170,20 @@ export default function SiteFooter() {
              * que o visitante pode precisar. Vem com um ponto separando,
              * no mesmo tamanho e na mesma cor apagada do resto da linha.
              *
-             * Some por completo enquanto CREDITO.nome estiver vazio: a
-             * empresa ainda não tem nome, e assinar com um provisório é
-             * pior que não assinar — vai ao ar, é indexado, e passa a ser
-             * o nome pelo qual o trabalho é conhecido. */}
+             * SEM opacidade extra de propósito. Já tentei /70 para
+             * deixá-lo mais discreto: no tema claro isso derrubou o
+             * contraste para 3,11:1, abaixo do mínimo de 4,5:1 da WCAG
+             * para texto de 11px — enquanto o link vizinho, na mesma
+             * linha, fica em 5,95:1. Só a partir de /95 voltaria a
+             * passar, o que não é discrição nenhuma. A assinatura já é
+             * discreta pelo tamanho e pela posição.
+             *
+             * Some por completo se CREDITO.nome ficar vazio. A
+             * assinatura esperou o estúdio ter nome de verdade: um
+             * provisório publicado é indexado e vira o nome pelo qual o
+             * trabalho passa a ser conhecido. */}
             {CREDITO.nome && (
-              <span className="text-secundario/70">
+              <span className="text-secundario">
                 Site produzido por{" "}
                 {CREDITO.url ? (
                   <a
