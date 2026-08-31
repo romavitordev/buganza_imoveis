@@ -228,7 +228,6 @@ textarea::placeholder {
 .bz-nav-anim    { animation-name: bzDown;  animation-duration: 0.8s; }
 .bz-media-anim  { animation-name: bzMedia; animation-duration: 1.8s; }
 .bz-footer-anim { animation-name: bzUp20;  animation-duration: 1s;   animation-delay: 0.5s; }
-.bz-sub-anim    { animation-name: bzUp16;  animation-duration: 0.8s; animation-delay: 0.6s; }
 .bz-head-anim   { animation-name: bzUp20;  animation-duration: 0.8s; animation-delay: 0.8s; }
 .bz-btns-anim   { animation-name: bzUp16;  animation-duration: 0.8s; animation-delay: 1.0s; }
 
@@ -826,23 +825,6 @@ textarea::placeholder {
 }
 .bz-footer-left { display: flex; flex-direction: column; gap: 14px; }
 
-.bz-subtitle {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  /* 12px é o piso de leitura no celular; no desktop volta a 11. */
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgb(var(--ink) / 0.7);
-  background: rgb(var(--paper) / 0.9);
-  border: 1px solid rgb(var(--ink) / 0.12);
-  border-radius: 999px;
-  padding: 8px 14px;
-  backdrop-filter: blur(4px);
-}
 /* Marcador dourado dos selos de seção.
    Era um ponto de 8×8. Virou filete porque é a forma que existe no
    logotipo (a base curva, o traço sob o nome) — e porque uma linha
@@ -928,7 +910,6 @@ textarea::placeholder {
 
 /* ---------- desktop (768px+) ---------- */
 @media (min-width: 768px) {
-  .bz-subtitle { font-size: 11px; }
   .bz-nav { padding: 20px 32px; }
   .bz-contact-label { display: block; }
   .bz-contact-circle { width: 32px; height: 32px; }

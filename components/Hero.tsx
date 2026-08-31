@@ -28,11 +28,6 @@ export default function Hero() {
       {/* Conteúdo inferior do hero */}
       <div className="bz-footer bz-anim bz-footer-anim">
         <div className="bz-footer-left">
-          <div className="bz-subtitle bz-anim bz-sub-anim">
-            <span className="bz-dot" />
-            Especialistas em negociações imobiliárias
-          </div>
-
           <h1 className="bz-heading">
             <span className="bz-line">
               <span className="bz-line-inner">Seu Imóvel,</span>
