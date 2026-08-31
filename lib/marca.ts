@@ -175,3 +175,67 @@ export const CORES = {
   /** Dourado mais claro, para brilhos e gradientes. */
   douradoClaro: "#E0C27E",
 } as const;
+
+/**
+ * REDES SOCIAIS — aceita o que o cliente mandar, sem exigir formato.
+ *
+ * POR QUE ISTO EXISTE: os campos de rede social são preenchidos por
+ * quem NÃO edita código. Quando alguém copia o perfil do celular, o que
+ * chega é a URL inteira com rastreador
+ * ("https://instagram.com/fulano?igsh=MXY..."); quando alguém digita de
+ * cabeça, chega "@fulano". Antes, o site montava
+ * `instagram.com/${valor}` e qualquer um dos dois virava link quebrado.
+ *
+ * Agora as três formas funcionam: "fulano", "@fulano" e a URL colada.
+ */
+function limpar(valor: string): string {
+  return valor.trim().replace(/^@/, "");
+}
+
+/** true se o texto parece um endereço, e não um nome de usuário. */
+function ehUrl(valor: string): boolean {
+  return /^(https?:)?[/][/]/i.test(valor) || /^[\w-]+[.][\w.-]+[/]/.test(valor);
+}
+
+function comHttps(valor: string): string {
+  return /^https?:/i.test(valor) ? valor : `https://${valor.replace(/^[/]+/, "")}`;
+}
+
+/** Só o nome de usuário, para exibir como "@fulano". */
+export function handleRede(valor: string): string {
+  const v = limpar(valor);
+  if (!ehUrl(v)) return v;
+  // último trecho não vazio do caminho, sem query nem barra final
+  const caminho = comHttps(v).split("?")[0].split("#")[0];
+  const partes = caminho.split("/").filter(Boolean);
+  return partes[partes.length - 1] ?? v;
+}
+
+export function urlInstagram(valor: string): string {
+  const v = limpar(valor);
+  return ehUrl(v) ? comHttps(v) : `https://instagram.com/${v}`;
+}
+
+/**
+ * Facebook aceita mais coisa que o Instagram: além de URL e handle, o
+ * cliente pode informar o NOME da página ("Imóvel Vago Sorocaba"), que
+ * não vira endereço nenhum. Nesse caso o link cai numa busca do
+ * Facebook pelo nome — não é o ideal, mas leva o visitante ao lugar
+ * certo, enquanto inventar uma URL a partir do nome o levaria a um 404.
+ *
+ * Como distinguir: nome de página tem espaço, handle e URL não têm.
+ */
+export function urlFacebook(valor: string): string {
+  const v = limpar(valor);
+  if (ehUrl(v)) return comHttps(v);
+  if (v.includes(" ")) {
+    return `https://www.facebook.com/search/top?q=${encodeURIComponent(v)}`;
+  }
+  return `https://www.facebook.com/${v}`;
+}
+
+/** true quando o valor é só um nome de página, sem endereço próprio. */
+export function facebookSemLink(valor: string): boolean {
+  const v = limpar(valor);
+  return !ehUrl(v) && v.includes(" ");
+}
