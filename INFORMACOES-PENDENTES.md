@@ -26,14 +26,14 @@ listas curtas: **o que falta de verdade** e **o que já foi**.
 | A.4 | **@ definitivo do Instagram** | `MARCA.instagram` | 🟡 |
 | A.5 | Foto do casal para o Quem Somos | `components/QuemSomos.tsx` | 🟢 |
 
-> **A.1 — deixou de ser bloqueio.** Em 07/09/2026 chegaram três
-> depoimentos reais (Érica Acosta, Sandra Acosta e Amanda Carrijo) e a
-> seção voltou ao ar com eles.
+> **A.1 — resolvido.** Em 07/09/2026 chegaram três depoimentos reais —
+> Érica Acosta, Sandra Acosta e Amanda Carrijo — e a seção voltou ao ar
+> com eles. São os primeiros depoimentos verdadeiros do site.
 >
-> Os nomes citados antes (Sr. Alceu, Carolina, Fábio Trix, Érica Fit,
-> Luiz) são de outras pessoas e continuam sem fala enviada — por isso o
-> item fica em verde e não fechado. Para acrescentar qualquer um: nome,
-> contexto e o texto do que a pessoa falou, com autorização dela.
+> Fica em verde, e não fechado, só porque três é pouco para um
+> carrossel: acrescentar mais melhora a seção. Não é pendência de
+> lançamento. Para incluir alguém: nome, contexto e a fala, com
+> autorização de quem falou.
 >
 > Se um dia a lista voltar a ficar vazia, a seção **some sozinha da
 > home** — `Depoimentos.tsx` devolve `null` com zero itens.
