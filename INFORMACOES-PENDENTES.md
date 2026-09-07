@@ -1,7 +1,8 @@
 # O que ainda falta para o site ir ao ar
 
-Atualizado em 21/08/2026, depois que os donos devolveram o documento de
-textos preenchido (as respostas estão em `RESPOSTAS-CLIENTE.txt`).
+Atualizado em 07/09/2026. A base veio do documento de textos que os
+donos devolveram preenchido (respostas em `RESPOSTAS-CLIENTE.txt`);
+depois chegaram os depoimentos reais e o WhatsApp definitivo.
 
 A versão anterior deste arquivo virou a maior fonte de dado velho do
 repositório: ainda descrevia o e-mail como inventado e o CRECI como
@@ -19,21 +20,23 @@ listas curtas: **o que falta de verdade** e **o que já foi**.
 
 | # | O que | Onde entra | Risco |
 |---|---|---|---|
-| A.1 | **As falas dos 5 depoimentos** | `lib/depoimentos.ts` | 🟠 |
+| A.1 | Mais depoimentos (3 já no ar) | `lib/depoimentos.ts` | 🟢 |
 | A.2 | **Confirmar a razão social** | `CONTROLADOR`, em `lib/marca.ts` | 🟠 |
 | A.3 | **Link da página no Facebook** | `MARCA.facebook` | 🟡 |
 | A.4 | **@ definitivo do Instagram** | `MARCA.instagram` | 🟡 |
 | A.5 | Foto do casal para o Quem Somos | `components/QuemSomos.tsx` | 🟢 |
 
-> **A.1** — Os cinco clientes já têm nome (Sr. Alceu, Carolina, Fábio
-> Trix, Érica Fit e Luiz); falta **o que cada um falou** e a autorização
-> para publicar. De cada um: nome (pode ser só o primeiro), contexto
-> ("Comprou apartamento no Campolim") e o texto.
+> **A.1 — deixou de ser bloqueio.** Em 07/09/2026 chegaram três
+> depoimentos reais (Érica Acosta, Sandra Acosta e Amanda Carrijo) e a
+> seção voltou ao ar com eles.
 >
-> Enquanto a lista estiver vazia, a seção **some sozinha da home** —
-> `components/Depoimentos.tsx` devolve `null` com zero itens. Não há mais
-> risco de depoimento inventado ir ao ar por descuido, que era o
-> problema da versão antiga deste documento.
+> Os nomes citados antes (Sr. Alceu, Carolina, Fábio Trix, Érica Fit,
+> Luiz) são de outras pessoas e continuam sem fala enviada — por isso o
+> item fica em verde e não fechado. Para acrescentar qualquer um: nome,
+> contexto e o texto do que a pessoa falou, com autorização dela.
+>
+> Se um dia a lista voltar a ficar vazia, a seção **some sozinha da
+> home** — `Depoimentos.tsx` devolve `null` com zero itens.
 >
 > **A.2** — Eles informaram **ELODY MULTI SERVICE LTDA ME** e disseram
 > que a razão social está **em processo de mudança**. A que aparece na
@@ -77,7 +80,7 @@ O passo a passo de cada uma está no **CHECKLIST-DEPLOY.md**.
 | Razão social, CNPJ e endereço vazios (🔴 LGPD) | Preenchidos — falta só confirmar a razão social (A.2) |
 | História do Quem Somos inventada | Substituída pela história real dos donos |
 | "+400 imóveis negociados" | **Removido** — era projeção minha, ninguém confirmou |
-| 7 depoimentos inventados, sem guarda de lista vazia | Removidos, e agora a seção some sozinha quando a lista está vazia |
+| 7 depoimentos inventados, sem guarda de lista vazia | Removidos; a seção some sozinha com lista vazia e hoje exibe **3 reais** |
 | Horário "9h às 18h" | Corrigido para **9h às 19h** |
 | Catálogo com 6 imóveis de demonstração | Zerado, e o seed não cria exemplos por padrão |
 | Regras de negócio afirmadas sem confirmação | Todas confirmadas pelos donos e corrigidas no chatbot e no FAQ |
@@ -89,9 +92,6 @@ O passo a passo de cada uma está no **CHECKLIST-DEPLOY.md**.
 
 1. **B.1 e B.2** — sem domínio e sem contas não há onde publicar.
 2. **A.2** — razão social errada na política é falha legal, não estética.
-3. **A.1** — sem as falas o site vai ao ar sem a seção de depoimentos.
-   Não impede o lançamento, mas é a seção que mais convence numa
-   imobiliária.
 
 O resto entra depois do site no ar sem complicação: tudo mora em
 `lib/marca.ts` ou `lib/depoimentos.ts`.

@@ -17,7 +17,6 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 | --- | --- | --- |
 | 🔴 tudo | domínio + e-mail real (Fase 0) | você |
 | 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
-| 🟠 ir ao ar | as falas dos 5 depoimentos já identificados (2.3) | donos |
 | 🟠 legal | confirmar a razão social — está em processo de mudança (2.6) | donos |
 | 🟠 legal | revisão da política de privacidade por advogado | você |
 | 🟡 estética | logotipo oficial em `public/logo.svg` | donos |
@@ -119,14 +118,14 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       A história real dos donos (5 parágrafos) substituiu o texto de
       exemplo em `components/QuemSomos.tsx`. O "+400 imóveis negociados",
       que era projeção minha, foi removido a pedido deles.
-- [ ] **2.3 — Depoimentos reais** 🟠 aguardando os donos
+- [x] **2.3 — Depoimentos reais** ✅ três no ar
       Os 7 inventados foram removidos e a seção agora **some sozinha**
       com a lista vazia — nada falso pode ir ao ar por descuido.
 
-      Cinco clientes já foram identificados (Sr. Alceu, Carolina, Fábio
-      Trix, Érica Fit e Luiz); falta o que cada um FALOU, com
-      autorização. Assim que chegarem em `lib/depoimentos.ts`, a seção
-      reaparece sem mexer em mais nada.
+      Chegaram em 07/09/2026: Érica Acosta, Sandra Acosta e Amanda
+      Carrijo. A seção voltou à home. Para acrescentar mais, basta
+      editar `lib/depoimentos.ts` — nome, contexto e a fala, com
+      autorização de quem falou.
 - [ ] **2.4 — Conferir os endereços cadastrados**
       O endereço completo é **uso interno**: o site mostra só o bairro, e
       o mapa aponta a região (decisão dos donos). Confira que o **bairro**

@@ -13,9 +13,30 @@ import { DEPOIMENTOS, type Depoimento } from "@/lib/depoimentos";
  * Pausa com o mouse em cima e respeita prefers-reduced-motion.
  */
 
-// Lista duplicada: slides de sobra deixam o loop contínuo de verdade,
-// mesmo com 3 visíveis (aprendizado do carrossel do TriAmici)
-const SLIDES = [...DEPOIMENTOS, ...DEPOIMENTOS];
+/**
+ * Quantas cópias da lista o loop precisa para girar de verdade.
+ *
+ * O Swiper em `loop` não avança quando o total de slides é pequeno em
+ * relação a `slidesPerView`: ele não tem de onde tirar os slides que
+ * ficam fora da tela dos dois lados. Duplicar a lista uma vez resolvia
+ * quando havia 7 depoimentos (14 slides), mas com os 3 reais virou 6
+ * slides para 3 visíveis — e o carrossel TRAVOU: medido no navegador,
+ * dez `slideNext` seguidos e o realIndex ficou parado em 4, com os
+ * mesmos três cartões na tela o tempo todo.
+ *
+ * Por isso a conta é sobre o alvo, não sobre um número fixo de cópias:
+ * repete até passar de 10 slides, que é folga suficiente para os 3
+ * visíveis do desktop (o maior `slidesPerView` dos breakpoints abaixo).
+ * Com 3 depoimentos dá 4 cópias; com 12, duas.
+ */
+const MAIOR_SLIDES_POR_VEZ = 3;
+const MINIMO_DE_SLIDES = MAIOR_SLIDES_POR_VEZ * 3 + 1;
+
+const copias = DEPOIMENTOS.length
+  ? Math.max(2, Math.ceil(MINIMO_DE_SLIDES / DEPOIMENTOS.length))
+  : 0;
+
+const SLIDES = Array.from({ length: copias }, () => DEPOIMENTOS).flat();
 
 function CartaoDepoimento({
   depoimento,
