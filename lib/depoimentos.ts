@@ -54,7 +54,7 @@ export const DEPOIMENTOS: Depoimento[] = [
   },
   {
     nome: "Amanda Carrijo",
-    contexto: `Aluga um apartamento administrado pela ${MARCA.nomeCurto}`,
+    contexto: `Aluga um apartamento administrado pela ${MARCA.nome}`,
     texto:
       "Marina é uma excelente profissional. Solícita, prática, sempre " +
       "disposta a dialogar e encontrar a melhor solução pro seu cliente. " +

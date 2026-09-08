@@ -371,9 +371,11 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
            * nome completo passou a empurrar os ícones para fora da
            * barra — a lupa simplesmente sumia.
            *
-           * A cidade é a parte dispensável. Quem abre o site no celular
-           * já sabe onde está, e o nome completo continua no rodapé, no
-           * título da aba e no rótulo de acessibilidade deste link. */}
+           * A saída de encurtar para "Marcelo Imóveis" caiu: os donos
+           * pediram o nome completo em TUDO. Então a cidade não some,
+           * ela desce — vira uma segunda linha miúda sob o nome, como
+           * já acontece no rodapé. O nome inteiro fica legível e ocupa
+           * a largura da parte maior, não a da frase toda. */}
           {/* Abaixo de 360px o texto SOME e fica só o logotipo.
            *
            * Num aparelho de 320px não há espaço para nome e quatro
@@ -384,13 +386,21 @@ export default function SiteNav({ whatsappHref, animated }: SiteNavProps) {
            *
            * O nome não se perde para quem não enxerga: o aria-label
            * deste link carrega o nome completo. */}
-          <span className="hidden truncate whitespace-nowrap text-[13px] font-semibold tracking-tight text-black min-[360px]:block sm:text-sm">
-            {/* O nome completo só a partir de 1024. Em 768 entra a
-                pílula de links no meio da barra, e entre 768 e 1023 ela
-                espremia "Marcelo Imóveis Sorocaba" até virar
-                "Marcelo Imóv…". */}
-            <span className="lg:hidden">{MARCA.nomeCurto}</span>
-            <span className="hidden lg:inline">{MARCA.nome}</span>
+          <span className="hidden min-w-0 leading-none min-[360px]:block">
+            {/* Nome e cidade empilhados até 1024. Entre 768 e 1023 a
+                pílula de links ocupa o meio da barra e uma linha só com
+                "Marcelo Imóveis Sorocaba" era espremida até virar
+                "Marcelo Imóv…" — nome cortado parece defeito, e cortar
+                justamente a cidade contraria o pedido dos donos.
+                Empilhado, o texto ocupa a largura de "Marcelo Imóveis"
+                e mostra o nome inteiro. A partir de 1024 há espaço de
+                sobra e ele volta para uma linha. */}
+            <span className="block truncate whitespace-nowrap text-[13px] font-semibold tracking-tight text-black sm:text-sm lg:inline">
+              {MARCA.nomeCurto}
+            </span>{" "}
+            <span className="block truncate whitespace-nowrap text-[10px] font-medium uppercase tracking-[0.12em] text-secundario lg:inline lg:text-sm lg:font-semibold lg:normal-case lg:tracking-tight lg:text-black">
+              {MARCA.cidade}
+            </span>
           </span>
         </Link>
 

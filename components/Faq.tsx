@@ -6,7 +6,7 @@ import { MARCA } from "@/lib/marca";
 
 const PERGUNTAS = [
   {
-    pergunta: `Quanto custa anunciar meu imóvel com a ${MARCA.nomeCurto}?`,
+    pergunta: `Quanto custa anunciar meu imóvel com a ${MARCA.nome}?`,
     resposta:
       "Nada. Você só paga a comissão de corretagem quando o negócio é concluído — sem taxa de anúncio, sem mensalidade e sem exclusividade forçada.",
   },

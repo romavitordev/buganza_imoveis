@@ -14,7 +14,7 @@ import { MARCA } from "@/lib/marca";
 export const CATEGORIAS = [
   "Comprar ou alugar",
   "Anunciar meu imóvel",
-  `Sobre a ${MARCA.nomeCurto}`,
+  `Sobre a ${MARCA.nome}`,
 ] as const;
 
 export type Categoria = (typeof CATEGORIAS)[number];
@@ -92,7 +92,7 @@ export const TOPICOS: TopicoChat[] = [
     titulo: "Como anunciar meu imóvel",
     chaves: ["anunciar", "anuncio", "anúncio", "vender", "vender meu", "colocar a venda", "colocar à venda", "comissao", "comissão", "taxa", "custo para anunciar"],
     resposta:
-      `Anunciar com a ${MARCA.nomeCurto} é sem taxa, sem mensalidade e sem exclusividade forçada — você só paga a comissão de corretagem quando o negócio fecha. Cuidamos das fotos, do anúncio e da divulgação, e a avaliação mercadológica do imóvel vem junto, sem custo. Chame no WhatsApp.`,
+      `Anunciar com a ${MARCA.nome} é sem taxa, sem mensalidade e sem exclusividade forçada — você só paga a comissão de corretagem quando o negócio fecha. Cuidamos das fotos, do anúncio e da divulgação, e a avaliação mercadológica do imóvel vem junto, sem custo. Chame no WhatsApp.`,
   },
   {
     id: "avaliacao",
@@ -108,7 +108,7 @@ export const TOPICOS: TopicoChat[] = [
   },
   {
     id: "cidades",
-    categoria: `Sobre a ${MARCA.nomeCurto}`,
+    categoria: `Sobre a ${MARCA.nome}`,
     titulo: "Cidades atendidas",
     chaves: ["cidade", "cidades", "regiao", "região", "onde", "atuam", "atende", "atendem", "sorocaba", "votorantim"],
     resposta:
@@ -116,7 +116,7 @@ export const TOPICOS: TopicoChat[] = [
   },
   {
     id: "atendimento",
-    categoria: `Sobre a ${MARCA.nomeCurto}`,
+    categoria: `Sobre a ${MARCA.nome}`,
     titulo: "Horário de atendimento",
     chaves: ["horario", "horário", "atendimento", "funciona", "aberto", "sabado", "sábado", "domingo", "quando"],
     resposta:

@@ -27,7 +27,7 @@ export const MARCA = {
   /** Nome do assistente do chat, no site e nos rótulos de acessibilidade. */
   assistente: "Assistente Marcelo",
   /** Como o painel administrativo se identifica nos títulos das abas. */
-  painel: "Painel Marcelo Imóveis",
+  painel: `Painel ${nome}`,
 
   creci: "118.400-F",
   cidade: "Sorocaba",
