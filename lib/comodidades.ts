@@ -23,6 +23,19 @@ export const COMODIDADES = [
   { valor: "escritorio", rotulo: "Escritório / home office" },
   { valor: "lavanderia", rotulo: "Lavanderia" },
   { valor: "pet-friendly", rotulo: "Aceita pets" },
+
+  /* Vieram dos sete imóveis reais enviados em 08/09/2026: sem elas, o
+     que o condomínio oferece caía todo no texto corrido da descrição e
+     não virava badge nem filtro. As cinco aparecem em mais de um dos
+     imóveis — "lago", "pista de skate" e "feira no condomínio", que
+     apareceram uma vez só, seguem na descrição de propósito: badge que
+     serve a um único anúncio é ruído no catálogo inteiro. */
+  { valor: "quadra", rotulo: "Quadra poliesportiva" },
+  { valor: "mini-market", rotulo: "Mini market" },
+  { valor: "brinquedoteca", rotulo: "Brinquedoteca" },
+  { valor: "lareira", rotulo: "Lareira" },
+  { valor: "acessibilidade", rotulo: "Acessibilidade" },
+  { valor: "vaga-coberta", rotulo: "Vaga coberta" },
 ] as const;
 
 export type Comodidade = (typeof COMODIDADES)[number]["valor"];

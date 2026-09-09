@@ -1,20 +1,26 @@
 import {
+  Accessibility,
+  Baby,
   Blinds,
+  CarFront,
   Dumbbell,
   Fence,
   Flame,
+  Flame as Lareira,
   Landmark,
   Laptop,
   MoveVertical,
   PartyPopper,
   PawPrint,
   ShieldCheck,
+  ShoppingBasket,
   Snowflake,
   Sofa,
   Sun,
   SunMedium,
   ToyBrick,
   Trees,
+  Trophy,
   UtensilsCrossed,
   WashingMachine,
   Waves,
@@ -41,6 +47,14 @@ const ICONES: Record<string, LucideIcon> = {
   escritorio: Laptop,
   lavanderia: WashingMachine,
   "pet-friendly": PawPrint,
+  quadra: Trophy,
+  "mini-market": ShoppingBasket,
+  brinquedoteca: Baby,
+  // Mesmo ícone da churrasqueira, com apelido: são as duas chamas da
+  // casa, e o lucide não traz uma lareira própria.
+  lareira: Lareira,
+  acessibilidade: Accessibility,
+  "vaga-coberta": CarFront,
 };
 
 /** Badges de comodidades na página do imóvel. */
