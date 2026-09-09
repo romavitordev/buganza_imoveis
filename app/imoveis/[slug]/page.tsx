@@ -1,7 +1,7 @@
 import { cache } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import {
   ArrowLeft,
   Bath,
@@ -53,6 +53,29 @@ interface PageProps {
   params: { slug: string };
 }
 
+/**
+ * O CÓDIGO DO IMÓVEL TAMBÉM ABRE A PÁGINA.
+ *
+ * O endereço "bonito" continua sendo o principal, porque as palavras
+ * dele ("casa-terrea-condominio-ibiti-do-paco") são sinal de busca para
+ * o Google. Mas ele nasce do título, e um dia alguém vai querer ajustar
+ * um título — e todo link já enviado no WhatsApp morreria junto.
+ *
+ * Por isso /imoveis/MIS-0001 abre o mesmo imóvel. O código é gerado uma
+ * vez, na criação, e não muda nunca: é o link seguro para divulgar.
+ * Chegando por ele, o visitante é redirecionado para o endereço
+ * canônico — o Google vê uma página só, e a barra de endereço mostra a
+ * versão com as palavras.
+ */
+const PADRAO_CODIGO = /^[a-z]{2,4}-\d{3,}$/i;
+
+const buscarPorCodigo = cache(async (codigo: string) => {
+  return prisma.property.findUnique({
+    where: { codigo: codigo.toUpperCase() },
+    select: { slug: true, status: true },
+  });
+});
+
 // cache(): generateMetadata e a página pedem o mesmo imóvel na mesma
 // renderização — deduplica para uma única query
 const buscarImovelAtivo = cache(async (slug: string) => {
@@ -65,12 +88,31 @@ const buscarImovelAtivo = cache(async (slug: string) => {
   return toPublicPropertyDTO(property);
 });
 
+/**
+ * Se o que veio na URL for um código, manda para o endereço canônico.
+ *
+ * Redirect permanente (308) de propósito: diz ao Google que o endereço
+ * definitivo é o outro, então o código não disputa posição com a página
+ * de verdade nem vira conteúdo duplicado.
+ *
+ * Imóvel pausado ou vendido NÃO redireciona — cai no 404 normal, como
+ * já acontece pelo slug. Redirecionar revelaria que o código existe.
+ */
+async function redirecionarSeForCodigo(valor: string) {
+  if (!PADRAO_CODIGO.test(valor)) return;
+  const achado = await buscarPorCodigo(valor);
+  if (achado && achado.status === "ATIVO") {
+    permanentRedirect(`/imoveis/${achado.slug}`);
+  }
+}
+
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   // notFound() AQUI (antes do streaming do loading.tsx) garante status 404
   // de verdade para slugs inexistentes — sem soft-404 para o Google.
+  await redirecionarSeForCodigo(params.slug);
   const imovel = await buscarImovelAtivo(params.slug);
   if (!imovel) notFound();
 
@@ -93,6 +135,7 @@ export async function generateMetadata({
 }
 
 export default async function ImovelPage({ params }: PageProps) {
+  await redirecionarSeForCodigo(params.slug);
   const imovel = await buscarImovelAtivo(params.slug);
   if (!imovel) notFound();
 

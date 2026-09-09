@@ -355,22 +355,43 @@ export default function PropertyForm({ property }: PropertyFormProps) {
           </select>
         </label>
 
+        {/* O endereço da página trava depois que o imóvel existe.
+         *
+         * Ele nasce do título e pode ser ajustado enquanto o anúncio
+         * ainda não foi publicado. Depois, não: mudar este campo apaga
+         * o endereço anterior, e todo link já enviado no WhatsApp passa
+         * a dar "página não encontrada" — sem nenhum aviso para quem
+         * editou nem para quem clicou.
+         *
+         * Editar o TÍTULO continua liberado e não mexe aqui. */}
         <label className={labelCls}>
           <span className={legendaCls}>
-            Slug (endereço da página — automático)
+            Endereço da página{property ? "" : " (gerado do título)"}
           </span>
           <input
             value={slug}
-            onChange={(e) => {
-              setSlug(slugPreview(e.target.value));
-              setSlugEditadoManualmente(true);
-            }}
-            className={inputCls}
+            readOnly={Boolean(property)}
+            onChange={
+              property
+                ? undefined
+                : (e) => {
+                    setSlug(slugPreview(e.target.value));
+                    setSlugEditadoManualmente(true);
+                  }
+            }
+            className={`${inputCls} ${property ? "cursor-not-allowed opacity-70" : ""}`}
             placeholder="casa-terrea-3-quartos-jardim-europa"
           />
           <span className="text-[12px] md:text-[11px] text-secundario">
             {dominioDoSite()}/imoveis/{slug || "…"}
           </span>
+          {property && (
+            <span className="text-[12px] md:text-[11px] text-secundario">
+              Fixo depois de criado, para não quebrar links já enviados.
+              Divulgue por <strong>{dominioDoSite()}/imoveis/{property.codigo}</strong>,
+              que leva a esta página e nunca muda.
+            </span>
+          )}
         </label>
       </Secao>
 

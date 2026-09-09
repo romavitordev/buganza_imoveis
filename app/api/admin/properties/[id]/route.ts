@@ -89,10 +89,28 @@ export async function PATCH(request: Request, { params }: Params) {
   }
 
   try {
-    const slug = await uniqueSlug(
-      input.slug ?? slugify(input.titulo),
-      params.id
-    );
+    /**
+     * O ENDEREÇO NÃO MUDA DEPOIS DE CRIADO.
+     *
+     * Antes, o slug era recalculado a cada edição: mandando um `slug`
+     * diferente — ou nenhum, caindo no título — o endereço trocava e o
+     * anterior passava a dar 404, derrubando todo link já enviado no
+     * WhatsApp sem aviso nenhum.
+     *
+     * O formulário já não deixa editar o campo, mas travar só a tela
+     * deixaria a rota aberta para qualquer requisição direta, e é a
+     * rota que grava. A regra vive aqui.
+     *
+     * Quem quiser um endereço curto e estável tem o código do imóvel:
+     * /imoveis/MIS-0001 abre a mesma página.
+     */
+    const atual = await prisma.property.findUnique({
+      where: { id: params.id },
+      select: { slug: true },
+    });
+    const slug = atual
+      ? atual.slug
+      : await uniqueSlug(input.slug ?? slugify(input.titulo), params.id);
 
     const property = await prisma.property.update({
       where: { id: params.id },
