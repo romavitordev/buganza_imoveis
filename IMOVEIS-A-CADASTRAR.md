@@ -1,5 +1,17 @@
 # Os 7 imóveis reais — o que o banco precisa e o que falta
 
+> **Status em 08/09/2026:** os sete já estão cadastrados. Os três de
+> demonstração foram apagados e o prefixo do código virou `MIS-`.
+>
+> **Cinco estão ativos** (MIS-0001, 0002, 0003, 0006, 0007).
+> **Dois nasceram PAUSADOS** — Santa Rosália (MIS-0004) e Fit Campolim
+> (MIS-0005) —, porque vieram sem transação e sem preço. Pausado não
+> aparece no site: eles ficam visíveis só no painel, esperando o dado.
+>
+> O cadastro está escrito em `scripts/cadastrar-imoveis-reais.mjs` e pode
+> ser refeito do zero a qualquer momento. **Falta a foto de todos** — o
+> que segue abaixo continua valendo como lista do que preencher.
+
 Levantado em 08/09/2026, a partir das mensagens do Marcelo, cruzando com
 os campos que o formulário do painel realmente exige.
 

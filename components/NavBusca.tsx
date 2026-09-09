@@ -11,7 +11,7 @@ import { Search, X } from "lucide-react";
  * barra de filtros. Dois campos de busca na mesma tela, um deles sem os
  * filtros do lado, é o tipo de duplicidade que faz o visitante escolher
  * errado. Aqui ele resolve o problema oposto: quem abre o site sabendo o
- * que quer ("Campolim", "BZ-0003") tinha que ir ao catálogo primeiro e
+ * que quer ("Campolim", "MIS-0003") tinha que ir ao catálogo primeiro e
  * só então procurar.
  *
  * DUAS VARIANTES, uma por tamanho de tela:
