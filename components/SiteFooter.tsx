@@ -62,7 +62,7 @@ export default function SiteFooter() {
   return (
     <footer className="border-t border-black/10 bg-white">
       {/* pb extra no mobile por causa da bottom nav fixa */}
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-9 px-4 pb-10 pt-12 md:grid-cols-4 md:gap-10 md:px-8">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-10 px-4 pb-10 pt-12 md:grid-cols-4 md:gap-10 md:px-8">
         {/* Marca — logotipo completo, com a assinatura */}
         <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
           <div className="flex items-start gap-3">
@@ -94,7 +94,7 @@ export default function SiteFooter() {
 
         {/* Navegação */}
         <nav aria-label="Navegação do rodapé" className="flex flex-col">
-          <p className="mb-1.5 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
+          <p className="mb-2 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
             Navegação
           </p>
           {NAVEGACAO.map(({ href, rotulo }) => (
@@ -104,15 +104,44 @@ export default function SiteFooter() {
           ))}
         </nav>
 
-        {/* Atendimento.
-            Uma coluna também no celular. Tentei col-span-2 por causa do
-            e-mail (251px, mais largo que a meia tela de 375px), mas isso
-            empurrava Navegação e "É proprietário?" para linhas próprias,
-            cada uma com metade da largura vazia ao lado — o rodapé ficou
-            MAIS alto que antes. Quem resolve o e-mail é a quebra no @,
-            abaixo. */}
-        <div className="flex flex-col">
-          <p className="mb-1.5 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
+        {/* Proprietários */}
+        <div className="flex flex-col gap-3 self-start">
+          <p className="mb-0 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
+            É proprietário?
+          </p>
+          <p className="text-[13px] leading-relaxed text-secundario">
+            Anuncie seu imóvel com a gente — você só paga na conclusão do
+            negócio.
+          </p>
+          <a
+            href={linkWhatsAppAnunciar()}
+            target="_blank"
+            rel="noopener noreferrer"
+            /* px menor no celular: dividindo a linha com a Navegação, a
+               coluna tem ~160px e o botão com px-5 encostava nas bordas. */
+            className="inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-pill bg-black px-4 py-2.5 text-[12px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:px-5"
+          >
+            <MessageCircle
+              size={13}
+              strokeWidth={2.5}
+              aria-hidden="true"
+            />
+            Anunciar imóvel
+          </a>
+        </div>
+        {/* Atendimento — a fileira inteira no celular.
+            O e-mail tem 32 caracteres e não cabe em meia tela de 375px.
+            Já tentei quebrá-lo no @, mas os donos querem o endereço
+            inteiro, numa linha só — e é o certo: e-mail partido em duas
+            linhas é o tipo de coisa que faz a pessoa digitar errado ao
+            copiar à mão.
+            Por isso este bloco vem DEPOIS de "É proprietário?" no
+            código: com ele em terceiro, Navegação e Proprietário
+            dividem a fileira do meio e o Atendimento fica com a largura
+            toda, sem sobrar metade de linha vazia como aconteceu na
+            primeira tentativa. */}
+        <div className="col-span-2 flex flex-col md:col-span-1">
+          <p className="mb-2 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
             Atendimento
           </p>
 
@@ -144,33 +173,14 @@ export default function SiteFooter() {
             </LinkRodape>
           )}
 
-          {/* O e-mail é mais largo que a coluna e precisa quebrar. A
-              questão é ONDE.
-
-              `break-all` quebrava em qualquer letra, e o resultado era
-              "…@gmail.co" numa linha e um "m" solto na outra — parece
-              erro de digitação, não quebra de linha.
-
-              Aqui o endereço é partido no @, e cada metade quebra só se
-              precisar. O navegador prefere quebrar no ponto sugerido,
-              então sai "marceloimoveissorocaba" / "@gmail.com": duas
-              partes que continuam sendo lidas como um endereço.
-
-              O `select-all` do conjunto mantém o clique triplo copiando
-              o e-mail inteiro, apesar de ele estar em dois pedaços. */}
+          {/* Endereço inteiro, numa linha só — pedido dos donos, e é o
+              certo: e-mail partido no meio é o que faz alguém digitar
+              errado ao copiar à mão. O que dá espaço para ele é a
+              largura da coluna (ver o comentário do bloco acima), não
+              um tamanho de fonte menor. */}
           <LinkRodape href={`mailto:${MARCA.email}`}>
             <Mail size={14} strokeWidth={2} className="shrink-0" aria-hidden="true" />
-            <span className="min-w-0 select-all break-words">
-              {(() => {
-                const [usuario, dominio] = MARCA.email.split("@");
-                return (
-                  <>
-                    {usuario}
-                    <wbr />@{dominio}
-                  </>
-                );
-              })()}
-            </span>
+            <span className="select-all">{MARCA.email}</span>
           </LinkRodape>
 
           <p className="mt-2 text-[12px] leading-relaxed text-secundario">
@@ -180,31 +190,6 @@ export default function SiteFooter() {
           </p>
         </div>
 
-        {/* Proprietários */}
-        <div className="col-span-2 flex flex-col gap-3 self-start md:col-span-1">
-          <p className="mb-0 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
-            É proprietário?
-          </p>
-          <p className="text-[13px] leading-relaxed text-secundario">
-            Anuncie seu imóvel com a gente — você só paga na conclusão do
-            negócio.
-          </p>
-          <a
-            href={linkWhatsAppAnunciar()}
-            target="_blank"
-            rel="noopener noreferrer"
-            /* px menor no celular: dividindo a linha com a Navegação, a
-               coluna tem ~160px e o botão com px-5 encostava nas bordas. */
-            className="inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-pill bg-black px-4 py-2.5 text-[12px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5 md:px-5"
-          >
-            <MessageCircle
-              size={13}
-              strokeWidth={2.5}
-              aria-hidden="true"
-            />
-            Anunciar imóvel
-          </a>
-        </div>
       </div>
 
       {/* Linha final */}

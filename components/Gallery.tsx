@@ -29,15 +29,18 @@ function prefereMenosMovimento(): boolean {
 }
 
 /**
- * Quantas miniaturas aparecem antes do "+N".
+ * As miniaturas ocupam UMA fileira só, e a última vira "+N".
  *
- * 12 preenche duas fileiras completas no desktop (6 colunas) e pouco
- * mais de duas no celular (5 colunas) — o suficiente para dar noção do
- * imóvel sem que a grade vire uma parede. Um anúncio pode ter até 30
- * fotos, e 30 miniaturas empurram preço e botão de contato para baixo
- * da dobra, que é o oposto do que a galeria deveria fazer.
+ * Quantas cabem depende do breakpoint — são 5 colunas no celular e 6 a
+ * partir de md —, então o número não pode ser fixo no código: com 12
+ * fixos, o celular ganhava três fileiras e o desktop duas. Aqui a grade
+ * é medida depois de montada (quantas colunas o CSS de fato aplicou) e
+ * o teto acompanha.
+ *
+ * O 6 abaixo é só o palpite do primeiro render, antes de haver o que
+ * medir — é o valor do desktop, e a medição corrige em seguida.
  */
-const MAX_MINIATURAS = 12;
+const COLUNAS_PADRAO = 6;
 
 /**
  * Galeria da página de detalhe: mídia grande + thumbnails clicáveis e
@@ -59,6 +62,17 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
   const capaUrl = ordenadas[0]?.url;
 
   const [indiceAtivo, setIndiceAtivo] = useState(0);
+  const gradeRef = useRef<HTMLDivElement>(null);
+  const [colunas, setColunas] = useState(COLUNAS_PADRAO);
+
+  /**
+   * Quantas miniaturas de foto entram na fileira.
+   *
+   * Cabendo tudo, mostra tudo — o "+N" não pode roubar um lugar para
+   * dizer "+0". Sobrando, ele ocupa a última célula, então restam
+   * `colunas - 1` fotos visíveis.
+   */
+  const visiveis = total <= colunas ? total : colunas - 1;
   // montado = presente no DOM; fechando = tocando animação de saída
   const [montado, setMontado] = useState(false);
   const [fechando, setFechando] = useState(false);
@@ -74,6 +88,27 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
     },
     [total]
   );
+
+  /**
+   * Conta as colunas que o CSS aplicou, relendo a cada redimensionamento.
+   *
+   * `gridTemplateColumns` devolve as larguras já resolvidas ("117px
+   * 117px …"), então contar os pedaços dá o número de colunas sem
+   * repetir os breakpoints aqui em JS — se um dia o Tailwind mudar, isto
+   * acompanha sozinho.
+   */
+  useEffect(() => {
+    const grade = gradeRef.current;
+    if (!grade) return;
+    const medir = () => {
+      const cols = getComputedStyle(grade).gridTemplateColumns.split(" ").filter(Boolean).length;
+      if (cols > 0) setColunas(cols);
+    };
+    medir();
+    const observador = new ResizeObserver(medir);
+    observador.observe(grade);
+    return () => observador.disconnect();
+  }, []);
 
   const abrir = useCallback(() => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
@@ -266,11 +301,12 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
        *    então nada fica inacessível. */}
       {total > 1 && (
         <div
+          ref={gradeRef}
           className="grid grid-cols-5 gap-2 md:grid-cols-6"
           role="group"
           aria-label="Miniaturas"
         >
-          {midias.slice(0, MAX_MINIATURAS).map((midia, i) => (
+          {midias.slice(0, visiveis).map((midia, i) => (
             <button
               key={`${midia.url}-${i}`}
               type="button"
@@ -319,19 +355,19 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
             </button>
           ))}
 
-          {total > MAX_MINIATURAS && (
+          {total > visiveis && (
             <button
               type="button"
               onClick={() => {
-                setIndiceAtivo(MAX_MINIATURAS);
+                setIndiceAtivo(visiveis);
                 abrir();
               }}
-              aria-label={`Ver as outras ${total - MAX_MINIATURAS} fotos`}
+              aria-label={`Ver as outras ${total - visiveis} fotos`}
               className="relative aspect-[4/3] overflow-hidden rounded-lg bg-mist transition-all duration-300 ease-premium hover:opacity-90"
             >
-              {midias[MAX_MINIATURAS]?.url && (
+              {midias[visiveis]?.url && (
                 <Image
-                  src={midias[MAX_MINIATURAS].url}
+                  src={midias[visiveis].url}
                   alt=""
                   fill
                   sizes="120px"
@@ -339,7 +375,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
                 />
               )}
               <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-[13px] font-semibold text-white">
-                +{total - MAX_MINIATURAS}
+                +{total - visiveis}
               </span>
             </button>
           )}
