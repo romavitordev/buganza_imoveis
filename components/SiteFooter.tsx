@@ -109,7 +109,7 @@ export default function SiteFooter() {
             e-mail (251px, mais largo que a meia tela de 375px), mas isso
             empurrava Navegação e "É proprietário?" para linhas próprias,
             cada uma com metade da largura vazia ao lado — o rodapé ficou
-            MAIS alto que antes. Quem resolve o e-mail é o break-all
+            MAIS alto que antes. Quem resolve o e-mail é a quebra no @,
             abaixo. */}
         <div className="flex flex-col">
           <p className="mb-1.5 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
@@ -144,12 +144,33 @@ export default function SiteFooter() {
             </LinkRodape>
           )}
 
-          {/* break-all no e-mail: em telas de 320px ele é mais largo que
-              a coluna, e sem isto empurra a página para a rolagem
-              horizontal. */}
+          {/* O e-mail é mais largo que a coluna e precisa quebrar. A
+              questão é ONDE.
+
+              `break-all` quebrava em qualquer letra, e o resultado era
+              "…@gmail.co" numa linha e um "m" solto na outra — parece
+              erro de digitação, não quebra de linha.
+
+              Aqui o endereço é partido no @, e cada metade quebra só se
+              precisar. O navegador prefere quebrar no ponto sugerido,
+              então sai "marceloimoveissorocaba" / "@gmail.com": duas
+              partes que continuam sendo lidas como um endereço.
+
+              O `select-all` do conjunto mantém o clique triplo copiando
+              o e-mail inteiro, apesar de ele estar em dois pedaços. */}
           <LinkRodape href={`mailto:${MARCA.email}`}>
             <Mail size={14} strokeWidth={2} className="shrink-0" aria-hidden="true" />
-            <span className="break-all">{MARCA.email}</span>
+            <span className="min-w-0 select-all break-words">
+              {(() => {
+                const [usuario, dominio] = MARCA.email.split("@");
+                return (
+                  <>
+                    {usuario}
+                    <wbr />@{dominio}
+                  </>
+                );
+              })()}
+            </span>
           </LinkRodape>
 
           <p className="mt-2 text-[12px] leading-relaxed text-secundario">

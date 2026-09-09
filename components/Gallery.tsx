@@ -29,6 +29,17 @@ function prefereMenosMovimento(): boolean {
 }
 
 /**
+ * Quantas miniaturas aparecem antes do "+N".
+ *
+ * 12 preenche duas fileiras completas no desktop (6 colunas) e pouco
+ * mais de duas no celular (5 colunas) — o suficiente para dar noção do
+ * imóvel sem que a grade vire uma parede. Um anúncio pode ter até 30
+ * fotos, e 30 miniaturas empurram preço e botão de contato para baixo
+ * da dobra, que é o oposto do que a galeria deveria fazer.
+ */
+const MAX_MINIATURAS = 12;
+
+/**
  * Galeria da página de detalhe: mídia grande + thumbnails clicáveis e
  * lightbox com animação fluida. Fotos + vídeo convivem na mesma fileira
  * (padrão Mercado Livre): o vídeo é a última miniatura, com ícone de
@@ -238,14 +249,28 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
         )}
       </div>
 
-      {/* Thumbnails */}
+      {/* Thumbnails.
+       *
+       * DUAS DECISÕES QUE VALEM EXPLICAR:
+       *
+       * 1. A proporção é 4/3, a mesma da foto principal — era quadrada.
+       *    Miniatura quadrada de uma foto deitada corta cerca de um
+       *    quarto das laterais no object-cover, e é justamente a borda
+       *    que diz se aquilo é a sala ou a varanda. De quebra, a grade
+       *    ficou mais baixa.
+       *
+       * 2. Só as 12 primeiras aparecem; havendo mais, a última vira
+       *    "+N". Um imóvel pode ter até 30 fotos, e 30 miniaturas são
+       *    cinco fileiras que empurram preço e botão de contato para
+       *    baixo da dobra. O "+N" abre a mesma galeria em tela cheia,
+       *    então nada fica inacessível. */}
       {total > 1 && (
         <div
           className="grid grid-cols-5 gap-2 md:grid-cols-6"
           role="group"
           aria-label="Miniaturas"
         >
-          {midias.map((midia, i) => (
+          {midias.slice(0, MAX_MINIATURAS).map((midia, i) => (
             <button
               key={`${midia.url}-${i}`}
               type="button"
@@ -256,7 +281,7 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
                   : `Ver foto ${i + 1}`
               }
               aria-current={i === indiceAtivo ? "true" : undefined}
-              className={`relative aspect-square overflow-hidden rounded-lg bg-mist transition-all duration-300 ease-premium ${
+              className={`relative aspect-[4/3] overflow-hidden rounded-lg bg-mist transition-all duration-300 ease-premium ${
                 i === indiceAtivo
                   ? "ring-2 ring-black ring-offset-2"
                   : "opacity-70 hover:opacity-100"
@@ -293,6 +318,31 @@ export default function Gallery({ fotos, titulo, videoUrl }: GalleryProps) {
               )}
             </button>
           ))}
+
+          {total > MAX_MINIATURAS && (
+            <button
+              type="button"
+              onClick={() => {
+                setIndiceAtivo(MAX_MINIATURAS);
+                abrir();
+              }}
+              aria-label={`Ver as outras ${total - MAX_MINIATURAS} fotos`}
+              className="relative aspect-[4/3] overflow-hidden rounded-lg bg-mist transition-all duration-300 ease-premium hover:opacity-90"
+            >
+              {midias[MAX_MINIATURAS]?.url && (
+                <Image
+                  src={midias[MAX_MINIATURAS].url}
+                  alt=""
+                  fill
+                  sizes="120px"
+                  className="object-cover"
+                />
+              )}
+              <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-[13px] font-semibold text-white">
+                +{total - MAX_MINIATURAS}
+              </span>
+            </button>
+          )}
         </div>
       )}
 
