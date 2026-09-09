@@ -23,6 +23,20 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 const aplicar = process.argv.includes("--aplicar");
+const forcar = process.argv.includes("--forcar-remoto");
+
+/**
+ * Este script APAGA o catálogo inteiro antes de recriar. É o que se quer
+ * no banco local, que existe justamente para ser refeito à vontade — e é
+ * a pior coisa possível apontado, por descuido, para produção: o catálogo
+ * real some, e as fotos já enviadas pelo painel vão junto, porque o
+ * onDelete: Cascade leva PropertyPhoto.
+ *
+ * A distância entre as duas coisas é uma variável de ambiente trocada.
+ * Num banco que não seja localhost, então, ele só roda com
+ * --forcar-remoto escrito à mão.
+ */
+const ehLocal = /localhost|127[.]0[.]0[.]1/.test(process.env.DATABASE_URL ?? "");
 
 /**
  * IPTU: o campo do banco é ANUAL e o site escreve "IPTU R$ X/ano".
@@ -258,12 +272,31 @@ function prefixo(n) {
 }
 
 async function main() {
+  if (!ehLocal && aplicar && !forcar) {
+    console.log(
+      [
+        "",
+        "X  Este banco NAO e local, e o script apaga o catalogo inteiro",
+        "   antes de recriar - inclusive as fotos ja enviadas pelo painel.",
+        "",
+        "   Para popular producao do zero, de proposito:",
+        "     node scripts/cadastrar-imoveis-reais.mjs --aplicar --forcar-remoto",
+        "",
+        "   Se JA existe catalogo em producao, NAO use este script:",
+        "   cadastre ou edite pelo painel em /admin.",
+        "",
+      ].join("\n")
+    );
+    process.exitCode = 1;
+    return;
+  }
+
   const existentes = await prisma.property.findMany({
     select: { codigo: true, titulo: true },
     orderBy: { codigo: "asc" },
   });
 
-  console.log(`\nBanco: ${process.env.DATABASE_URL?.includes("localhost") ? "LOCAL" : "REMOTO ⚠"}`);
+  console.log(`\nBanco: ${ehLocal ? "LOCAL" : "REMOTO (!)"}`);
   console.log(`\nSerão APAGADOS ${existentes.length} imóvel(is):`);
   existentes.forEach((i) => console.log(`  − ${i.codigo}  ${i.titulo}`));
 

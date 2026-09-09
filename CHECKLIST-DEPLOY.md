@@ -15,17 +15,23 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 
 | bloqueia | o quê | quem |
 | --- | --- | --- |
-| 🔴 tudo | domínio + e-mail real (Fase 0) | você |
+| 🔴 tudo | domínio (Fase 0) | você |
 | 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
+| 🟠 anúncio | **fotos dos 7 imóveis** — nenhum tem foto ainda | donos |
+| 🟠 anúncio | transação e preço de Santa Rosália e Fit Campolim | donos |
 | 🟠 legal | confirmar a razão social — está em processo de mudança (2.6) | donos |
 | 🟠 legal | revisão da política de privacidade por advogado | você |
 | 🟡 estética | logotipo oficial em `public/logo.svg` | donos |
 | 🟢 depois | Search Console, Sentry, ensinar o chatbot | você |
 
-Nada de falso está mais no ar: os depoimentos inventados saíram, a
-seção some sozinha com a lista vazia, o "+400 imóveis" foi removido e o
-catálogo nasce vazio. O que resta é conteúdo que **falta**, não conteúdo
-que **mente** — e faltar não impede o lançamento.
+**Conteúdo: o site já tem o que precisa para existir.** Nome, CRECI,
+CNPJ, WhatsApp e e-mail são reais; os depoimentos são de três clientes
+de verdade; os 7 imóveis estão cadastrados com dados vindos dos donos.
+Nada de inventado está no ar.
+
+O que falta é **foto**. Um catálogo sem foto abre e funciona, mas não
+vende: ninguém decide visitar um imóvel que não viu. É a única coisa
+entre o site pronto e o site útil.
 
 ---
 
@@ -101,19 +107,42 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 ## Fase 2 — Preparar o conteúdo (antes de qualquer um ver)
 
-- [x] **2.1 — Apagar os imóveis fictícios** ✅ feito
-      O banco de desenvolvimento foi zerado (6 imóveis, 16 fotos e 51
-      eventos) e o seed não cria mais exemplos por padrão. O banco de
-      produção nasce vazio.
+- [x] **2.1 — Catálogo real no lugar dos exemplos** ✅ feito
+      Os imóveis de demonstração saíram e entraram os **7 reais**
+      enviados pelos donos, com código `MIS-`. Estão escritos em
+      `scripts/cadastrar-imoveis-reais.mjs`, que é o que vai popular
+      produção no passo 3.5 — ninguém vai redigitar nada no painel.
 
-      Para zerar um catálogo de novo (ele **pede confirmação**, e mostra
-      se está num banco local ou remoto antes de qualquer coisa):
+      | | | |
+      |---|---|---|
+      | MIS-0001 | Casa Ibiti do Paço | ● ativo |
+      | MIS-0002 | Apto Trix Home Horto | ● ativo |
+      | MIS-0003 | Barracão Vila Gabriel | ● ativo |
+      | MIS-0004 | Casa Santa Rosália | ⏸ pausado |
+      | MIS-0005 | Apto Fit Campolim | ⏸ pausado |
+      | MIS-0006 | Casa Aldeia da Mata | ● ativo |
+      | MIS-0007 | Casa Bosque São Bento | ● ativo |
+
+      Os dois pausados vieram sem transação e sem preço; ficam invisíveis
+      no site até os dados chegarem.
+
+      Para zerar um catálogo (ele **pede confirmação** e mostra se o
+      banco é local ou remoto antes de qualquer coisa):
       ```bash
       node scripts/limpar-catalogo.mjs            # só lista
       node scripts/limpar-catalogo.mjs --apagar   # apaga
       ```
-      Apaga imóveis, fotos e métricas. Admin, leads e a base do chatbot
-      ficam de fora.
+
+- [ ] **2.8 — Fotos dos imóveis** 🟠 aguardando os donos
+      **Nenhum dos 7 tem foto.** Um catálogo sem foto abre e funciona,
+      mas não vende — ninguém decide visitar um imóvel que não viu.
+
+      Há uma pasta por imóvel em `fotos/`, nomeada com o código. O
+      passo a passo está em `fotos/LEIA-ME.md`. Para testar localmente:
+      ```bash
+      node scripts/importar-fotos.mjs --aplicar
+      ```
+      **Em produção, as fotos sobem pelo painel** — ver 3.7.
 - [x] **2.2 — Textos institucionais** ✅ feito
       A história real dos donos (5 parágrafos) substituiu o texto de
       exemplo em `components/QuemSomos.tsx`. O "+400 imóveis negociados",
@@ -195,19 +224,47 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       ```bash
       DATABASE_URL="<url do Neon>" ADMIN_EMAIL="<seu e-mail>" ADMIN_PASSWORD="<sua senha forte>" npm run db:seed
       ```
-      > **O catálogo nasce vazio.** O `db:seed` cria só o administrador
-      > — os três imóveis de demonstração vivem no `npm run db:demo`, que
-      > é comando de desenvolvimento e **não deve ser rodado aqui**. Se eles fossem para produção, o site de uma
-      > imobiliária de verdade estrearia com anúncio inventado.
+      > O `db:seed` cria **só o administrador**. Os imóveis vêm no passo
+      > seguinte. O `npm run db:demo`, que cria exemplos inventados, é
+      > comando de desenvolvimento e **não deve ser rodado aqui**.
+
+- [ ] **3.5 — Levar os 7 imóveis para o banco de produção**
+      Eles já estão escritos em código, então não precisam ser digitados
+      de novo no painel:
+      ```bash
+      DATABASE_URL="<url do Neon>" node scripts/cadastrar-imoveis-reais.mjs --aplicar --forcar-remoto
+      ```
+      > **`--forcar-remoto` é obrigatório de propósito.** O script APAGA
+      > o catálogo antes de recriar — o que é o certo num banco vazio e
+      > destrutivo em qualquer outro. Rode este comando **uma vez**, no
+      > banco recém-criado. Depois disso, imóvel se cadastra e edita pelo
+      > painel; se rodar de novo, perde o que foi feito por lá, fotos
+      > incluídas.
       >
-      > Enquanto o primeiro imóvel real não entra, o catálogo mostra
-      > "Estamos preparando os primeiros anúncios" com o convite ao
-      > WhatsApp — e a seção de destaques da home simplesmente não
-      > aparece.
+      > Sem o `--forcar-remoto`, ele se recusa a rodar e explica.
+      >
+      > Vão 5 imóveis ATIVOS e 2 PAUSADOS (Santa Rosália e Fit Campolim,
+      > que estão sem transação e sem preço). Os pausados não aparecem no
+      > site — quando os dados chegarem, é editar e ativar no painel.
 
-- [ ] **3.5 — Deploy** → botão *Deploy* na Vercel.
+- [ ] **3.6 — Deploy** → botão *Deploy* na Vercel.
 
-- [ ] **3.6 — Apontar o domínio**
+- [ ] **3.7 — Subir as fotos, pelo painel**
+      Entre em `/admin`, abra cada imóvel e envie as fotos.
+      > **Aqui não dá para usar o `importar-fotos.mjs`**: ele só escreve
+      > no fallback local. Com o Supabase configurado ele se recusa a
+      > rodar, e faz isso de propósito — o painel comprime cada foto no
+      > navegador (máx. 1920px) antes de enviar, e é isso que mantém as
+      > 800 fotos dentro do plano gratuito.
+      >
+      > A **primeira foto** de cada imóvel é a capa: é ela que aparece no
+      > card e na prévia do link no WhatsApp.
+      >
+      > Antes de enviar, confira o que a foto mostra: telefone em placa,
+      > número da casa na fachada, placa de carro. O site publica
+      > exatamente o que sobe.
+
+- [ ] **3.8 — Apontar o domínio**
       Na Vercel: *Settings → Domains* → adicione seu domínio. Ela mostra
       os registros DNS; cadastre-os no painel do Registro.br.
 
@@ -225,8 +282,10 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 - [ ] **4.5 — Ativar a 2FA** em *Minha conta* (escaneie o QR).
       > Leia antes a seção do `AUTH_SECRET` no DEPLOY.md — trocá-lo
       > depois **derruba a 2FA**.
-- [ ] **4.6 — Cadastrar um imóvel de verdade** com fotos, para ver o
-      fluxo completo funcionando.
+- [ ] **4.6 — Conferir os 7 imóveis** que subiram no 3.5: preço, bairro
+      e área de cada um, e se as fotos ficaram na ordem certa.
+      Confirme também que **Santa Rosália e Fit Campolim NÃO aparecem**
+      no catálogo público — eles devem estar só no painel, pausados.
 - [ ] **4.7 — Testar no celular** (a maior parte do tráfego vem de lá).
 
 ---
