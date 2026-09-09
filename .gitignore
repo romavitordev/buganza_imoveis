@@ -43,3 +43,13 @@ pnpm-workspace.yaml
 
 # claude
 .claude/
+
+# Fotos originais dos imóveis.
+# As PASTAS ficam versionadas (com .gitkeep) para todo mundo saber onde
+# colocar; os arquivos, não — são pesados, mudam sempre, e em produção
+# vivem no Supabase, não no repositório.
+/fotos/**/*.jpg
+/fotos/**/*.jpeg
+/fotos/**/*.png
+/fotos/**/*.webp
+/fotos/**/*.heic
