@@ -62,9 +62,19 @@ export default function SiteFooter() {
   return (
     <footer className="border-t border-black/10 bg-white">
       {/* pb extra no mobile por causa da bottom nav fixa */}
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-10 px-4 pb-10 pt-12 md:grid-cols-4 md:gap-10 md:px-8">
+      <div /* QUANDO AS QUATRO COLUNAS ENTRAM — e por que não em md.
+             O e-mail tem 32 caracteres e, desde que passou a não
+             quebrar, ocupa uma largura mínima que a coluna precisa
+             respeitar. Em md (768px) a coluna sobra com ~175px e ele
+             furava o rodapé: a página inteira ganhava 44px de rolagem
+             horizontal, medidos.
+             Então: duas colunas até lg, e as quatro a partir de 1024 —
+             com o vão menor ali, que é o que devolve os pixels de que a
+             coluna precisa. De xl em diante sobra espaço e o vão volta
+             ao normal. */
+          className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-10 px-4 pb-10 pt-12 md:gap-x-10 md:px-8 lg:grid-cols-4 lg:gap-x-6 xl:gap-10">
         {/* Marca — logotipo completo, com a assinatura */}
-        <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
+        <div className="col-span-2 flex flex-col gap-3 lg:col-span-1">
           <div className="flex items-start gap-3">
             <BrandMark size={46} />
             <div>
@@ -140,7 +150,7 @@ export default function SiteFooter() {
             dividem a fileira do meio e o Atendimento fica com a largura
             toda, sem sobrar metade de linha vazia como aconteceu na
             primeira tentativa. */}
-        <div className="col-span-2 flex flex-col md:col-span-1">
+        <div className="col-span-2 flex flex-col lg:col-span-1">
           <p className="mb-2 text-[12px] md:text-[11px] font-medium uppercase tracking-[0.08em] text-secundario">
             Atendimento
           </p>
@@ -180,7 +190,7 @@ export default function SiteFooter() {
               um tamanho de fonte menor. */}
           <LinkRodape href={`mailto:${MARCA.email}`}>
             <Mail size={14} strokeWidth={2} className="shrink-0" aria-hidden="true" />
-            <span className="select-all">{MARCA.email}</span>
+            <span className="select-all text-[12px] lg:text-[11.5px] xl:text-[13px]">{MARCA.email}</span>
           </LinkRodape>
 
           <p className="mt-2 text-[12px] leading-relaxed text-secundario">
