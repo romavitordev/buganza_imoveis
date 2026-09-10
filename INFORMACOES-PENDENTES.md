@@ -60,7 +60,7 @@ listas curtas: **o que falta de verdade** e **o que já foi**.
 | # | O que | Risco |
 |---|---|---|
 | B.1 | Registrar `marcelocorretorsorocaba.com.br` (~R$ 40/ano) | 🔴 |
-| B.2 | Criar as contas: Neon, Supabase, Resend, Upstash, Vercel | 🔴 |
+| B.2 | Criar as contas: Neon, Supabase, Upstash, Vercel | 🔴 |
 | B.3 | Definir a senha forte do admin (**não** a do exemplo) | 🔴 |
 | B.4 | Revisão da política de privacidade por advogado | 🟠 |
 | B.5 | Agendar o `npm run db:retencao` mensal (LGPD) | 🟡 |

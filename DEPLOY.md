@@ -1,4 +1,4 @@
-# Deploy e segurança — Buganza Imóveis
+# Deploy e segurança — Marcelo Imóveis Sorocaba
 
 Guia prático para colocar o site no ar (Vercel) de forma segura. Faça na
 ordem; os itens marcados com 🔒 são **obrigatórios** para não deixar
@@ -26,10 +26,20 @@ brecha.
 > Sem Supabase, o upload cai em `public/uploads`, que **não funciona na
 > Vercel** (disco efêmero). Configure antes de subir fotos em produção.
 
-## 2.5 Aviso de lead por e-mail (Resend)
+## 2.5 Aviso de lead por e-mail (Resend) — NÃO USADO
 
-Quando um visitante envia o "Tenho interesse", o corretor recebe um
-e-mail com nome, WhatsApp clicável, imóvel e mensagem. Para ligar:
+> **Os donos optaram por não usar aviso por e-mail.** Esta seção fica
+> como referência, caso mudem de ideia: ligar é criar a conta e
+> preencher duas variáveis, sem tocar no código.
+>
+> **Sem isso, o contato não se perde** — ele é gravado e aparece em
+> `/admin/leads`. O que não existe é o aviso, então alguém precisa abrir
+> o painel para ver. O caminho principal de contato do site é o
+> **WhatsApp**, que chega direto no celular e não depende disto.
+
+O único lugar que gera "lead" é o **formulário do chat** ("deixar
+contato"). Ligado o aviso, o corretor recebe um e-mail com nome,
+WhatsApp clicável, imóvel e mensagem. Para ligar:
 
 1. Crie uma conta gratuita em [resend.com](https://resend.com)
    (3.000 e-mails/mês — sobra para o volume de leads).
@@ -40,11 +50,11 @@ e-mail com nome, WhatsApp clicável, imóvel e mensagem. Para ligar:
 Pronto — não precisa de mais nada para funcionar: sem domínio próprio
 verificado, os avisos saem do remetente `onboarding@resend.dev`.
 
-**Opcional (recomendado depois que o domínio estiver no ar):** em
-**Resend → Domains**, verifique `buganzaimoveis.com.br` (2 registros
-DNS) e defina `LEAD_NOTIFY_FROM="Buganza Imóveis
-<avisos@buganzaimoveis.com.br>"` — os avisos passam a sair do próprio
-domínio, com menos chance de cair em spam.
+**Opcional (depois que o domínio estiver no ar):** em **Resend →
+Domains**, verifique o domínio de vocês (2 registros DNS) e defina
+`LEAD_NOTIFY_FROM="Marcelo Imóveis Sorocaba <avisos@seudominio.com.br>"`
+— os avisos passam a sair do próprio domínio, com menos chance de cair
+em spam.
 
 > As variáveis são opcionais: sem elas o site funciona normalmente e o
 > lead continua caindo na caixa do painel (/admin/leads) — só não chega
