@@ -56,7 +56,7 @@ Estas travam o resto. Resolva antes de mexer em plataforma.
       Confira disponibilidade em <https://registro.br> antes de fechar o
       nome. Prefira `.com.br` (é o que o brasileiro digita).
 
-- [ ] **0.4 — Definir a senha do admin**
+- [x] **0.4 — Senha do admin definida** ✅
       **Não use `admin123`** (é a do exemplo, está no repositório
       público). Gere uma forte agora e guarde no gerenciador de senhas do
       navegador ou num papel guardado:
@@ -75,7 +75,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 - [ ] **1.1 — Registro.br** → registrar o domínio · **R$ 40/ano**
       Exige CPF/CNPJ. Pague o boleto/PIX; a liberação leva algumas horas.
-- [ ] **1.2 — Neon** (<https://neon.tech>) → banco Postgres · grátis
+- [x] **1.2 — Neon** ✅ (<https://neon.tech>) → banco Postgres · grátis
       Crie o projeto e copie **as DUAS connection strings** que ele
       mostra:
 
@@ -90,10 +90,10 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > responder erro. Com você sozinho testando, a URL direta funciona
       > — é por isso que essa falha só aparece no dia em que o site tem
       > movimento. A direta é usada só pelo `db:push` e pelas migrações.
-- [ ] **1.3 — Supabase** (<https://supabase.com>) → fotos e vídeos · grátis
+- [x] **1.3 — Supabase** ✅ (<https://supabase.com>) → fotos e vídeos · grátis
       Crie o projeto → **Storage** → bucket **público** chamado `imoveis`.
       Em *Project Settings → API*, copie a `URL` e a `service_role key`.
-- [ ] **1.4 — Resend** (<https://resend.com>) → aviso de lead · grátis
+- [x] **1.4 — Resend** ✅ (<https://resend.com>) → aviso de lead · grátis
       Crie uma API key (`re_...`). O plano gratuito dá 3.000 e-mails por
       mês — muito além do volume de uma imobiliária local.
 
@@ -107,7 +107,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > jeito e fica em `/painel-mis/leads` — mas ninguém é avisado, e só é
       > visto quando alguém lembra de abrir o painel. Contato parado
       > alguns dias é cliente que já ligou para outra imobiliária.
-- [ ] **1.5 — Upstash** (<https://upstash.com>) → rate limit · grátis
+- [x] **1.5 — Upstash** ✅ (<https://upstash.com>) → rate limit · grátis
       Crie um banco **Redis** e copie a **URL e o token REST**.
 - [ ] **1.6 — Vercel** (<https://vercel.com>) → hospedagem
       Entre com a conta do GitHub.
@@ -223,7 +223,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       | `UPSTASH_REDIS_REST_URL` | Upstash (1.5) |
       | `UPSTASH_REDIS_REST_TOKEN` | Upstash (1.5) |
 
-- [ ] **3.3 — Criar as tabelas no banco**
+- [x] **3.3 — Tabelas criadas no Neon** ✅
       Do seu computador, apontando para o Neon:
       ```bash
       DATABASE_URL="<url do Neon>" npm run db:push
@@ -231,7 +231,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > **Obrigatório.** O banco novo não tem as tabelas do chat
       > (`ChatPergunta`, `ChatConhecimento`) nem os campos da 2FA.
 
-- [ ] **3.4 — Criar o usuário admin** (com a senha da 0.4)
+- [x] **3.4 — Usuário admin criado** ✅ (com a senha da 0.4)
       ```bash
       DATABASE_URL="<url do Neon>" ADMIN_EMAIL="<seu e-mail>" ADMIN_PASSWORD="<sua senha forte>" npm run db:seed
       ```
@@ -239,7 +239,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > seguinte. O `npm run db:demo`, que cria exemplos inventados, é
       > comando de desenvolvimento e **não deve ser rodado aqui**.
 
-- [ ] **3.5 — Levar os 7 imóveis para o banco de produção**
+- [x] **3.5 — Os 7 imóveis no banco de produção** ✅
       Eles já estão escritos em código, então não precisam ser digitados
       de novo no painel:
       ```bash
