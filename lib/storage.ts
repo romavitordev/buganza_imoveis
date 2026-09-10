@@ -23,6 +23,27 @@ function supabaseConfig(): { url: string; serviceKey: string } | null {
   return { url: url.replace(/\/$/, ""), serviceKey };
 }
 
+/**
+ * Cabeçalhos de autenticação do Supabase Storage.
+ *
+ * DOIS cabeçalhos, e não um, porque o Supabase tem duas gerações de
+ * chave em circulação:
+ *
+ *  - as LEGADAS (`service_role`) são JWT e são aceitas em
+ *    `Authorization: Bearer`;
+ *  - as NOVAS (`sb_secret_…`) NÃO são JWT. Mandadas como Bearer, o
+ *    Storage recusa com "Invalid Compact JWS" — ele tenta decodificar um
+ *    token que não existe. Elas são aceitas no cabeçalho `apikey`.
+ *
+ * Mandar os dois faz as duas gerações funcionarem, e é o que a própria
+ * biblioteca oficial do Supabase faz. Descoberto testando o bucket real:
+ * com só o Bearer, TODO upload de foto falharia em produção — e só no
+ * dia em que alguém tentasse enviar a primeira.
+ */
+function cabecalhosAuth(serviceKey: string): Record<string, string> {
+  return { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` };
+}
+
 let avisoFallbackDado = false;
 
 function avisarFallbackLocal() {
@@ -98,7 +119,7 @@ export async function criarUploadAssinado(
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${config.serviceKey}`,
+        ...cabecalhosAuth(config.serviceKey),
         "Content-Type": "application/json",
       },
       body: "{}",
@@ -186,7 +207,7 @@ async function uploadSupabase(
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${config.serviceKey}`,
+        ...cabecalhosAuth(config.serviceKey),
         "Content-Type": file.type || "application/octet-stream",
         "x-upsert": "false",
       },
@@ -233,7 +254,7 @@ export async function deletePropertyPhoto(storageKey: string): Promise<void> {
     `${config.url}/storage/v1/object/${BUCKET}/${storageKey}`,
     {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${config.serviceKey}` },
+      headers: { ...cabecalhosAuth(config.serviceKey) },
     }
   );
 
