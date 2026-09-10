@@ -145,16 +145,15 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       node scripts/limpar-catalogo.mjs --apagar   # apaga
       ```
 
-- [ ] **2.8 — Fotos dos imóveis** 🟠 aguardando os donos
-      **Nenhum dos 7 tem foto.** Um catálogo sem foto abre e funciona,
-      mas não vende — ninguém decide visitar um imóvel que não viu.
+- [x] **2.8 — Fotos dos imóveis** ✅ feito
+      **100 fotos no ar**, distribuídas nos 7 imóveis, cada uma com a
+      capa escolhida. Verificado no bucket: nenhuma quebrada.
 
-      Há uma pasta por imóvel em `fotos/`, nomeada com o código. O
-      passo a passo está em `fotos/LEIA-ME.md`. Para testar localmente:
-      ```bash
-      node scripts/importar-fotos.mjs --aplicar
-      ```
-      **Em produção, as fotos sobem pelo painel** — ver 3.7.
+      A ordem foi montada foto a foto — a primeira de cada imóvel é a
+      capa, que aparece no card do catálogo e na prévia do link no
+      WhatsApp. As pastas em `fotos/` continuam sendo a fonte da
+      verdade; `fotos/LEIA-ME.md` tem o passo a passo para acrescentar
+      ou trocar.
 - [x] **2.2 — Textos institucionais** ✅ feito
       A história real dos donos (5 parágrafos) substituiu o texto de
       exemplo em `components/QuemSomos.tsx`. O "+400 imóveis negociados",
@@ -261,13 +260,14 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 - [ ] **3.6 — Deploy** → botão *Deploy* na Vercel.
 
-- [ ] **3.7 — Subir as fotos, pelo painel**
-      Entre em `/painel-mis`, abra cada imóvel e envie as fotos.
-      > **Aqui não dá para usar o `importar-fotos.mjs`**: ele só escreve
-      > no fallback local. Com o Supabase configurado ele se recusa a
-      > rodar, e faz isso de propósito — o painel comprime cada foto no
-      > navegador (máx. 1920px) antes de enviar, e é isso que mantém as
-      > 800 fotos dentro do plano gratuito.
+- [x] **3.7 — Fotos no Supabase** ✅ feito
+      As 100 subiram por `scripts/importar-fotos.ts`, que usa o MESMO
+      `lib/storage.ts` do painel — não há uma segunda implementação de
+      upload. Para acrescentar ou trocar depois, tanto faz: o script
+      (que preserva a ordem das pastas) ou o painel, que comprime cada
+      foto no navegador antes de enviar.
+      > Foto acima de 5 MB o script recusa e diz qual é — essa vai pelo
+      > painel, que reduz para 1920px sozinho.
       >
       > A **primeira foto** de cada imóvel é a capa: é ela que aparece no
       > card e na prévia do link no WhatsApp.

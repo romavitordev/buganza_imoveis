@@ -23,8 +23,8 @@ fotos/
 3. Rode:
 
 ```bash
-node scripts/importar-fotos.mjs            # só mostra o que vai fazer
-node scripts/importar-fotos.mjs --aplicar  # importa
+npx tsx scripts/importar-fotos.ts            # só mostra o que vai fazer
+npx tsx scripts/importar-fotos.ts --aplicar  # envia
 ```
 
 Rodar de novo **substitui** as fotos daquele imóvel pelas da pasta. Para
@@ -39,10 +39,14 @@ trocar uma foto, mude o arquivo e rode outra vez — não acumula.
 | Tamanho por foto | 5 MB |
 | Ideal | 1920 px no maior lado |
 
-O importador avisa se alguma foto estiver acima de 1920 px ou muito
-pesada. Ele **não** redimensiona: quem faz isso é o painel, no navegador,
-na hora do upload. Se as suas fotos vierem grandes demais, use o painel
-(`/painel-mis`) em vez deste script — ele comprime sozinho.
+O importador **recusa** foto acima de 5 MB e diz qual é. Ele não
+redimensiona: quem faz isso é o painel, no navegador, na hora do upload.
+Se alguma foto vier grande demais, envie aquela pelo painel
+(`/painel-mis`) — ele comprime sozinho.
+
+Com o Supabase configurado, as fotos vão direto para o bucket de
+produção. Sem ele, caem em `public/uploads` — o mesmo caminho que o
+painel usa em desenvolvimento.
 
 ## Antes de importar: privacidade 🔴
 
