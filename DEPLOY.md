@@ -26,20 +26,22 @@ brecha.
 > Sem Supabase, o upload cai em `public/uploads`, que **não funciona na
 > Vercel** (disco efêmero). Configure antes de subir fotos em produção.
 
-## 2.5 Aviso de lead por e-mail (Resend) — NÃO USADO
+## 2.5 Aviso de lead por e-mail (Resend)
 
-> **Os donos optaram por não usar aviso por e-mail.** Esta seção fica
-> como referência, caso mudem de ideia: ligar é criar a conta e
-> preencher duas variáveis, sem tocar no código.
->
-> **Sem isso, o contato não se perde** — ele é gravado e aparece em
-> `/admin/leads`. O que não existe é o aviso, então alguém precisa abrir
-> o painel para ver. O caminho principal de contato do site é o
-> **WhatsApp**, que chega direto no celular e não depende disto.
+O único lugar do site que gera "lead" é o **formulário do chat**
+("deixar contato") — todo o resto leva direto ao WhatsApp. Quando esse
+formulário é enviado, o corretor recebe um e-mail com **nome, WhatsApp
+clicável, o imóvel que a pessoa estava vendo e a mensagem**, mais um
+botão para abrir a caixa de leads.
 
-O único lugar que gera "lead" é o **formulário do chat** ("deixar
-contato"). Ligado o aviso, o corretor recebe um e-mail com nome,
-WhatsApp clicável, imóvel e mensagem. Para ligar:
+O WhatsApp vai como link `wa.me`: dá para responder do celular em um
+toque, sem digitar o número.
+
+> **Se as variáveis não estiverem configuradas, o contato NÃO se perde:**
+> ele é gravado e aparece em `/admin/leads`. O que deixa de existir é o
+> aviso — e aí alguém precisa lembrar de abrir o painel.
+
+Para ligar:
 
 1. Crie uma conta gratuita em [resend.com](https://resend.com)
    (3.000 e-mails/mês — sobra para o volume de leads).

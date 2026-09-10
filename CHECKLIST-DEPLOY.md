@@ -16,7 +16,7 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 | bloqueia | o quê | quem |
 | --- | --- | --- |
 | 🔴 tudo | domínio (Fase 0) | você |
-| 🔴 deploy | contas: Neon, Supabase, Upstash, Vercel (Fase 1) | você |
+| 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
 | 🟠 anúncio | **fotos dos 7 imóveis** — nenhum tem foto ainda | donos |
 | 🟠 anúncio | transação e preço de Santa Rosália e Fit Campolim | donos |
 | 🟠 legal | confirmar a razão social — está em processo de mudança (2.6) | donos |
@@ -93,26 +93,20 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 - [ ] **1.3 — Supabase** (<https://supabase.com>) → fotos e vídeos · grátis
       Crie o projeto → **Storage** → bucket **público** chamado `imoveis`.
       Em *Project Settings → API*, copie a `URL` e a `service_role key`.
-- [ ] **1.4 — Resend** (<https://resend.com>) → **OPCIONAL** · grátis
-      Só serve para uma coisa: mandar um e-mail avisando quando alguém
-      **deixa contato pelo chat** do site. Os donos disseram que não vão
-      usar aviso por e-mail, então esta conta pode ser pulada — o site
-      funciona igual sem ela.
+- [ ] **1.4 — Resend** (<https://resend.com>) → aviso de lead · grátis
+      Crie uma API key (`re_...`). O plano gratuito dá 3.000 e-mails por
+      mês — muito além do volume de uma imobiliária local.
 
-      > **O que muda sem o Resend:** o contato continua sendo **gravado
-      > normalmente** e aparece em `/admin/leads`. O que deixa de existir
-      > é o aviso: ninguém é notificado, e o contato só é visto quando
-      > alguém abre o painel.
-      >
-      > Isso vale para o formulário do chat. Todo o resto do site leva ao
-      > **WhatsApp**, que chega direto no celular de vocês e não depende
-      > de nada disso.
-      >
-      > **Combinem quem abre `/admin/leads` e com que frequência.** Um
-      > contato que fica dias sem resposta é um cliente que já ligou para
-      > outra imobiliária. Se um dia quiserem o aviso por e-mail, criar a
-      > conta e preencher as duas variáveis liga tudo, sem mexer no
-      > código.
+      **O que ele resolve:** quando alguém deixa contato pelo chat do
+      site, chega um e-mail com **nome, WhatsApp clicável, qual imóvel a
+      pessoa estava vendo e a mensagem**, mais um botão para abrir a
+      caixa de leads. O WhatsApp vem como link: dá para responder do
+      celular em um toque, sem digitar o número.
+
+      > **Por que vale a pena:** sem ele, o contato é gravado do mesmo
+      > jeito e fica em `/admin/leads` — mas ninguém é avisado, e só é
+      > visto quando alguém lembra de abrir o painel. Contato parado
+      > alguns dias é cliente que já ligou para outra imobiliária.
 - [ ] **1.5 — Upstash** (<https://upstash.com>) → rate limit · grátis
       Crie um banco **Redis** e copie a **URL e o token REST**.
 - [ ] **1.6 — Vercel** (<https://vercel.com>) → hospedagem
@@ -225,8 +219,8 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       | `WHATSAPP_NUMBER` | `5515998036636` (só dígitos) |
       | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | só na hora do seed (3.4), não precisa ficar salvo |
       | `NEXT_PUBLIC_SITE_URL` | `https://www.seudominio.com.br` |
-      | `RESEND_API_KEY` | **opcional** — só para aviso de lead por e-mail (1.4) |
-      | `LEAD_NOTIFY_EMAIL` | **opcional** — vem junto com a de cima |
+      | `RESEND_API_KEY` | Resend (1.4) — a chave `re_...` |
+      | `LEAD_NOTIFY_EMAIL` | quem recebe o aviso: o e-mail da 0.2 |
       | `UPSTASH_REDIS_REST_URL` | Upstash (1.5) |
       | `UPSTASH_REDIS_REST_TOKEN` | Upstash (1.5) |
 
@@ -292,10 +286,14 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 - [ ] **4.1 — Abrir o site** e navegar: home, catálogo, um imóvel.
 - [ ] **4.2 — Testar o "deixar contato" do chat** → abra o chat no site,
-      escolha deixar contato e envie. O registro tem que aparecer em
-      `/admin/leads`.
-      > Sem o Resend (1.4), **não** chega e-mail nenhum — e está certo.
-      > O que importa neste teste é o contato aparecer no painel.
+      escolha deixar contato e envie. Duas coisas têm que acontecer: o
+      registro aparecer em `/admin/leads` **e** chegar o e-mail de aviso.
+      > Se o registro aparecer e o e-mail não, o problema está só nas
+      > variáveis do Resend — o contato não se perdeu. Confira
+      > `RESEND_API_KEY` e `LEAD_NOTIFY_EMAIL` na Vercel.
+      >
+      > Teste **clicando no link do WhatsApp dentro do e-mail**: é assim
+      > que vocês vão responder no dia a dia.
 - [ ] **4.3 — Testar o WhatsApp** → o botão abre a conversa com o número
       certo?
 - [ ] **4.4 — Numa aba anônima:** abrir `/admin` → tem que redirecionar
