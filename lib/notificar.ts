@@ -74,7 +74,7 @@ function corpoHtml(lead: LeadParaNotificar): string {
     `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;color:#14264A">` +
     `<h2 style="margin:0 0 12px">Novo lead no site 🏠</h2>` +
     linhas.join("") +
-    `<p style="margin:16px 0 0"><a href="${siteUrl()}/admin/leads" ` +
+    `<p style="margin:16px 0 0"><a href="${siteUrl()}/painel-mis/leads" ` +
     `style="display:inline-block;background:#14264A;color:#fff;padding:10px 18px;` +
     `border-radius:999px;text-decoration:none">Abrir caixa de leads</a></p>` +
     `</div>`

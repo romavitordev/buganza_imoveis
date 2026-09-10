@@ -81,7 +81,7 @@ export async function getCurrentSession(): Promise<SessionPayload | null> {
  */
 export async function exigirSessao(): Promise<SessionPayload> {
   const sessao = await getCurrentSession();
-  if (!sessao) redirect("/admin/login");
+  if (!sessao) redirect("/painel-mis/login");
   return sessao;
 }
 

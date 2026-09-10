@@ -42,7 +42,7 @@ trocar uma foto, mude o arquivo e rode outra vez — não acumula.
 O importador avisa se alguma foto estiver acima de 1920 px ou muito
 pesada. Ele **não** redimensiona: quem faz isso é o painel, no navegador,
 na hora do upload. Se as suas fotos vierem grandes demais, use o painel
-(`/admin`) em vez deste script — ele comprime sozinho.
+(`/painel-mis`) em vez deste script — ele comprime sozinho.
 
 ## Antes de importar: privacidade 🔴
 

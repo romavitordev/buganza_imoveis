@@ -1,5 +1,5 @@
 /**
- * Apoio ao "ensino" do chatbot pelo painel (/admin/suporte).
+ * Apoio ao "ensino" do chatbot pelo painel (/painel-mis/suporte).
  *
  * Roda no servidor e no navegador (a tela mostra um preview das
  * palavras-chave enquanto o corretor digita), então não importa Prisma.

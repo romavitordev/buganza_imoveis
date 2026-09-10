@@ -181,7 +181,7 @@ export default function ChatWidget() {
     bairros: [],
     cidades: [],
   });
-  // Respostas que os corretores escreveram em /admin/suporte — entram na
+  // Respostas que os corretores escreveram em /painel-mis/suporte — entram na
   // mesma disputa dos tópicos fixos, então a base cresce sem deploy.
   const [aprendidos, setAprendidos] = useState<TopicoAprendido[]>([]);
   const lugaresPedidosRef = useRef(false);
@@ -680,7 +680,7 @@ export default function ChatWidget() {
 
   // O widget é para visitantes do site — não aparece no painel admin.
   // (return depois dos hooks para não violar as regras do React)
-  if (pathname?.startsWith("/admin")) return null;
+  if (pathname?.startsWith("/painel-mis")) return null;
 
   return (
     <>

@@ -79,7 +79,7 @@ export default async function AdminDashboardPage() {
     .catch(() => 0);
 
   // Perguntas ainda na fila (as respondidas/ignoradas somem daqui) —
-  // o card leva para /admin/suporte, onde viram resposta do bot
+  // o card leva para /painel-mis/suporte, onde viram resposta do bot
   const perguntasChat = await prisma.chatPergunta
     .findMany({
       where: { status: "NOVA" },

@@ -38,7 +38,7 @@ O WhatsApp vai como link `wa.me`: dá para responder do celular em um
 toque, sem digitar o número.
 
 > **Se as variáveis não estiverem configuradas, o contato NÃO se perde:**
-> ele é gravado e aparece em `/admin/leads`. O que deixa de existir é o
+> ele é gravado e aparece em `/painel-mis/leads`. O que deixa de existir é o
 > aviso — e aí alguém precisa lembrar de abrir o painel.
 
 Para ligar:
@@ -59,7 +59,7 @@ Domains**, verifique o domínio de vocês (2 registros DNS) e defina
 em spam.
 
 > As variáveis são opcionais: sem elas o site funciona normalmente e o
-> lead continua caindo na caixa do painel (/admin/leads) — só não chega
+> lead continua caindo na caixa do painel (/painel-mis/leads) — só não chega
 > aviso por e-mail. Falha no envio nunca perde o lead.
 
 ---
@@ -104,7 +104,7 @@ chave que cifra o segredo da 2FA. Trocá-lo tem dois efeitos:
 
 **Faça nesta ordem para não se trancar do lado de fora:**
 
-1. **Antes** de trocar, desative a 2FA em **/admin → Minha conta**
+1. **Antes** de trocar, desative a 2FA em **/painel-mis → Minha conta**
    (enquanto você ainda consegue entrar).
 2. Troque o `AUTH_SECRET` na Vercel e refaça o deploy.
 3. Entre com e-mail e senha e **ative a 2FA de novo**, escaneando o QR
@@ -131,7 +131,7 @@ produção.** Duas formas:
 
 - **Antes do seed:** defina `ADMIN_PASSWORD` com uma senha forte (12+
   caracteres, sem palavra de dicionário) no comando do §1.
-- **Depois de logar:** troque em **/admin → Minha conta** (exige a senha
+- **Depois de logar:** troque em **/painel-mis → Minha conta** (exige a senha
   atual, aplica bcrypt).
 
 A senha forte é a defesa nº 1 do painel — vale mais que qualquer outra
@@ -141,7 +141,7 @@ medida desta lista.
 
 ## 5. O que já está pronto no código (não precisa fazer nada)
 
-- **Proteção do admin no servidor** (`middleware.ts`): `/admin` e
+- **Proteção do admin no servidor** (`middleware.ts`): `/painel-mis` e
   `/api/admin` exigem sessão válida. Truque de front/inspecionar não
   burla — a decisão é server-side.
 - **Sessão em cookie `HttpOnly`** assinado (JWT/jose): o JavaScript da
@@ -156,8 +156,11 @@ medida desta lista.
 - **`precoInterno` nunca vaza**: DTO com allowlist (`lib/dto.ts`).
 - **Número de WhatsApp server-only**: redirecionado por `/api/contato`,
   fora do "inspecionar".
-- **`robots.txt`** bloqueia `/admin` e `/api` da indexação.
-- **2FA opcional (TOTP)**: ative em **/admin → Minha conta** escaneando
+- **`robots.txt`** pede para não indexar `/api`. O painel **não** é
+  citado ali de propósito: o arquivo é público, e listá-lo entregaria o
+  endereço. Quem impede a indexação do painel é o `noindex` do layout
+  dele — que vale inclusive para a página de login.
+- **2FA opcional (TOTP)**: ative em **/painel-mis → Minha conta** escaneando
   o QR com Google Authenticator/Authy. Com ela ativa, o login exige
   senha + código de 6 dígitos. **Recomendado ativar após o deploy.**
 - **Segredo da 2FA cifrado em repouso** (AES-256-GCM). A senha usa
@@ -199,7 +202,7 @@ código, confira se a detecção ainda cobre a sua versão de Node.
 Depois que o site estiver no ar, confirme (numa aba anônima, deslogado):
 
 1. Abrir `seusite.com/api/admin/properties` → deve dar **401**.
-2. Abrir `seusite.com/admin` → deve **redirecionar para o login**.
+2. Abrir `seusite.com/painel-mis` → deve **redirecionar para o login**.
 3. No console (F12): `document.cookie` → o `bz_admin` **não** deve
    aparecer (prova do HttpOnly).
 4. Aba **Network**, na resposta do login → o cookie deve vir com
@@ -212,5 +215,8 @@ Depois que o site estiver no ar, confirme (numa aba anônima, deslogado):
 
 ## 7. Melhorias futuras (opcionais)
 
-- **Renomear `/admin`** para um caminho discreto: camada extra contra
-  robôs. Se fizer, **não** cite o novo nome no `robots.txt`.
+- ~~Renomear o endereço do painel~~ ✅ **feito** em 10/09/2026: saiu de
+  `/adm`+`in` para `/painel-mis`, e o novo nome **não** aparece no
+  `robots.txt` — listá-lo lá entregaria de bandeja o que a troca tirou
+  de vista. O `noindex` de `app/painel-mis/layout.tsx` é quem impede a
+  indexação, inclusive da página de login.

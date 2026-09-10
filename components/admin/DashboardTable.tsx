@@ -275,7 +275,7 @@ export default function DashboardTable({
         throw new Error(body?.erro ?? "Erro ao duplicar o imóvel.");
       }
       // A cópia nasce pausada — abre direto na edição para ajustar
-      router.push(`/admin/imoveis/${body.property.id}`);
+      router.push(`/painel-mis/imoveis/${body.property.id}`);
     } catch (e) {
       setErro(e instanceof Error ? e.message : "Erro ao duplicar o imóvel.");
       setOcupadoId(null);
@@ -309,7 +309,7 @@ export default function DashboardTable({
 
   async function sair() {
     await fetch("/api/admin/auth/logout", { method: "POST" });
-    router.push("/admin/login");
+    router.push("/painel-mis/login");
     router.refresh();
   }
 
@@ -333,14 +333,14 @@ export default function DashboardTable({
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href="/admin/imoveis/novo"
+            href="/painel-mis/imoveis/novo"
             className="inline-flex items-center gap-2 rounded-pill bg-black px-5 py-2.5 text-[13px] font-medium text-white"
           >
             <Plus size={14} aria-hidden="true" />
             Novo imóvel
           </Link>
           <Link
-            href="/admin/leads"
+            href="/painel-mis/leads"
             className="inline-flex items-center gap-2 rounded-pill border border-black/15 px-5 py-2.5 text-[13px] font-medium text-secundario transition-colors hover:border-black"
           >
             <MessageCircle size={14} aria-hidden="true" />
@@ -352,7 +352,7 @@ export default function DashboardTable({
             )}
           </Link>
           <Link
-            href="/admin/conta"
+            href="/painel-mis/conta"
             aria-label="Minha conta"
             className="inline-flex items-center gap-2 rounded-pill border border-black/15 p-2.5 text-secundario transition-colors hover:border-black"
           >
@@ -456,7 +456,7 @@ export default function DashboardTable({
               </p>
             </div>
             <Link
-              href="/admin/suporte"
+              href="/painel-mis/suporte"
               className="flex-none rounded-pill bg-black px-4 py-2 text-[12px] font-medium text-white transition-transform duration-200 ease-premium hover:-translate-y-0.5"
             >
               Ensinar o bot
@@ -723,7 +723,7 @@ export default function DashboardTable({
                           <Copy size={15} aria-hidden="true" />
                         </button>
                         <Link
-                          href={`/admin/imoveis/${p.id}`}
+                          href={`/painel-mis/imoveis/${p.id}`}
                           aria-label={`Editar ${p.codigo}`}
                           className="rounded-full p-2 transition-colors hover:bg-mist"
                         >

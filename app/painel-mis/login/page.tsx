@@ -34,8 +34,8 @@ function LoginForm() {
       });
 
       if (res.ok) {
-        const destino = searchParams.get("de") ?? "/admin";
-        router.push(destino.startsWith("/admin") ? destino : "/admin");
+        const destino = searchParams.get("de") ?? "/painel-mis";
+        router.push(destino.startsWith("/painel-mis") ? destino : "/painel-mis");
         router.refresh();
         return;
       }

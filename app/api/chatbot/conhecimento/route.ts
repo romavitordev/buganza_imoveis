@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * ROTA PÚBLICA — respostas que os corretores escreveram em /admin/suporte.
+ * ROTA PÚBLICA — respostas que os corretores escreveram em /painel-mis/suporte.
  * O widget junta estas com os tópicos fixos de lib/chatbot.ts, então a
  * base do bot cresce sem precisar de deploy.
  *

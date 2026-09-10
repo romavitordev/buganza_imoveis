@@ -104,7 +104,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       celular em um toque, sem digitar o número.
 
       > **Por que vale a pena:** sem ele, o contato é gravado do mesmo
-      > jeito e fica em `/admin/leads` — mas ninguém é avisado, e só é
+      > jeito e fica em `/painel-mis/leads` — mas ninguém é avisado, e só é
       > visto quando alguém lembra de abrir o painel. Contato parado
       > alguns dias é cliente que já ligou para outra imobiliária.
 - [ ] **1.5 — Upstash** (<https://upstash.com>) → rate limit · grátis
@@ -262,7 +262,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 - [ ] **3.6 — Deploy** → botão *Deploy* na Vercel.
 
 - [ ] **3.7 — Subir as fotos, pelo painel**
-      Entre em `/admin`, abra cada imóvel e envie as fotos.
+      Entre em `/painel-mis`, abra cada imóvel e envie as fotos.
       > **Aqui não dá para usar o `importar-fotos.mjs`**: ele só escreve
       > no fallback local. Com o Supabase configurado ele se recusa a
       > rodar, e faz isso de propósito — o painel comprime cada foto no
@@ -287,7 +287,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 - [ ] **4.1 — Abrir o site** e navegar: home, catálogo, um imóvel.
 - [ ] **4.2 — Testar o "deixar contato" do chat** → abra o chat no site,
       escolha deixar contato e envie. Duas coisas têm que acontecer: o
-      registro aparecer em `/admin/leads` **e** chegar o e-mail de aviso.
+      registro aparecer em `/painel-mis/leads` **e** chegar o e-mail de aviso.
       > Se o registro aparecer e o e-mail não, o problema está só nas
       > variáveis do Resend — o contato não se perdeu. Confira
       > `RESEND_API_KEY` e `LEAD_NOTIFY_EMAIL` na Vercel.
@@ -296,7 +296,7 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > que vocês vão responder no dia a dia.
 - [ ] **4.3 — Testar o WhatsApp** → o botão abre a conversa com o número
       certo?
-- [ ] **4.4 — Numa aba anônima:** abrir `/admin` → tem que redirecionar
+- [ ] **4.4 — Numa aba anônima:** abrir `/painel-mis` → tem que redirecionar
       para o login. Abrir `/api/admin/properties` → tem que dar **401**.
 - [ ] **4.5 — Ativar a 2FA** em *Minha conta* (escaneie o QR).
       > Leia antes a seção do `AUTH_SECRET` no DEPLOY.md — trocá-lo
@@ -355,7 +355,7 @@ marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
 ## Depois que estiver no ar
 
 - [ ] Cadastrar o site no **Google Search Console** (indexação)
-- [ ] Ensinar o chatbot em `/admin/suporte` conforme as perguntas chegam
+- [ ] Ensinar o chatbot em `/painel-mis/suporte` conforme as perguntas chegam
 - [ ] Monitoramento de erro (**Sentry**, plano grátis) — hoje, se quebrar
       de madrugada, você só descobre pelo cliente reclamando
 - [ ] Backup do banco. O Neon no plano grátis guarda histórico curto; um

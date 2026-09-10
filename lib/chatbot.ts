@@ -186,7 +186,7 @@ function toleranciaDe(palavra: string): number {
 }
 
 /**
- * Resposta escrita pelos corretores em /admin/suporte. Entra na mesma
+ * Resposta escrita pelos corretores em /painel-mis/suporte. Entra na mesma
  * disputa dos tópicos fixos — assim a base cresce sem deploy.
  */
 export interface TopicoAprendido {

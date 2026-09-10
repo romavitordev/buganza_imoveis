@@ -251,7 +251,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
 
       if (!editando && body?.property?.id) {
         // Recém-criado → vai para a edição para subir as fotos
-        router.push(`/admin/imoveis/${body.property.id}`);
+        router.push(`/painel-mis/imoveis/${body.property.id}`);
         router.refresh();
         return;
       }
@@ -272,7 +272,7 @@ export default function PropertyForm({ property }: PropertyFormProps) {
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <Link
-          href="/admin"
+          href="/painel-mis"
           className="inline-flex items-center gap-2 text-[13px] font-medium text-secundario transition-colors hover:text-black"
         >
           <ArrowLeft size={15} aria-hidden="true" />

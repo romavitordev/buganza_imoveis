@@ -36,7 +36,7 @@ export default async function LeadsPage() {
   return (
     <main className="mx-auto flex max-w-4xl flex-col gap-8 px-4 py-10 md:px-8">
       <Link
-        href="/admin"
+        href="/painel-mis"
         className="inline-flex items-center gap-2 text-[13px] font-medium text-secundario transition-colors hover:text-black"
       >
         <ArrowLeft size={15} aria-hidden="true" />

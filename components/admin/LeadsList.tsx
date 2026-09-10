@@ -176,7 +176,7 @@ export default function LeadsList({
                         <>
                           {" · "}
                           <Link
-                            href={`/admin/imoveis/${lead.imovel.id}`}
+                            href={`/painel-mis/imoveis/${lead.imovel.id}`}
                             className="underline underline-offset-2 hover:text-black"
                           >
                             {lead.imovel.codigo} — {lead.imovel.titulo}

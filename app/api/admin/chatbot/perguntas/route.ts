@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Fila de perguntas sem resposta (/admin/suporte).
+ * Fila de perguntas sem resposta (/painel-mis/suporte).
  *
  * PATCH { id, status } — tira da fila: RESPONDIDA (virou conhecimento)
  * ou IGNORADA (ruído, tipo "ola"/teste). Nada é apagado: o histórico

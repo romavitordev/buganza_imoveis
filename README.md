@@ -85,7 +85,7 @@ npm run dev
 ```
 
 - Site: http://localhost:3000
-- Admin: http://localhost:3000/admin (login com `ADMIN_EMAIL`/`ADMIN_PASSWORD`)
+- Admin: http://localhost:3000/painel-mis (login com `ADMIN_EMAIL`/`ADMIN_PASSWORD`)
 
 ## Qualidade
 
@@ -101,13 +101,13 @@ código — são os que doem se quebrarem:
 | teste | o que impede |
 | --- | --- |
 | `tests/dto.test.ts` | `precoInterno` vazar numa resposta pública |
-| `tests/admin-guard.test.ts` | uma rota nova do painel nascer sem checagem de sessão |
+| `tests/painel-mis-guard.test.ts` | uma rota nova do painel nascer sem checagem de sessão |
 
 ## Segurança
 
 O painel tem **duas camadas independentes**, e isso é proposital:
 
-1. **[middleware.ts](middleware.ts)** — barra `/admin` e `/api/admin` na
+1. **[middleware.ts](middleware.ts)** — barra `/painel-mis` e `/api/admin` na
    borda, antes de chegar na rota.
 2. **No próprio handler** — toda rota do painel começa com
    `barrarSemSessao()` ([lib/session.ts](lib/session.ts)), e toda página
@@ -121,7 +121,7 @@ responder para qualquer um. O próprio Next já teve CVE de bypass de
 middleware (CVE-2025-29927; a versão daqui está corrigida).
 
 Verificado na prática: removendo o `middleware.ts` e reconstruindo, as 23
-rotas do painel continuam devolvendo 401 e `/admin` continua
+rotas do painel continuam devolvendo 401 e `/painel-mis` continua
 redirecionando para o login.
 
 Outras defesas: CSP e cabeçalhos de segurança em
@@ -172,7 +172,7 @@ app/
 components/                # Hero, cena SVG, cards, galeria, admin
 lib/                       # prisma, session (jose), dto, storage, whatsapp…
 prisma/                    # schema + seed
-middleware.ts              # 1ª camada: protege /admin e /api/admin
+middleware.ts              # 1ª camada: protege /painel-mis e /api/admin
 tests/                     # Vitest — inclui as duas regras de negócio
 scripts/                   # banco local, seed de demonstração, limpeza
 ```

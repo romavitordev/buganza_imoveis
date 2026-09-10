@@ -1,14 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/session";
+import { ROTA_LOGIN } from "@/lib/rotas";
 
 /**
  * Protege todo o painel admin e as APIs do admin.
  * Exceções: página de login e endpoint de login.
- * Páginas sem sessão → redirect para /admin/login.
+ * Páginas sem sessão → redirect para o login do painel.
  * APIs sem sessão → 401 JSON.
  */
 
-const ROTAS_LIVRES = ["/admin/login", "/api/admin/auth/login"];
+const ROTAS_LIVRES = [ROTA_LOGIN, "/api/admin/auth/login"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -31,11 +32,14 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  const loginUrl = new URL("/admin/login", request.url);
+  const loginUrl = new URL(ROTA_LOGIN, request.url);
   loginUrl.searchParams.set("de", pathname);
   return NextResponse.redirect(loginUrl);
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  /* O matcher não aceita variável: o Next lê esta configuração em tempo
+     de build, antes de qualquer import rodar. Se ROTA_PAINEL mudar, esta
+     linha muda junto — tests/rotas.test.ts falha se esquecerem. */
+  matcher: ["/painel-mis/:path*", "/api/admin/:path*"],
 };

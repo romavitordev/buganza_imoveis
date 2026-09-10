@@ -171,9 +171,21 @@ const IMOVEIS = [
     slug: "apartamento-fit-campolim",
     tipo: "RESIDENCIAL",
     subtipo: "APARTAMENTO",
-    // PAUSADO pelo mesmo motivo da casa acima: sem transação e sem preço.
+    /**
+     * VENDA confirmada pelos donos em 10/09/2026, junto com os valores.
+     *
+     * O empreendimento tem VÁRIAS unidades à venda, com preços
+     * diferentes: 63 (504.923), 74 (512.779), 96 (495.077),
+     * 101 (485.836), 112 (487.595) e 134 (520.901). Os donos pediram
+     * para anunciar apenas a mais barata — a 101.
+     *
+     * A descrição avisa que existem outras. Sem isso, quem ligasse pelo
+     * valor de 485 mil e recebesse a oferta de uma de 520 mil acharia
+     * que o site estava desatualizado.
+     */
     transacao: "VENDA",
-    status: "PAUSADO",
+    status: "ATIVO",
+    precoVenda: 485836,
     cidade: "Sorocaba",
     bairro: "Campolim",
     areaM2: 55,
@@ -199,6 +211,7 @@ const IMOVEIS = [
       "Apartamento de 55 m² no Fit Campolim, com 2 dormitórios, sendo 1 suíte, e 1 vaga.",
       "Sala de 2 ambientes com varanda.",
       "O prédio conta com piscina, academia, brinquedoteca, salão gourmet, salão de festas e mini market.",
+      "O valor anunciado é o da unidade mais econômica disponível hoje. Há outras unidades no mesmo empreendimento, com valores diferentes — fale com a gente pelo WhatsApp para ver as opções.",
     ].join("\n\n"),
   },
 

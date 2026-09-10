@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Gestão da base aprendida do chatbot (/admin/suporte). Protegida pelo
+ * Gestão da base aprendida do chatbot (/painel-mis/suporte). Protegida pelo
  * middleware (/api/admin) + barrarSemSessao em cada handler, como todas
  * as rotas do painel (defense in depth — ver lib/session.ts).
  *
