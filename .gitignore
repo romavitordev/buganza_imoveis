@@ -53,3 +53,7 @@ pnpm-workspace.yaml
 /fotos/**/*.png
 /fotos/**/*.webp
 /fotos/**/*.heic
+
+# Lista de variaveis para colar na Vercel. Tem as MESMAS credenciais do
+# .env — nunca versionar. Gerada sob demanda; pode ser apagada depois.
+vercel-env.txt

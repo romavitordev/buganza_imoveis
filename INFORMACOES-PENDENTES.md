@@ -59,9 +59,9 @@ listas curtas: **o que falta de verdade** e **o que já foi**.
 
 | # | O que | Risco |
 |---|---|---|
-| B.1 | Registrar `marcelocorretorsorocaba.com.br` (~R$ 40/ano) | 🔴 |
-| B.2 | Criar as contas: Neon, Supabase, Resend, Upstash, Vercel | 🔴 |
-| B.3 | Definir a senha forte do admin (**não** a do exemplo) | 🔴 |
+| ~~B.1~~ | ~~Registrar domínio~~ — `marceloimoveissorocaba.com.br` registrado pelos donos | ✅ |
+| B.2 | Criar a conta na **Vercel** e importar o repositório — Neon, Supabase, Resend e Upstash já estão de pé | 🔴 |
+| ~~B.3~~ | ~~Senha forte do admin~~ — definida e o usuário já criado no Neon | ✅ |
 | B.4 | Revisão da política de privacidade por advogado | 🟠 |
 | B.5 | Agendar o `npm run db:retencao` mensal (LGPD) | 🟡 |
 

@@ -15,10 +15,8 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 
 | bloqueia | o quê | quem |
 | --- | --- | --- |
-| 🔴 tudo | domínio (Fase 0) | você |
-| 🔴 deploy | contas: Neon, Supabase, Resend, Upstash, Vercel (Fase 1) | você |
-| 🟠 anúncio | **fotos dos 7 imóveis** — nenhum tem foto ainda | donos |
-| 🟠 anúncio | transação e preço de Santa Rosália e Fit Campolim | donos |
+| 🔴 deploy | **conta na Vercel + importar o repositório** — é o que falta | você |
+| 🟠 anúncio | transação e preço de **Santa Rosália** (único pausado) | donos |
 | 🟠 legal | confirmar a razão social — está em processo de mudança (2.6) | donos |
 | 🟠 legal | revisão da política de privacidade por advogado | você |
 | 🟡 estética | logotipo oficial em `public/logo.svg` | donos |
@@ -41,7 +39,7 @@ Estas travam o resto. Resolva antes de mexer em plataforma.
 
 - [x] **0.1 — Nome da imobiliária** ✅ confirmado
       **"Marcelo Imóveis Sorocaba"**, em `lib/marca.ts`. O domínio
-      escolhido acompanha: `marcelocorretorsorocaba.com.br`.
+      registrado pelos donos acompanha: `marceloimoveissorocaba.com.br`.
 
 - [x] **0.2 — E-mail de verdade** ✅ feito
       Os donos criaram `marceloimoveissorocaba@gmail.com`, que já está no
@@ -52,9 +50,10 @@ Estas travam o resto. Resolva antes de mexer em plataforma.
       > `contato@seudominio.com.br` (Zoho Mail é grátis para 1 domínio).
       > Não é urgente: o Gmail funciona para tudo.
 
-- [ ] **0.3 — Escolher o domínio**
-      Confira disponibilidade em <https://registro.br> antes de fechar o
-      nome. Prefira `.com.br` (é o que o brasileiro digita).
+- [x] **0.3 — Domínio escolhido e registrado** ✅
+      **`marceloimoveissorocaba.com.br`**, comprado pelos donos. Já
+      resolve no DNS do Registro.br (`a.auto.dns.br` / `b.auto.dns.br`) e
+      ainda não aponta para lugar nenhum — os registros entram no 3.8.
 
 - [x] **0.4 — Senha do admin definida** ✅
       **Não use `admin123`** (é a do exemplo, está no repositório
@@ -73,8 +72,9 @@ Estas travam o resto. Resolva antes de mexer em plataforma.
 
 Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
-- [ ] **1.1 — Registro.br** → registrar o domínio · **R$ 40/ano**
-      Exige CPF/CNPJ. Pague o boleto/PIX; a liberação leva algumas horas.
+- [x] **1.1 — Registro.br** ✅ domínio registrado pelos donos
+      A zona é hospedada no próprio Registro.br, então os registros do
+      3.8 se cadastram lá mesmo, sem trocar servidores DNS.
 - [x] **1.2 — Neon** ✅ (<https://neon.tech>) → banco Postgres · grátis
       Crie o projeto e copie **as DUAS connection strings** que ele
       mostra:
@@ -131,12 +131,13 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       | MIS-0002 | Apto Trix Home Horto | ● ativo |
       | MIS-0003 | Barracão Vila Gabriel | ● ativo |
       | MIS-0004 | Casa Santa Rosália | ⏸ pausado |
-      | MIS-0005 | Apto Fit Campolim | ⏸ pausado |
+      | MIS-0005 | Apto Fit Campolim | ● ativo |
       | MIS-0006 | Casa Aldeia da Mata | ● ativo |
       | MIS-0007 | Casa Bosque São Bento | ● ativo |
 
-      Os dois pausados vieram sem transação e sem preço; ficam invisíveis
-      no site até os dados chegarem.
+      O Fit Campolim recebeu preço depois e foi ativado. Só o Santa
+      Rosália segue pausado, sem transação e sem preço — invisível no
+      site até os dados chegarem.
 
       Para zerar um catálogo (ele **pede confirmação** e mostra se o
       banco é local ou remoto antes de qualquer coisa):

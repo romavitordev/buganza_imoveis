@@ -48,7 +48,7 @@ cp .env.example .env
 | `AUTH_SECRET` | Segredo do JWT (`openssl rand -base64 32`) — obrigatório |
 | `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | Credenciais do Supabase |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Login criado pelo seed |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp que recebe os contatos (confirme o número!) |
+| `WHATSAPP_NUMBER` | WhatsApp que recebe os contatos (confirme o número!) |
 
 ### 4. Criar tabelas e dados de exemplo
 
