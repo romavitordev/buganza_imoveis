@@ -131,10 +131,29 @@ export default function ChatWidget() {
     if (!aberto) return;
     const telaCheia = window.matchMedia("(max-width: 767px)").matches;
     if (!telaCheia) return;
-    const anterior = document.body.style.overflow;
+    // `overflow: hidden` no body basta no Android, mas o Safari do
+    // iOS ignora e a página atrás continua rolando por baixo do chat.
+    // O que ele respeita é o body sair do fluxo: fixamos na posição
+    // atual e devolvemos o visitante exatamente onde estava ao fechar —
+    // sem isso, fechar o chat joga a pessoa de volta ao topo do
+    // catálogo, que é pior que o problema original.
+    const y = window.scrollY;
+    const anterior = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      top: document.body.style.top,
+      width: document.body.style.width,
+    };
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${y}px`;
+    document.body.style.width = "100%";
     return () => {
-      document.body.style.overflow = anterior;
+      document.body.style.overflow = anterior.overflow;
+      document.body.style.position = anterior.position;
+      document.body.style.top = anterior.top;
+      document.body.style.width = anterior.width;
+      window.scrollTo(0, y);
     };
   }, [aberto]);
 
@@ -710,10 +729,15 @@ export default function ChatWidget() {
           /* No mobile ocupa a tela inteira, como um app de conversa: o
              cartão flutuante deixava a bottom nav aparecendo por baixo e
              o teclado do celular espremia a conversa em poucas linhas.
-             100dvh (e não 100vh) porque no iOS a barra do navegador
-             entra na conta do vh e cortava o campo de digitação.
-             No desktop segue como painel flutuante. */
-          className="fixed inset-0 z-[70] flex h-[100dvh] w-full flex-col overflow-hidden border-black/10 bg-white md:inset-auto md:right-6 md:bottom-6 md:h-[560px] md:max-h-[80vh] md:w-[420px] md:rounded-2xl md:border md:shadow-[0_16px_56px_rgba(0,0,0,0.24)]"
+             SEM altura explícita no mobile, de propósito: quem define a
+             caixa é o `inset-0`. Com `top:0`, `bottom:0` E `height`
+             juntos, o CSS resolve a contradição ignorando o `bottom` —
+             o painel passa a ter a altura do viewport dinâmico ancorada
+             no topo e, com a barra do navegador à mostra, sobra uma
+             faixa embaixo pela qual o site atrás aparece. Preso pelos
+             dois lados isso não acontece: o fundo do painel É o fundo
+             da área visível. No desktop segue como painel flutuante. */
+          className="fixed inset-0 z-[70] flex w-full flex-col overflow-hidden overscroll-contain border-black/10 bg-white md:inset-auto md:right-6 md:bottom-6 md:h-[560px] md:max-h-[80vh] md:w-[420px] md:rounded-2xl md:border md:shadow-[0_16px_56px_rgba(0,0,0,0.24)]"
         >
           {/* Cabeçalho */}
           <header className="flex items-center justify-between gap-3 border-b border-black/10 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3">
@@ -756,7 +780,7 @@ export default function ChatWidget() {
           </header>
 
           {/* Conversa */}
-          <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+          <div className="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
             {mensagens.map((m, i) => (
               <div
                 key={i}
