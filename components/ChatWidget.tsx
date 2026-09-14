@@ -61,6 +61,16 @@ import { MARCA } from "@/lib/marca";
 interface Bolha {
   de: "bot" | "user";
   texto: ReactNode;
+  /**
+   * Respeitar as quebras de linha escritas no texto.
+   *
+   * Só a saudação usa. Fora dela o padrão do HTML é o certo: as
+   * respostas do chatbot e o que o admin escreve em /painel-mis/suporte
+   * seguem quebrando pela largura, como sempre quebraram — ligar isso
+   * para todo mundo mudaria a aparência de texto que ninguém pediu para
+   * mudar.
+   */
+  quebras?: boolean;
 }
 
 /**
@@ -93,9 +103,10 @@ const PREFIXO_CATEGORIA = "cat:";
  *
  * O \u00A0 antes do 👋 é espaço que não quebra: sem ele, numa tela
  * estreita o emoji fica órfão na linha de baixo, separado do nome.
- * A bolha usa `whitespace-pre-line`, que respeita o \n E continua
- * quebrando sozinha quando a linha não couber — é o que mantém isto
- * seguro em qualquer largura.
+ * Quem faz o \n valer é o `quebras: true` na bolha desta mensagem, que
+ * liga o `whitespace-pre-line` — e só nela. A classe respeita a quebra
+ * escrita E continua quebrando sozinha quando a linha não couber, que é
+ * o que mantém isto seguro em qualquer largura.
  */
 const SAUDACAO = `Olá! Sou o ${MARCA.assistente}\u00A0👋\nComo posso ajudar?`;
 
@@ -103,7 +114,7 @@ export default function ChatWidget() {
   const pathname = usePathname();
   const [aberto, setAberto] = useState(false);
   const [mensagens, setMensagens] = useState<Bolha[]>([
-    { de: "bot", texto: SAUDACAO },
+    { de: "bot", texto: SAUDACAO, quebras: true },
   ]);
   const [entrada, setEntrada] = useState("");
   /** Bolha de "digitando" no lugar da resposta que ainda vai chegar. */
@@ -196,7 +207,7 @@ export default function ChatWidget() {
       // dele numa troca de página seria pior que a saudação errada).
       setMensagens((atual) =>
         atual.length === 1 && atual[0].de === "bot"
-          ? [{ de: "bot", texto: SAUDACAO }]
+          ? [{ de: "bot", texto: SAUDACAO, quebras: true }]
           : atual
       );
     }
@@ -796,7 +807,9 @@ export default function ChatWidget() {
                 className={m.de === "user" ? "flex justify-end" : "flex justify-start"}
               >
                 <div
-                  className={`max-w-[88%] whitespace-pre-line break-words rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+                  className={`max-w-[88%] break-words rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+                    m.quebras ? "whitespace-pre-line " : ""
+                  }${
                     m.de === "user"
                       ? "bg-black text-white"
                       : "bg-mist text-black/80"
