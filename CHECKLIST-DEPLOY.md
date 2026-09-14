@@ -15,7 +15,7 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 
 | bloqueia | o quê | quem |
 | --- | --- | --- |
-| 🟠 agora | **DNS propagar** — os dois registros já estão salvos no Registro.br | espera |
+| 🟠 agora | certificado do **apex** (sem `www`) sendo emitido — o `www` já está no ar | espera |
 | 🟠 depois | ativar a 2FA e testar o "deixar contato" de ponta a ponta | você |
 | 🟠 anúncio | transação e preço de **Santa Rosália** (único pausado) | donos |
 | 🟠 legal | confirmar a razão social — está em processo de mudança (2.6) | donos |
@@ -283,7 +283,20 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > número da casa na fachada, placa de carro. O site publica
       > exatamente o que sobe.
 
-- [ ] **3.8 — Apontar o domínio** — feito do seu lado, aguardando DNS
+- [x] **3.8 — Domínio no ar** ✅ <https://www.marceloimoveissorocaba.com.br>
+      Responde 200 com certificado válido; `http://` redireciona para
+      `https://`; sitemap e robots saem com o endereço próprio.
+
+      > O apex (sem `www`) já resolve para `76.76.21.21`, mas o
+      > certificado dele é emitido separadamente e pode levar alguns
+      > minutos a mais. Até lá, `https://marceloimoveissorocaba.com.br`
+      > falha na conexão e o `www` funciona normal — não é erro de
+      > configuração, é fila da emissão.
+      >
+      > A publicação da zona no Registro.br demorou horas, não minutos:
+      > os registros ficaram salvos no painel e ausentes da zona esse
+      > tempo todo. Se acontecer de novo num domínio recém-registrado,
+      > é esperar a janela de transição, não refazer o cadastro.
       Na Vercel estão os dois: `www` como **Production** e o apex
       redirecionando para ele com **308 permanente** (permanente, e não
       307, para o Google consolidar tudo num endereço só).
