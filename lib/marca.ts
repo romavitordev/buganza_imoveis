@@ -48,12 +48,24 @@ export const MARCA = {
   /**
    * Perfil do Instagram, sem o @.
    *
-   * PROVISÓRIO: é o perfil pessoal, e eles pretendem migrar para um @
-   * da imobiliária. Quando migrarem, trocar aqui — e só aqui.
+   * É o perfil da imobiliária, informado pelos donos em 14/09/2026 — a
+   * migração que estava prevista aconteceu, e o perfil pessoal
+   * (nina_buganza) saiu do site.
    */
-  instagram: "nina_buganza",
-  /** Página no Facebook. Vazio = o link não aparece no rodapé. */
-  facebook: "Imóvel Vago Sorocaba",
+  instagram: "marceloimoveissorocaba",
+  /**
+   * Página no Facebook. Vazio = o link não aparece no rodapé.
+   *
+   * É um PERFIL PESSOAL, não uma página da imobiliária — decisão dos
+   * donos em 14/09/2026, cientes disso. Se um dia criarem uma página da
+   * empresa, trocar aqui e o rodapé acompanha.
+   *
+   * Guardado o endereço final, e não o link de compartilhamento
+   * (facebook.com/share/…) que chegou: aquele é um encurtador com
+   * rastreador na query, e encurtador de rede social é exatamente o
+   * tipo de link que para de funcionar sem avisar.
+   */
+  facebook: "https://www.facebook.com/marina.magliodejesusbuganzapereira",
 } as const;
 
 /**

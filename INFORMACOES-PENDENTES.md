@@ -22,8 +22,8 @@ listas curtas: **o que falta de verdade** e **o que já foi**.
 |---|---|---|---|
 | A.1 | Mais depoimentos (3 já no ar) | `lib/depoimentos.ts` | 🟢 |
 | A.2 | **Confirmar a razão social** | `CONTROLADOR`, em `lib/marca.ts` | 🟠 |
-| A.3 | **Link da página no Facebook** | `MARCA.facebook` | 🟡 |
-| A.4 | **@ definitivo do Instagram** | `MARCA.instagram` | 🟡 |
+| ~~A.3~~ | ~~Link do Facebook~~ — endereço informado em 14/09/2026 | ✅ |
+| ~~A.4~~ | ~~@ do Instagram~~ — perfil da imobiliária no ar | ✅ |
 | A.5 | Foto do casal para o Quem Somos | `components/QuemSomos.tsx` | 🟢 |
 
 > **A.1 — resolvido.** Em 07/09/2026 chegaram três depoimentos reais —
@@ -44,14 +44,20 @@ listas curtas: **o que falta de verdade** e **o que já foi**.
 > identificação do controlador que a LGPD exige (art. 9º) aponta para
 > uma empresa que não existe mais.
 >
-> **A.4** — Hoje está `nina_buganza`, o perfil **pessoal**, por decisão
-> dos donos enquanto o perfil da imobiliária não existe. Está certo para
-> hoje; vira problema no dia em que migrarem e ninguém trocar aqui.
+> **A.4 — resolvido.** A migração prevista aconteceu: o perfil agora é
+> `marceloimoveissorocaba`, da imobiliária, e o pessoal saiu do site.
 >
-> **A.3** — O rodapé aponta para uma busca por "Imóvel Vago Sorocaba"
-> em vez do endereço da página, porque o permalink não foi informado.
-> Funciona, mas é um clique a mais e depende do que o Facebook resolver
-> mostrar.
+> **A.3 — resolvido, com uma ressalva que é decisão dos donos.** O
+> rodapé deixou de cair numa busca e passou a linkar um endereço
+> direto — mas o endereço é de um **perfil pessoal**, não de uma página
+> da empresa. Eles foram avisados disso e optaram assim. No dia em que
+> criarem uma página da imobiliária, trocar `MARCA.facebook` e o
+> rodapé acompanha.
+>
+> O que foi guardado é o endereço final, não o link de
+> compartilhamento (`facebook.com/share/…`) que chegou: encurtador de
+> rede social carrega rastreador na query e para de funcionar sem
+> avisar.
 
 ---
 
