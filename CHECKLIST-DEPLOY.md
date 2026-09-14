@@ -15,7 +15,8 @@ decisão, conta em plataforma e texto que só os donos podem escrever.
 
 | bloqueia | o quê | quem |
 | --- | --- | --- |
-| 🔴 deploy | **conta na Vercel + importar o repositório** — é o que falta | você |
+| 🟠 agora | **DNS propagar** — os dois registros já estão salvos no Registro.br | espera |
+| 🟠 depois | ativar a 2FA e testar o "deixar contato" de ponta a ponta | você |
 | 🟠 anúncio | transação e preço de **Santa Rosália** (único pausado) | donos |
 | 🟠 legal | confirmar a razão social — está em processo de mudança (2.6) | donos |
 | 🟠 legal | revisão da política de privacidade por advogado | você |
@@ -27,9 +28,10 @@ CNPJ, WhatsApp e e-mail são reais; os depoimentos são de três clientes
 de verdade; os 7 imóveis estão cadastrados com dados vindos dos donos.
 Nada de inventado está no ar.
 
-O que falta é **foto**. Um catálogo sem foto abre e funciona, mas não
-vende: ninguém decide visitar um imóvel que não viu. É a única coisa
-entre o site pronto e o site útil.
+As **100 fotos** subiram e o site **está no ar** em
+<https://buganza-imoveis.vercel.app>. O que falta é o domínio próprio
+responder: os dois registros de DNS já estão salvos no Registro.br e
+aguardam a zona publicar. Nada abaixo depende de programação.
 
 ---
 
@@ -109,8 +111,8 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > alguns dias é cliente que já ligou para outra imobiliária.
 - [x] **1.5 — Upstash** ✅ (<https://upstash.com>) → rate limit · grátis
       Crie um banco **Redis** e copie a **URL e o token REST**.
-- [ ] **1.6 — Vercel** (<https://vercel.com>) → hospedagem
-      Entre com a conta do GitHub.
+- [x] **1.6 — Vercel** ✅ projeto `buganza-imoveis` criado
+      Entrou pela conta do GitHub, com o repositório conectado.
       > ⚠️ O plano Hobby é oficialmente **não-comercial**. Para uma
       > imobiliária, o correto é o **Pro (US$ 20/mês ≈ R$ 110)**. Dá para
       > começar no Hobby validando, mas saiba do risco.
@@ -202,11 +204,11 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
 
 ## Fase 3 — Deploy
 
-- [ ] **3.1 — Importar o repositório na Vercel**
+- [x] **3.1 — Repositório importado** ✅
       *Add New → Project* → `romavitordev/buganza_imoveis`. Ainda **não**
       clique em Deploy: cadastre as variáveis primeiro.
 
-- [ ] **3.2 — Cadastrar as variáveis de ambiente**
+- [x] **3.2 — Variáveis cadastradas** ✅ as 11, em *Production and Preview*
       Em *Settings → Environment Variables*:
 
       | Variável | De onde vem |
@@ -259,7 +261,11 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > que estão sem transação e sem preço). Os pausados não aparecem no
       > site — quando os dados chegarem, é editar e ativar no painel.
 
-- [ ] **3.6 — Deploy** → botão *Deploy* na Vercel.
+- [x] **3.6 — Deploy** ✅ no ar em <https://buganza-imoveis.vercel.app>
+      O projeto foi criado sem disparar build (a Vercel só cria o deploy
+      de produção a partir de um push no `main`). Se um dia a tela
+      disser "No Production Deployment", é isso: falta um push, não há
+      o que consertar.
 
 - [x] **3.7 — Fotos no Supabase** ✅ feito
       As 100 subiram por `scripts/importar-fotos.ts`, que usa o MESMO
@@ -277,15 +283,40 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       > número da casa na fachada, placa de carro. O site publica
       > exatamente o que sobe.
 
-- [ ] **3.8 — Apontar o domínio**
-      Na Vercel: *Settings → Domains* → adicione seu domínio. Ela mostra
-      os registros DNS; cadastre-os no painel do Registro.br.
+- [ ] **3.8 — Apontar o domínio** — feito do seu lado, aguardando DNS
+      Na Vercel estão os dois: `www` como **Production** e o apex
+      redirecionando para ele com **308 permanente** (permanente, e não
+      307, para o Google consolidar tudo num endereço só).
+
+      No Registro.br, em *Configurar endereçamento → MODO AVANÇADO*:
+
+      | TIPO | NOME | DADOS |
+      |---|---|---|
+      | CNAME | `www` | `0e648435c4cb5816.vercel-dns-017.com` |
+      | A | *(vazio = raiz)* | `76.76.21.21` |
+
+      > **São dois registros, não dois domínios.** Para o DNS, o nome
+      > puro e o `www` são nomes diferentes e cada um precisa da sua
+      > linha. O visitante continua vendo um endereço só.
+      >
+      > O CNAME é **único por projeto** — o valor acima vale para este
+      > projeto da Vercel e mais nenhum. Se o projeto for recriado, o
+      > valor muda.
+      >
+      > O editor do Registro.br **não aceita `@`**: o apex se escreve
+      > deixando o campo Nome vazio.
+      >
+      > Quando a zona publicar, a Vercel troca sozinha o "Invalid
+      > Configuration" por "Valid" e emite o certificado. Não precisa
+      > clicar em *Refresh*.
 
 ---
 
 ## Fase 4 — Verificação (não pule)
 
-- [ ] **4.1 — Abrir o site** e navegar: home, catálogo, um imóvel.
+- [x] **4.1 — Site no ar** ✅ home, catálogo e página de imóvel em 200.
+      Os **6 ativos** aparecem e o Santa Rosália (pausado) não —
+      conferido no HTML publicado, não só no painel.
 - [ ] **4.2 — Testar o "deixar contato" do chat** → abra o chat no site,
       escolha deixar contato e envie. Duas coisas têm que acontecer: o
       registro aparecer em `/painel-mis/leads` **e** chegar o e-mail de aviso.
@@ -295,10 +326,13 @@ Todas têm plano gratuito. Use o e-mail da 0.2 em todas.
       >
       > Teste **clicando no link do WhatsApp dentro do e-mail**: é assim
       > que vocês vão responder no dia a dia.
-- [ ] **4.3 — Testar o WhatsApp** → o botão abre a conversa com o número
-      certo?
-- [ ] **4.4 — Numa aba anônima:** abrir `/painel-mis` → tem que redirecionar
-      para o login. Abrir `/api/admin/properties` → tem que dar **401**.
+- [x] **4.3 — WhatsApp** ✅ `/api/contato` redireciona para
+      `wa.me/5515998036636`, e o número **não aparece** no HTML —
+      prova de que o server-only está funcionando como projetado.
+- [x] **4.4 — Painel protegido** ✅ `/painel-mis` devolve 307 para o
+      login e `/api/admin/properties` devolve 401, deslogado.
+      Cabeçalhos conferidos na resposta: CSP, HSTS, X-Frame-Options
+      e X-Content-Type-Options.
 - [ ] **4.5 — Ativar a 2FA** em *Minha conta* (escaneie o QR).
       > Leia antes a seção do `AUTH_SECRET` no DEPLOY.md — trocá-lo
       > depois **derruba a 2FA**.
@@ -340,10 +374,11 @@ marca). Se o arquivo for PNG em vez de SVG, mude `ARQUIVO_LOGO` no topo de
 
 **Ainda precisa mexer à mão em:**
 - [ ] `app/icon.svg` — o favicon (desenho próprio, marinho + dourado)
-- [ ] `components/QuemSomos.tsx` — o texto da história
-- [ ] `lib/depoimentos.ts` — hoje a lista está **vazia**, e com ela
-      vazia a seção some sozinha da home. Basta acrescentar os
-      depoimentos reais (nome, contexto e texto) para ela reaparecer.
+- [x] `components/QuemSomos.tsx` — a história real dos donos, feita no 2.2
+- [x] `lib/depoimentos.ts` — três depoimentos reais no ar desde o 2.3.
+      Com a lista vazia a seção some sozinha da home; para acrescentar
+      outros, é editar o arquivo (nome, contexto e texto), sempre com
+      autorização de quem falou.
 - [x] **Os números do Quem Somos** ✅ resolvido
       Sobraram **+15 anos de mercado** e **100% acompanhamento pessoal**,
       os dois vindos dos donos. O "+400 imóveis negociados" era projeção
