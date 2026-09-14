@@ -55,6 +55,57 @@ listas curtas: **o que falta de verdade** e **o que já foi**.
 
 ---
 
+## Falta — dados dos imóveis, campo a campo
+
+Levantado **direto do banco de produção em 13/09/2026**, não de
+anotação — o que está abaixo é o que o Neon realmente não tem hoje.
+Substitui o antigo `IMOVEIS-A-CADASTRAR.md`, que era o documento de
+digitação dos 7 e cumpriu seu papel quando eles entraram no ar.
+
+Todo campo aqui se preenche pelo painel, em *Imóveis → editar*.
+
+### 🔴 Está no ar sem preço
+
+| Imóvel | Problema |
+|---|---|
+| **MIS-0003 — Barracão Vila Gabriel** | ATIVO, para locação, **sem valor de aluguel** |
+
+Um anúncio publicado sem preço faz o visitante sair da página: ou ele
+acha que é caro demais para estar escrito, ou desiste de perguntar. Se
+for proposital ("sob consulta"), tudo bem — mas é bom que seja decisão,
+não esquecimento.
+
+### 🟠 Segura o MIS-0004 (Santa Rosália) pausado
+
+Falta **preço de venda**, **área construída** e **banheiros**. Enquanto
+o preço não vier, ele fica invisível no site — que é o certo. Os outros
+seis estão ativos.
+
+### 🟡 Ficha incompleta, mas publicável
+
+| Campo | Quem está sem |
+|---|---|
+| banheiros | todos menos o Ibiti (0001) |
+| vagas | Barracão (0003), Aldeia (0006), Bosque (0007), Ibiti (0001) |
+| área construída | Santa Rosália (0004), Aldeia (0006) |
+
+Ficha vazia não quebra nada, mas cada campo em branco é uma pergunta a
+mais que chega no WhatsApp — e uma comparação a menos que o visitante
+consegue fazer sozinho.
+
+### Fotos — todas no ar
+
+**100 fotos**, distribuídas nos sete (12 · 9 · 15 · 8 · 18 · 25 · 13),
+com a capa escolhida em cada um. Nada pendente aqui.
+
+> **Ao trocar ou acrescentar foto, olhe o que ela mostra.** Telefone em
+> placa de "aluga-se", número da casa na fachada, placa de carro, nome
+> de rua. Número da casa mais fachada, num anúncio que diz que o imóvel
+> está vazio, basta para localizar o lugar. O site publica exatamente o
+> que sobe — não há edição automática.
+
+---
+
 ## Falta — providências suas, fora do conteúdo
 
 | # | O que | Risco |
