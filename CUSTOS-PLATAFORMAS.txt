@@ -1,0 +1,199 @@
+===============================================================
+QUANDO O SITE COMECA A CUSTAR DINHEIRO
+Marcelo Imoveis Sorocaba - levantado em 14/09/2026
+===============================================================
+
+Este arquivo responde uma pergunta so: a partir de quando cada
+plataforma que mantem o site no ar deixa de ser gratuita.
+
+Os numeros de consumo foram MEDIDOS no banco e no bucket em
+14/09/2026, nao estimados. Os limites dos planos gratuitos foram
+conferidos nas paginas oficiais na mesma data - eles mudam, entao
+reconfira antes de tomar decisao com base neste arquivo.
+
+Cotacao usada nas conversoes: US$ 1 = R$ 5,50.
+
+
+---------------------------------------------------------------
+RESUMO EM TRES LINHAS
+---------------------------------------------------------------
+
+1. Vercel: R$ 110/mes AGORA. Nao e questao de uso, e de regra.
+2. Neon: provavelmente a primeira a apertar por uso. Cobra por
+   consumo, sem mensalidade minima.
+3. Supabase: ~R$ 140/mes quando o movimento chegar a umas 40
+   visitas por dia.
+
+
+---------------------------------------------------------------
+1. VERCEL - hospedagem - PAGAR AGORA
+---------------------------------------------------------------
+
+Plano hoje : Hobby (gratuito)
+Plano certo: Pro - US$ 20/mes (~R$ 110)
+
+ISSO NAO DEPENDE DE TRAFEGO. A politica de uso justo da Vercel
+diz, com todas as letras:
+
+  "Hobby teams are restricted to non-commercial personal use
+   only. All commercial usage of the platform requires either a
+   Pro or Enterprise plan."
+
+E a definicao de uso comercial alcanca o site por dois caminhos
+independentes:
+
+  - "advertising the sale of a product or service"
+    O site e um catalogo de imoveis a venda e para locacao.
+
+  - "receiving payment to create, update, or host the site"
+    Alcanca ate quem escreveu o codigo, se foi pago para isso.
+
+Ou seja: o site esta em desacordo desde que subiu. Nenhum volume
+de trafego conserta isso, e o risco nao e cobranca retroativa - e
+a conta ser pausada, com o site fora do ar sem aviso util.
+
+Os limites tecnicos do Hobby, para constar, sao folgados e NAO
+sao o problema aqui: 100 GB de transferencia, 1 milhao de
+invocacoes de funcao e 4 horas de CPU ativa por mes.
+
+Fonte: vercel.com/docs/limits/fair-use-guidelines
+
+
+---------------------------------------------------------------
+2. NEON - banco de dados - A PRIMEIRA A APERTAR POR USO
+---------------------------------------------------------------
+
+Plano hoje : Free
+Consumo    : 8,15 MB de banco  (1,6% do limite de 0,5 GB)
+Proximo    : Launch - por uso, SEM mensalidade minima
+             US$ 0,106 por CU-hora, US$ 0,35 por GB-mes
+
+O limite que importa NAO e espaco, e processamento:
+100 CU-hours por mes.
+
+No plano gratuito o compute e de 0,25 CU. A conta fica:
+
+  100 CU-hours / 0,25 CU = 400 horas de banco ACORDADO por mes
+  400 h / 30 dias        = cerca de 13 horas por dia
+
+O banco dorme sozinho depois de alguns minutos sem uso. Com
+visita espalhada ao longo do dia ele acorda e nao dorme mais - e
+13 h/dia de banco acordado e plausivel para um site com movimento
+comercial normal. O ISR (as paginas ficam em cache por 5 minutos)
+segura bastante, mas nao zera.
+
+POR QUE VIGIAR ESTA PRIMEIRO: estourar o limite SUSPENDE o
+compute ate o mes virar. Na pratica o painel para de abrir e a
+busca para de funcionar. As outras plataformas degradam; esta
+desliga.
+
+Fonte: neon.com/pricing
+
+
+---------------------------------------------------------------
+3. SUPABASE - fotos - ~40 VISITAS/DIA
+---------------------------------------------------------------
+
+Plano hoje : Free
+Consumo    : 31,7 MB em 100 arquivos (3,1% do limite de 1 GB)
+             media de 324 KB por foto
+Proximo    : Pro - US$ 25/mes (~R$ 140)
+
+O teto NAO e o 1 GB de armazenamento. Nesse ritmo o catalogo pode
+crescer umas 30 vezes antes de encostar nele.
+
+O teto e o TRAFEGO DE SAIDA: 5 GB por mes.
+
+  Uma visita que abre o catalogo e entra num imovel puxa cerca
+  de 3,5 MB de foto.
+
+  5 GB / 3,5 MB = por volta de 1.400 visitas engajadas por mes
+                = entre 40 e 50 por dia
+
+O plano gratuito tem mais 5 GB de "cached egress", que pode
+praticamente dobrar esse numero. Por isso a faixa de 1.200 a
+1.500 visitas, e nao um numero exato.
+
+Fonte: supabase.com/pricing
+
+
+---------------------------------------------------------------
+4. RESEND e UPSTASH - longe
+---------------------------------------------------------------
+
+Resend (aviso de lead por e-mail)
+  Gratuito ate 3.000 e-mails por mes. So lead vira e-mail, entao
+  seriam 100 contatos POR DIA para apertar.
+
+Upstash (rate limit)
+  Conta so as chamadas de limite de requisicao. Volume
+  desprezivel no uso de uma imobiliaria local.
+
+Nenhuma das duas e preocupacao previsivel.
+
+
+---------------------------------------------------------------
+5. REGISTRO.BR - dominio
+---------------------------------------------------------------
+
+R$ 40 por ano, ja recorrente. Proxima renovacao: setembro/2027.
+
+ATENCAO: dominio .com.br nao renovado e liberado para qualquer
+um registrar. Vale deixar o pagamento em debito automatico ou um
+lembrete no calendario - perder o dominio custa muito mais que
+os R$ 40.
+
+
+---------------------------------------------------------------
+O QUE ESTE ARQUIVO NAO SABE
+---------------------------------------------------------------
+
+Armazenamento e tamanho de banco foram lidos direto da fonte.
+TRAFEGO CONSUMIDO ATE AGORA, NAO - isso so existe no painel de
+cada plataforma.
+
+Os numeros de "quando vai apertar" acima sao MODELO, nao leitura.
+A verdade mora em:
+
+  Supabase -> Settings -> Usage
+  Neon     -> Monitoring  (olhar CU-hours do mes)
+  Vercel   -> Usage
+
+SUGESTAO: olhar os tres daqui a um mes, com trafego real, e
+comparar com o que esta escrito aqui. Se a realidade divergir,
+corrigir este arquivo - estimativa que ninguem revisita vira
+numero inventado com cara de fato.
+
+
+---------------------------------------------------------------
+UM RISCO QUE NAO E DE LIMITE
+---------------------------------------------------------------
+
+A pagina da Supabase diz que projetos gratuitos sao PAUSADOS
+apos 1 semana de inatividade.
+
+O detalhe do nosso caso: a Supabase e usada SO para Storage. O
+Postgres dela esta vazio, porque o banco do site e o Neon. Se a
+contagem de inatividade olhar o banco e nao o storage, o projeto
+pode ser pausado mesmo com o site recebendo visita - e as fotos
+param de carregar.
+
+Nao foi possivel confirmar se requisicao de storage conta como
+atividade. Vale observar nas primeiras semanas. Se acontecer, o
+plano Pro resolve (ele impede o pausamento), e a correcao passa a
+ser urgente, nao planejada.
+
+
+---------------------------------------------------------------
+CUSTO TOTAL, POR ETAPA
+---------------------------------------------------------------
+
+Hoje                    R$ 110/mes   (Vercel Pro)
++ quando o Neon apertar por uso, sem mensalidade minima
++ a ~40 visitas/dia     R$ 140/mes   (Supabase Pro)
+                        --------------------------------
+Cenario com movimento   ~R$ 250/mes  + R$ 40/ano do dominio
+
+Para efeito de comparacao: um unico anuncio em portal
+imobiliario costuma custar mais que isso sozinho, e nao deixa
+nada construido no fim do mes.
