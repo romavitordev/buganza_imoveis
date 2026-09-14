@@ -88,7 +88,16 @@ const PREFIXO_CATEGORIA = "cat:";
  * busca foi para o placeholder do campo — onde ele é lido no momento
  * exato de digitar, e não antes.
  */
-const SAUDACAO = `Olá! Sou o ${MARCA.assistente} 👋 Como posso ajudar?`;
+/**
+ * A quebra depois do emoji é escrita, não sorteada pela largura da tela.
+ *
+ * O \u00A0 antes do 👋 é espaço que não quebra: sem ele, numa tela
+ * estreita o emoji fica órfão na linha de baixo, separado do nome.
+ * A bolha usa `whitespace-pre-line`, que respeita o \n E continua
+ * quebrando sozinha quando a linha não couber — é o que mantém isto
+ * seguro em qualquer largura.
+ */
+const SAUDACAO = `Olá! Sou o ${MARCA.assistente}\u00A0👋\nComo posso ajudar?`;
 
 export default function ChatWidget() {
   const pathname = usePathname();
@@ -787,7 +796,7 @@ export default function ChatWidget() {
                 className={m.de === "user" ? "flex justify-end" : "flex justify-start"}
               >
                 <div
-                  className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
+                  className={`max-w-[88%] whitespace-pre-line break-words rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
                     m.de === "user"
                       ? "bg-black text-white"
                       : "bg-mist text-black/80"
