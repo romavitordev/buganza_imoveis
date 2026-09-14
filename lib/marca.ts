@@ -54,18 +54,15 @@ export const MARCA = {
    */
   instagram: "marceloimoveissorocaba",
   /**
-   * Página no Facebook. Vazio = o link não aparece no rodapé.
+   * Perfil no Facebook, sem a URL — o `urlFacebook` monta o endereço.
    *
-   * É um PERFIL PESSOAL, não uma página da imobiliária — decisão dos
-   * donos em 14/09/2026, cientes disso. Se um dia criarem uma página da
-   * empresa, trocar aqui e o rodapé acompanha.
-   *
-   * Guardado o endereço final, e não o link de compartilhamento
-   * (facebook.com/share/…) que chegou: aquele é um encurtador com
-   * rastreador na query, e encurtador de rede social é exatamente o
-   * tipo de link que para de funcionar sem avisar.
+   * É o perfil profissional da corretora, informado pelos donos em
+   * 14/09/2026. Guardado só o handle, e não o link que chegou: aquele
+   * vinha com `rdid` e `share_url` na query, rastreadores de
+   * compartilhamento que não têm por que ir parar no rodapé de um site
+   * público.
    */
-  facebook: "https://www.facebook.com/marina.magliodejesusbuganzapereira",
+  facebook: "marinabuganzacorretora",
 } as const;
 
 /**
